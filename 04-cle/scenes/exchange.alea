@@ -1,0 +1,41 @@
+// Exchange — two strangers in a square where everyone listens. Two rails,
+// "you" and "the other"; between them the square, an ear. Said aloud, at
+// the top: the clock, 23, and the jump, 5. Each chooses a secret number of
+// jumps (in a box, kept, in vermilion), jumps it and says the result,
+// which flies across; each takes the other's number and jumps their own
+// secret again; both land on the key. The square heard the four numbers
+// said aloud, and has a question mark. Times are the scene's own (0 to 1).
+// What it returns: 0 paper, up to 1 ink.
+
+work Exchange(a = 6, b = 15, A = 8, B = 19, key = 2, public0 = 0.05, secret0 = 0.18, send0 = 0.32, flight = 0.06, again0 = 0.55, key0 = 0.68, heard0 = 0.8, accent = 0) {
+  let left = 0.2
+  let right = 0.8
+  let rails = merge(line(left, 0.28, left, 1.15, 0.004, 0.002), line(right, 0.28, right, 1.15, 0.004, 0.002)) * 0.4
+  let heads = merge(text("you", left, 0.22, 0.03, 0, "mono"), text("the other", right, 0.22, 0.03, 0, "mono")) * 0.7
+  // the square: everyone, in the middle, listening
+  let ear = merge(cut(circle(0.5, 0.7, 0.1, 0.002), circle(0.5, 0.7, 0.085, 0.002)), cut(circle(0.5, 0.7, 0.05, 0.002), circle(0.5, 0.7, 0.035, 0.002))) * 0.4
+  let earlabel = text("everyone", 0.5, 0.79, 0.026, 0, "mono") * 0.5
+  // said aloud: the clock and the jump
+  let public = merge(text("clock  23", 0.5, 0.34, 0.034, 0, "mono"), text("jump   5", 0.5, 0.39, 0.034, 0, "mono")) * smoothstep(public0, public0 + 0.03, t) * 0.8
+  // the secrets, kept in a box on each rail
+  let box(cx) = cut(rect(cx, 0.5, 0.12, 0.07, 0, 0.002), rect(cx, 0.5, 0.112, 0.062, 0, 0.002))
+  let secrets = merge(box(left), box(right), text("secret", left, 0.56, 0.022, 0, "mono") * 0.5, text("secret", right, 0.56, 0.022, 0, "mono") * 0.5) * smoothstep(secret0, secret0 + 0.03, t)
+  let sa = text("{a}", left, 0.5, 0.045, 0, "mono") * smoothstep(secret0 + 0.03, secret0 + 0.05, t)
+  let sb = text("{b}", right, 0.5, 0.045, 0, "mono") * smoothstep(secret0 + 0.08, secret0 + 0.1, t)
+  // the results, said aloud: they fly across, and stay on the other side
+  let fly(start, from, to, y0, words) = merge(
+      glow(x: from + (to - from) * clamp((t - start) / flight, 0, 1), y: y0, size: 0.07) * (t > start) * (t < start + flight + 0.01),
+      line(from, y0, from + (to - from) * clamp((t - start) / flight, 0, 1), y0, 0.003, 0.002) * (t > start) * 0.35,
+      text(words, from, y0 - 0.04, 0.045, 0, "mono") * smoothstep(start - 0.04, start - 0.02, t),
+      text(words, to, y0 + 0.04, 0.045, 0, "mono") * smoothstep(start + flight, start + flight + 0.02, t) * 0.8)
+  let sendA = fly(send0, left, right, 0.62, "{A}")
+  let sendB = fly(send0 + flight + 0.06, right, left, 0.86, "{B}")
+  // again: each jumps their secret on the other's number
+  let again = merge(text("{B}  × 5, {a} times", left, 1.0, 0.028, 0, "mono"), text("{A}  × 5, {b} times", right, 1.0, 0.028, 0, "mono")) * smoothstep(again0, again0 + 0.03, t) * 0.7
+  let keys = merge(text("{key}", left, 1.08, 0.08, 0, "mono"), text("{key}", right, 1.08, 0.08, 0, "mono")) * smoothstep(key0, key0 + 0.03, t)
+  let keylabel = text("the key", 0.5, 1.08, 0.03, 0, "mono") * smoothstep(key0 + 0.04, key0 + 0.07, t) * 0.6
+  // what the square heard
+  let heard = merge(text("heard:  23  5  {A}  {B}", 0.5, 1.22, 0.03, 0, "mono") * 0.6, text("?", 0.5, 0.7, 0.07, 0, "serif")) * smoothstep(heard0, heard0 + 0.03, t)
+  output accent * merge(sa, sb, keys)
+         + (1 - accent) * merge(rails, heads, ear, earlabel, public, secrets, sendA, sendB, again, keylabel, heard)
+}

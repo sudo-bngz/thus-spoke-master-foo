@@ -21,6 +21,7 @@ captions translate him.
 | 01 | [Algorithme](01-algorithme/) | What is an algorithm? A recipe: steps, in order, until the work is done. Two recipes sort the same sixteen cards (insertion, merging); a counter adds up their comparisons, and for a thousand cards the difference is a large square against a small one. | 1 min 40 |
 | 02 | [Aléa](02-alea/) | Can a computer roll a die? It fakes chance: fifteen bits slide along a register, the last two mixed and fed back (an LFSR, the noise of old game consoles), grown step by step in alea from the edition's own seed. Same seed, same numbers; one bit changed, another tape. Real chance comes from the world. Master Foo speaks Japanese. | 1 min 47 |
 | 03 | [Hachage](03-hachage/) | What is a hash? A fingerprint for data: any text in, 256 bits out, always the same for the same text; change one letter and half the bits flip; no way back. A password kept as its hash, a git commit named by it, a download checked by it. The fingerprints are real SHA-256 digests, to check with `sha256sum`. | 1 min 46 |
+| 04 | [Clé](04-cle/) | How do two strangers agree on a secret in a square where everyone listens? Arithmetic on a clock of 23 hours, a prime; jumping by 5 visits every hour; forward is easy, backward is the discrete logarithm. Each keeps a secret number of jumps, says the result aloud, and both land on the same key (Diffie–Hellman, with the real numbers). The lock in the browser. | 2 min 10 |
 
 ## Render
 
@@ -44,6 +45,10 @@ alea alea.alea --seed 0xa161 -o out/               # the seed shown in the film
 cd ../03-hachage
 python3 gen.py
 alea hachage.alea --seed 0xa162 -o out/
+
+cd ../04-cle
+python3 gen.py
+alea cle.alea --seed 0xa163 -o out/
 ```
 
 Master Foo's Japanese needs misaki, Kokoro's pronunciation library:
@@ -71,12 +76,17 @@ fonts/                  Noto Sans JP (subset, OFL), for the katakana and the sea
   gen.py                the script, and the SHA-256 digests of the texts shown, as bits
   hachage.alea          the Reel; the edition chooses which letter the avalanche changes
   scenes/               koan, digest, fingerprint, avalanche, oneway, uses
+04-cle/
+  gen.py                the script, and the numbers of the exchange, checked (23, 5, 6, 15 → 8, 19 → 2)
+  cle.alea              the Reel
+  scenes/               koan, clock, oneway, exchange, lock
 lib/episode.py          what the generators share: the voice measured, the captions typed, the layout
 ```
 
 ## The voices
 
 - Master Foo: `bm_george` in 01; from 02, `jm_kumo`, in Japanese.
+- The mix keeps a small room (`room: 0.12`) and no echo, so the voices stay clear.
 - The explanation: `af_heart`.
 
 The captions are typed as the words are said; `gen.py` writes them, since

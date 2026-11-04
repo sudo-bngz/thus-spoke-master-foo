@@ -149,5 +149,5 @@ work Algorithme {
   ]
 
   render image(look, width: 1080, height: 1920, at: 0.4289)
-  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.45, echo: 0.12)
+  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.12, echo: 0)
 }

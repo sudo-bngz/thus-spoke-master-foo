@@ -15,7 +15,7 @@ SEED = "0xa161"                     # the edition published; shown in the film
 EN_ENGINE = "../voices/kokoro.py"
 JA_ENGINE = "../voices/kokoro-ja.py"
 NARRATOR = ("af_heart", 0.95)
-MASTER = ("jm_kumo", 0.85)
+MASTER = ("jm_kumo", 0.82)
 
 LEAD, GAP, HOLD = 1.4, 1.0, 2.0
 
@@ -255,7 +255,7 @@ def main():
   ]
 """)
     w(f"  render image(look, width: 1080, height: 1920, at: {(S['lfsr'] + L['lfsr'] * 0.75) / total:.4f})")
-    w("  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.45, echo: 0.12)")
+    w("  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.12, echo: 0)")
     w("}")
     with open(os.path.join(HERE, "alea.alea"), "w") as f:
         f.write("\n".join(out) + "\n")

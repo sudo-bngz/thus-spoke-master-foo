@@ -256,7 +256,7 @@ def main():
   ]
 """)
     w(f"  render image(look, width: 1080, height: 1920, at: {(S['insertion'] + L['insertion'] * 0.62) / total:.4f})")
-    w("  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.45, echo: 0.12)")
+    w("  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.12, echo: 0)")
     w("}")
     with open(os.path.join(HERE, "algorithme.alea"), "w") as f:
         f.write("\n".join(out) + "\n")

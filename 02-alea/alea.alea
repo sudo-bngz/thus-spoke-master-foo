@@ -15,31 +15,31 @@ use "scenes/seed.alea"
 use "scenes/entropy.alea"
 
 work Alea {
-  let total = 107.2
+  let total = 108.0
   let T = t * total
   let EN = "../voices/kokoro.py"
   let JA = "../voices/kokoro-ja.py"
 
   // ── the voices: the master, in Japanese; the one who explains, in English ──
-  let m1 = say("ある弟子が、フー師に乱数をひとつ求めた。", at: 1.40, engine: JA, voice: "jm_kumo", speed: 0.85, gain: 2.3)
-  let m2 = say("師は答えた。七。", at: m1.end + 1.0, engine: JA, voice: "jm_kumo", speed: 0.85, gain: 2.3)
-  let m3 = say("弟子はもう一度たずねた。師は答えた。七。", at: m2.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.85, gain: 2.3)
-  let n1 = say("A computer cannot roll a die.", at: 18.30, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
+  let m1 = say("ある弟子が、フー師に乱数をひとつ求めた。", at: 1.40, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let m2 = say("師は答えた。七。", at: m1.end + 1.0, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let m3 = say("弟子はもう一度たずねた。師は答えた。七。", at: m2.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let n1 = say("A computer cannot roll a die.", at: 18.90, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n2 = say("It only follows recipes, and the same recipe always gives the same answer.", at: n1.end + 1.0, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
-  let n3 = say("So it fakes chance, with a recipe that scrambles bits.", at: 30.00, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
+  let n3 = say("So it fakes chance, with a recipe that scrambles bits.", at: 30.60, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n4 = say("Fifteen bits slide to the right. The last two are mixed, and the result comes back at the start.", at: n3.end + 1.0, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n5 = say("Step after step, the bits that fall out look like chance.", at: n4.end + 1.4, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n6 = say("Played fast, they are noise: the very noise of an old game console.", at: n5.end + 1.6, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n7 = say("But after thirty-two thousand, seven hundred and sixty-seven steps, it all starts again.", at: n6.end + 1.4, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
-  let n8 = say("The bits it starts from are its seed.", at: 59.30, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
+  let n8 = say("The bits it starts from are its seed.", at: 59.90, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n9 = say("Same seed, same numbers. Every time.", at: n8.end + 1.2, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n10 = say("Change a single bit, and everything changes.", at: n9.end + 1.2, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n11 = say("This film, too, was drawn from a seed. Another seed, another film.", at: n10.end + 1.6, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
-  let n12 = say("When chance must be real, for a password or a key, the machine listens to the world:", at: 78.60, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
+  let n12 = say("When chance must be real, for a password or a key, the machine listens to the world:", at: 79.20, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n13 = say("the timing of your keys, the moves of your mouse, the noise in its own circuits.", at: n12.end + 0.8, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n14 = say("It stirs them into a seed that no one can guess.", at: n13.end + 1.2, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
-  let m4 = say("そして師は、弟子にたねを渡した。", at: 96.10, engine: JA, voice: "jm_kumo", speed: 0.85, gain: 2.3)
-  let m5 = say("その時、弟子は悟った。", at: m4.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.85, gain: 2.3)
+  let m4 = say("そして師は、弟子にたねを渡した。", at: 96.70, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let m5 = say("その時、弟子は悟った。", at: m4.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
 
   // ── the register: fifteen bits from the edition's seed; at each generation
   // they slide right and the last two, mixed, come back at the start. Each row
@@ -61,12 +61,12 @@ work Alea {
   let fit(piece) = zoom(piece, by: 0.82, x: 0.5, y: 0.66)
   let ink(piece, accent) = overlay(paint(fit(piece), palette: PAPER, range: [0, 1]), paint(fit(accent), palette: ["#000000", "#c23b22"], range: [0, 1], alpha: fit(accent)))
   let reel = timeline([
-      scene(ink(Koan(draw0: ((m1.start) - 0.00) / 16.9, draw1: ((m1.end) - 0.00) / 16.9, word: ((m3.end + 0.8) - 0.00) / 16.9, title: ((m3.end + 1.0) - 0.00) / 16.9, kana: ["ラ", "ン", "ダ", "ム"], episode: "02  ·  chance", big: "7", bigat: [((m2.end - 0.5) - 0.00) / 16.9, ((m3.end - 0.5) - 0.00) / 16.9], bigoff: ((m3.end + 0.5) - 0.00) / 16.9, accent: 0), Koan(draw0: ((m1.start) - 0.00) / 16.9, draw1: ((m1.end) - 0.00) / 16.9, word: ((m3.end + 0.8) - 0.00) / 16.9, title: ((m3.end + 1.0) - 0.00) / 16.9, kana: ["ラ", "ン", "ダ", "ム"], episode: "02  ·  chance", big: "7", bigat: [((m2.end - 0.5) - 0.00) / 16.9, ((m3.end - 0.5) - 0.00) / 16.9], bigoff: ((m3.end + 0.5) - 0.00) / 16.9, accent: 1)), 16.9),  wipe(0.8, angle: 0, softness: 0.12),
-      scene(ink(Machine(die: ((n1.words[3]) - 16.90) / 11.7, strike: ((n1.end) - 16.90) / 11.7, box: ((n2.words[3]) - 16.90) / 11.7, runs: [((n2.words[7]) - 16.90) / 11.7, ((n2.words[9]) - 16.90) / 11.7, ((n2.words[12]) - 16.90) / 11.7], accent: 0), Machine(die: ((n1.words[3]) - 16.90) / 11.7, strike: ((n1.end) - 16.90) / 11.7, box: ((n2.words[3]) - 16.90) / 11.7, runs: [((n2.words[7]) - 16.90) / 11.7, ((n2.words[9]) - 16.90) / 11.7, ((n2.words[12]) - 16.90) / 11.7], accent: 1)), 11.7),  glitch(0.6, amount: 0.5),
-      scene(ink(Lfsr(reg: reg, s0: ((s0) - 28.60) / 29.3, s1: ((s1) - 28.60) / 29.3, mix: ((n4.words[10]) - 28.60) / 29.3, period: ((n7.words[2]) - 28.60) / 29.3, accent: 0), Lfsr(reg: reg, s0: ((s0) - 28.60) / 29.3, s1: ((s1) - 28.60) / 29.3, mix: ((n4.words[10]) - 28.60) / 29.3, period: ((n7.words[2]) - 28.60) / 29.3, accent: 1)), 29.3),  wipe(0.7, angle: 90, softness: 0.1),
-      scene(ink(Seed(r: reg, flip: 3, show: [((n8.words[7]) - 57.90) / 19.3, ((n9.words[0]) - 57.90) / 19.3, ((n10.words[3]) - 57.90) / 19.3], fill: 1.6 / 19.3, cmd: "$ alea alea.alea --seed 0xa161", typed: [((n11.words[8]) - 57.90) / 19.3, ((n11.end) - 57.90) / 19.3], accent: 0), Seed(r: reg, flip: 3, show: [((n8.words[7]) - 57.90) / 19.3, ((n9.words[0]) - 57.90) / 19.3, ((n10.words[3]) - 57.90) / 19.3], fill: 1.6 / 19.3, cmd: "$ alea alea.alea --seed 0xa161", typed: [((n11.words[8]) - 57.90) / 19.3, ((n11.end) - 57.90) / 19.3], accent: 1)), 19.3),  morph(0.8, amount: 0.15),
-      scene(ink(Entropy(when: [((n13.words[4]) - 77.20) / 17.5, ((n13.words[9]) - 77.20) / 17.5, ((n13.words[15]) - 77.20) / 17.5], stir: ((n14.words[1]) - 77.20) / 17.5, seed: ((n14.words[5]) - 77.20) / 17.5, accent: 0), Entropy(when: [((n13.words[4]) - 77.20) / 17.5, ((n13.words[9]) - 77.20) / 17.5, ((n13.words[15]) - 77.20) / 17.5], stir: ((n14.words[1]) - 77.20) / 17.5, seed: ((n14.words[5]) - 77.20) / 17.5, accent: 1)), 17.5),  wipe(0.8, angle: 180, softness: 0.12),
-      scene(ink(Koan(draw0: ((m4.start) - 94.70) / 12.5, draw1: ((m5.end) - 94.70) / 12.5, word: ((m4.start + 1.0) - 94.70) / 12.5, title: ((m5.end + 0.6) - 94.70) / 12.5, kana: ["ラ", "ン", "ダ", "ム"], episode: "02  ·  chance", accent: 0), Koan(draw0: ((m4.start) - 94.70) / 12.5, draw1: ((m5.end) - 94.70) / 12.5, word: ((m4.start + 1.0) - 94.70) / 12.5, title: ((m5.end + 0.6) - 94.70) / 12.5, kana: ["ラ", "ン", "ダ", "ム"], episode: "02  ·  chance", accent: 1)), 12.5),  morph(1.2, amount: 0.2),
+      scene(ink(Koan(draw0: ((m1.start) - 0.00) / 17.5, draw1: ((m1.end) - 0.00) / 17.5, word: ((m3.end + 0.8) - 0.00) / 17.5, title: ((m3.end + 1.0) - 0.00) / 17.5, kana: ["ラ", "ン", "ダ", "ム"], episode: "02  ·  chance", big: "7", bigat: [((m2.end - 0.5) - 0.00) / 17.5, ((m3.end - 0.5) - 0.00) / 17.5], bigoff: ((m3.end + 0.5) - 0.00) / 17.5, accent: 0), Koan(draw0: ((m1.start) - 0.00) / 17.5, draw1: ((m1.end) - 0.00) / 17.5, word: ((m3.end + 0.8) - 0.00) / 17.5, title: ((m3.end + 1.0) - 0.00) / 17.5, kana: ["ラ", "ン", "ダ", "ム"], episode: "02  ·  chance", big: "7", bigat: [((m2.end - 0.5) - 0.00) / 17.5, ((m3.end - 0.5) - 0.00) / 17.5], bigoff: ((m3.end + 0.5) - 0.00) / 17.5, accent: 1)), 17.5),  wipe(0.8, angle: 0, softness: 0.12),
+      scene(ink(Machine(die: ((n1.words[3]) - 17.50) / 11.7, strike: ((n1.end) - 17.50) / 11.7, box: ((n2.words[3]) - 17.50) / 11.7, runs: [((n2.words[7]) - 17.50) / 11.7, ((n2.words[9]) - 17.50) / 11.7, ((n2.words[12]) - 17.50) / 11.7], accent: 0), Machine(die: ((n1.words[3]) - 17.50) / 11.7, strike: ((n1.end) - 17.50) / 11.7, box: ((n2.words[3]) - 17.50) / 11.7, runs: [((n2.words[7]) - 17.50) / 11.7, ((n2.words[9]) - 17.50) / 11.7, ((n2.words[12]) - 17.50) / 11.7], accent: 1)), 11.7),  glitch(0.6, amount: 0.5),
+      scene(ink(Lfsr(reg: reg, s0: ((s0) - 29.20) / 29.3, s1: ((s1) - 29.20) / 29.3, mix: ((n4.words[10]) - 29.20) / 29.3, period: ((n7.words[2]) - 29.20) / 29.3, accent: 0), Lfsr(reg: reg, s0: ((s0) - 29.20) / 29.3, s1: ((s1) - 29.20) / 29.3, mix: ((n4.words[10]) - 29.20) / 29.3, period: ((n7.words[2]) - 29.20) / 29.3, accent: 1)), 29.3),  wipe(0.7, angle: 90, softness: 0.1),
+      scene(ink(Seed(r: reg, flip: 3, show: [((n8.words[7]) - 58.50) / 19.3, ((n9.words[0]) - 58.50) / 19.3, ((n10.words[3]) - 58.50) / 19.3], fill: 1.6 / 19.3, cmd: "$ alea alea.alea --seed 0xa161", typed: [((n11.words[8]) - 58.50) / 19.3, ((n11.end) - 58.50) / 19.3], accent: 0), Seed(r: reg, flip: 3, show: [((n8.words[7]) - 58.50) / 19.3, ((n9.words[0]) - 58.50) / 19.3, ((n10.words[3]) - 58.50) / 19.3], fill: 1.6 / 19.3, cmd: "$ alea alea.alea --seed 0xa161", typed: [((n11.words[8]) - 58.50) / 19.3, ((n11.end) - 58.50) / 19.3], accent: 1)), 19.3),  morph(0.8, amount: 0.15),
+      scene(ink(Entropy(when: [((n13.words[4]) - 77.80) / 17.5, ((n13.words[9]) - 77.80) / 17.5, ((n13.words[15]) - 77.80) / 17.5], stir: ((n14.words[1]) - 77.80) / 17.5, seed: ((n14.words[5]) - 77.80) / 17.5, accent: 0), Entropy(when: [((n13.words[4]) - 77.80) / 17.5, ((n13.words[9]) - 77.80) / 17.5, ((n13.words[15]) - 77.80) / 17.5], stir: ((n14.words[1]) - 77.80) / 17.5, seed: ((n14.words[5]) - 77.80) / 17.5, accent: 1)), 17.5),  wipe(0.8, angle: 180, softness: 0.12),
+      scene(ink(Koan(draw0: ((m4.start) - 95.30) / 12.7, draw1: ((m5.end) - 95.30) / 12.7, word: ((m4.start + 1.0) - 95.30) / 12.7, title: ((m5.end + 0.6) - 95.30) / 12.7, kana: ["ラ", "ン", "ダ", "ム"], episode: "02  ·  chance", accent: 0), Koan(draw0: ((m4.start) - 95.30) / 12.7, draw1: ((m5.end) - 95.30) / 12.7, word: ((m4.start + 1.0) - 95.30) / 12.7, title: ((m5.end + 0.6) - 95.30) / 12.7, kana: ["ラ", "ン", "ダ", "ム"], episode: "02  ·  chance", accent: 1)), 12.7),  morph(1.2, amount: 0.2),
   ], loop: 1)
 
   // ── over it: the series, the step, the captions (the master's, translated, in vermilion) ──
@@ -143,6 +143,6 @@ work Alea {
     notes(reel.cues, instrument: brush, scale: "chromatic", key: 100, gain: 0.3),
   ]
 
-  render image(look, width: 1080, height: 1920, at: 0.4718)
-  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.45, echo: 0.12)
+  render image(look, width: 1080, height: 1920, at: 0.4738)
+  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.12, echo: 0)
 }

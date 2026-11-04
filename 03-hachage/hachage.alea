@@ -16,30 +16,30 @@ use "scenes/oneway.alea"
 use "scenes/uses.alea"
 
 work Hachage {
-  let total = 106.0
+  let total = 107.2
   let T = t * total
   let EN = "../voices/kokoro.py"
   let JA = "../voices/kokoro-ja.py"
 
   // ── the voices: the master, in Japanese; the one who explains, in English ──
-  let m1 = say("ある弟子が、フー師に手紙を託した。", at: 1.40, engine: JA, voice: "jm_kumo", speed: 0.85, gain: 2.3)
-  let m2 = say("途中で誰かが書き換えたら、どう分かりますか。", at: m1.end + 1.0, engine: JA, voice: "jm_kumo", speed: 0.85, gain: 2.3)
-  let m3 = say("師は手紙を読み、封筒にひとつの言葉を書いた。", at: m2.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.85, gain: 2.3)
-  let n1 = say("A hash is a fingerprint for data.", at: 20.70, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
+  let m1 = say("ある弟子が、フー師に手紙を託した。", at: 1.40, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let m2 = say("途中で誰かが書き換えたら、どう分かりますか。", at: m1.end + 1.0, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let m3 = say("師は手紙を読み、封筒にひとつの言葉を書いた。", at: m2.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let n1 = say("A hash is a fingerprint for data.", at: 21.40, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n2 = say("Any text goes in: a word, a sentence, a whole book.", at: n1.end + 1.0, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n3 = say("Out comes a code, always the same size: two hundred and fifty-six bits.", at: n2.end + 1.0, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n4 = say("The same text always gives the same fingerprint.", at: n3.end + 1.6, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
-  let n5 = say("Change a single letter, and the fingerprint changes completely.", at: 40.40, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
+  let n5 = say("Change a single letter, and the fingerprint changes completely.", at: 41.10, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n6 = say("About half of the bits flip, as if by chance. This is called the avalanche.", at: n5.end + 1.2, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
-  let n7 = say("And there is no way back: from the fingerprint, you cannot find the text.", at: 53.60, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
+  let n7 = say("And there is no way back: from the fingerprint, you cannot find the text.", at: 54.30, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n8 = say("Only by trying every text there is, which would take longer than the universe has existed.", at: n7.end + 1.2, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
-  let n9 = say("That is why a website keeps only the hash of your password, never the password.", at: 68.00, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
+  let n9 = say("That is why a website keeps only the hash of your password, never the password.", at: 68.70, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n10 = say("Why every commit in git is named by its hash.", at: n9.end + 1.0, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n11 = say("And why a file's fingerprint tells you it was not changed on the way.", at: n10.end + 1.0, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
   let n12 = say("A hash is a seal. Change one letter, and the seal breaks.", at: n11.end + 1.6, engine: EN, voice: "af_heart", speed: 0.95, gain: 2.3)
-  let m4 = say("手紙は戻ってきた。一文字だけ、変わっていた。", at: 89.40, engine: JA, voice: "jm_kumo", speed: 0.85, gain: 2.3)
-  let m5 = say("封筒の言葉は、もう合わなかった。", at: m4.end + 1.2, engine: JA, voice: "jm_kumo", speed: 0.85, gain: 2.3)
-  let m6 = say("その時、弟子は悟った。", at: m5.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.85, gain: 2.3)
+  let m4 = say("手紙は戻ってきた。一文字だけ、変わっていた。", at: 90.10, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let m5 = say("封筒の言葉は、もう合わなかった。", at: m4.end + 1.2, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let m6 = say("その時、弟子は悟った。", at: m5.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
 
   // ── the fingerprints: SHA-256, computed by gen.py, as bits ──
   let SENTENCE = "thus spoke master foo"
@@ -63,12 +63,12 @@ work Hachage {
   let fit(piece) = zoom(piece, by: 0.82, x: 0.5, y: 0.66)
   let ink(piece, accent) = overlay(paint(fit(piece), palette: PAPER, range: [0, 1]), paint(fit(accent), palette: ["#000000", "#c23b22"], range: [0, 1], alpha: fit(accent)))
   let reel = timeline([
-      scene(ink(Koan(draw0: ((m1.start) - 0.00) / 19.3, draw1: ((m1.end) - 0.00) / 19.3, word: ((m3.end + 0.8) - 0.00) / 19.3, title: ((m3.end + 1.0) - 0.00) / 19.3, kana: ["ハ", "ッ", "シ", "ュ"], episode: "03  ·  hash", big: "2df1", bigsize: 0.13, bigat: [((m3.start + 0.72 * m3.duration) - 0.00) / 19.3, ((m3.end + 5) - 0.00) / 19.3], bigoff: ((m3.end + 0.5) - 0.00) / 19.3, accent: 0), Koan(draw0: ((m1.start) - 0.00) / 19.3, draw1: ((m1.end) - 0.00) / 19.3, word: ((m3.end + 0.8) - 0.00) / 19.3, title: ((m3.end + 1.0) - 0.00) / 19.3, kana: ["ハ", "ッ", "シ", "ュ"], episode: "03  ·  hash", big: "2df1", bigsize: 0.13, bigat: [((m3.start + 0.72 * m3.duration) - 0.00) / 19.3, ((m3.end + 5) - 0.00) / 19.3], bigoff: ((m3.end + 0.5) - 0.00) / 19.3, accent: 1)), 19.3),  wipe(0.8, angle: 0, softness: 0.12),
-      scene(ink(Fingerprint(sentence: SENTENCE, hex1: HEX1, hex2: HEXB, short: bits1, long: bitsb, type0: ((n2.words[0]) - 19.30) / 19.7, type1: ((n2.words[3]) - 19.30) / 19.7, in1: ((n2.words[6]) - 19.30) / 19.7, out1: ((n2.words[6] + 0.6) - 19.30) / 19.7, book: ((n2.words[9]) - 19.30) / 19.7, in2: ((n2.end + 0.4) - 19.30) / 19.7, out2: ((n3.words[1]) - 19.30) / 19.7, size: ((n3.words[8]) - 19.30) / 19.7, again: ((n4.words[1]) - 19.30) / 19.7, in3: ((n4.words[3]) - 19.30) / 19.7, out3: ((n4.words[6]) - 19.30) / 19.7, accent: 0), Fingerprint(sentence: SENTENCE, hex1: HEX1, hex2: HEXB, short: bits1, long: bitsb, type0: ((n2.words[0]) - 19.30) / 19.7, type1: ((n2.words[3]) - 19.30) / 19.7, in1: ((n2.words[6]) - 19.30) / 19.7, out1: ((n2.words[6] + 0.6) - 19.30) / 19.7, book: ((n2.words[9]) - 19.30) / 19.7, in2: ((n2.end + 0.4) - 19.30) / 19.7, out2: ((n3.words[1]) - 19.30) / 19.7, size: ((n3.words[8]) - 19.30) / 19.7, again: ((n4.words[1]) - 19.30) / 19.7, in3: ((n4.words[3]) - 19.30) / 19.7, out3: ((n4.words[6]) - 19.30) / 19.7, accent: 1)), 19.7),  pixels(0.6, size: 0.05),
-      scene(ink(Avalanche(s1: SENTENCE, s2: sentences[v], pos: positions[v], a: bits1, b: bitsv[v], changed: changed[v], show1: ((n5.start - 0.8) - 39.00) / 13.2, show2: ((n5.words[3]) - 39.00) / 13.2, flip: ((n6.words[0]) - 39.00) / 13.2, tally: ((n6.words[8]) - 39.00) / 13.2, accent: 0), Avalanche(s1: SENTENCE, s2: sentences[v], pos: positions[v], a: bits1, b: bitsv[v], changed: changed[v], show1: ((n5.start - 0.8) - 39.00) / 13.2, show2: ((n5.words[3]) - 39.00) / 13.2, flip: ((n6.words[0]) - 39.00) / 13.2, tally: ((n6.words[8]) - 39.00) / 13.2, accent: 1)), 13.2),  wipe(0.7, angle: 90, softness: 0.1),
-      scene(ink(Oneway(bits: bits1, back: ((n7.words[6]) - 52.20) / 14.4, strike: ((n7.words[11]) - 52.20) / 14.4, trying: ((n8.words[2]) - 52.20) / 14.4, accent: 0), Oneway(bits: bits1, back: ((n7.words[6]) - 52.20) / 14.4, strike: ((n7.words[11]) - 52.20) / 14.4, trying: ((n8.words[2]) - 52.20) / 14.4, accent: 1)), 14.4),  morph(0.8, amount: 0.15),
-      scene(ink(Uses(when: [((n9.words[4]) - 66.60) / 21.4, ((n10.words[1]) - 66.60) / 21.4, ((n11.words[2]) - 66.60) / 21.4], pwhex: PWHEX, githex: GITHEX, filehex: FILEHEX, accent: 0), Uses(when: [((n9.words[4]) - 66.60) / 21.4, ((n10.words[1]) - 66.60) / 21.4, ((n11.words[2]) - 66.60) / 21.4], pwhex: PWHEX, githex: GITHEX, filehex: FILEHEX, accent: 1)), 21.4),  wipe(0.8, angle: 180, softness: 0.12),
-      scene(ink(Koan(draw0: ((m4.start) - 88.00) / 18.0, draw1: ((m6.end) - 88.00) / 18.0, word: ((m6.start + 0.5) - 88.00) / 18.0, title: ((m6.end + 0.6) - 88.00) / 18.0, kana: ["ハ", "ッ", "シ", "ュ"], episode: "03  ·  hash", big: "2df1", big2: hexv[v], swap: 1, bigsize: 0.13, bigat: [((m4.start + 0.3) - 88.00) / 18.0, ((m5.start + 0.5) - 88.00) / 18.0], bigoff: ((m5.end + 0.3) - 88.00) / 18.0, accent: 0), Koan(draw0: ((m4.start) - 88.00) / 18.0, draw1: ((m6.end) - 88.00) / 18.0, word: ((m6.start + 0.5) - 88.00) / 18.0, title: ((m6.end + 0.6) - 88.00) / 18.0, kana: ["ハ", "ッ", "シ", "ュ"], episode: "03  ·  hash", big: "2df1", big2: hexv[v], swap: 1, bigsize: 0.13, bigat: [((m4.start + 0.3) - 88.00) / 18.0, ((m5.start + 0.5) - 88.00) / 18.0], bigoff: ((m5.end + 0.3) - 88.00) / 18.0, accent: 1)), 18.0),  morph(1.2, amount: 0.2),
+      scene(ink(Koan(draw0: ((m1.start) - 0.00) / 20.0, draw1: ((m1.end) - 0.00) / 20.0, word: ((m3.end + 0.8) - 0.00) / 20.0, title: ((m3.end + 1.0) - 0.00) / 20.0, kana: ["ハ", "ッ", "シ", "ュ"], episode: "03  ·  hash", big: "2df1", bigsize: 0.13, bigat: [((m3.start + 0.72 * m3.duration) - 0.00) / 20.0, ((m3.end + 5) - 0.00) / 20.0], bigoff: ((m3.end + 0.5) - 0.00) / 20.0, accent: 0), Koan(draw0: ((m1.start) - 0.00) / 20.0, draw1: ((m1.end) - 0.00) / 20.0, word: ((m3.end + 0.8) - 0.00) / 20.0, title: ((m3.end + 1.0) - 0.00) / 20.0, kana: ["ハ", "ッ", "シ", "ュ"], episode: "03  ·  hash", big: "2df1", bigsize: 0.13, bigat: [((m3.start + 0.72 * m3.duration) - 0.00) / 20.0, ((m3.end + 5) - 0.00) / 20.0], bigoff: ((m3.end + 0.5) - 0.00) / 20.0, accent: 1)), 20.0),  wipe(0.8, angle: 0, softness: 0.12),
+      scene(ink(Fingerprint(sentence: SENTENCE, hex1: HEX1, hex2: HEXB, short: bits1, long: bitsb, type0: ((n2.words[0]) - 20.00) / 19.7, type1: ((n2.words[3]) - 20.00) / 19.7, in1: ((n2.words[6]) - 20.00) / 19.7, out1: ((n2.words[6] + 0.6) - 20.00) / 19.7, book: ((n2.words[9]) - 20.00) / 19.7, in2: ((n2.end + 0.4) - 20.00) / 19.7, out2: ((n3.words[1]) - 20.00) / 19.7, size: ((n3.words[8]) - 20.00) / 19.7, again: ((n4.words[1]) - 20.00) / 19.7, in3: ((n4.words[3]) - 20.00) / 19.7, out3: ((n4.words[6]) - 20.00) / 19.7, accent: 0), Fingerprint(sentence: SENTENCE, hex1: HEX1, hex2: HEXB, short: bits1, long: bitsb, type0: ((n2.words[0]) - 20.00) / 19.7, type1: ((n2.words[3]) - 20.00) / 19.7, in1: ((n2.words[6]) - 20.00) / 19.7, out1: ((n2.words[6] + 0.6) - 20.00) / 19.7, book: ((n2.words[9]) - 20.00) / 19.7, in2: ((n2.end + 0.4) - 20.00) / 19.7, out2: ((n3.words[1]) - 20.00) / 19.7, size: ((n3.words[8]) - 20.00) / 19.7, again: ((n4.words[1]) - 20.00) / 19.7, in3: ((n4.words[3]) - 20.00) / 19.7, out3: ((n4.words[6]) - 20.00) / 19.7, accent: 1)), 19.7),  pixels(0.6, size: 0.05),
+      scene(ink(Avalanche(s1: SENTENCE, s2: sentences[v], pos: positions[v], a: bits1, b: bitsv[v], changed: changed[v], show1: ((n5.start - 0.8) - 39.70) / 13.2, show2: ((n5.words[3]) - 39.70) / 13.2, flip: ((n6.words[0]) - 39.70) / 13.2, tally: ((n6.words[8]) - 39.70) / 13.2, accent: 0), Avalanche(s1: SENTENCE, s2: sentences[v], pos: positions[v], a: bits1, b: bitsv[v], changed: changed[v], show1: ((n5.start - 0.8) - 39.70) / 13.2, show2: ((n5.words[3]) - 39.70) / 13.2, flip: ((n6.words[0]) - 39.70) / 13.2, tally: ((n6.words[8]) - 39.70) / 13.2, accent: 1)), 13.2),  wipe(0.7, angle: 90, softness: 0.1),
+      scene(ink(Oneway(bits: bits1, back: ((n7.words[6]) - 52.90) / 14.4, strike: ((n7.words[11]) - 52.90) / 14.4, trying: ((n8.words[2]) - 52.90) / 14.4, accent: 0), Oneway(bits: bits1, back: ((n7.words[6]) - 52.90) / 14.4, strike: ((n7.words[11]) - 52.90) / 14.4, trying: ((n8.words[2]) - 52.90) / 14.4, accent: 1)), 14.4),  morph(0.8, amount: 0.15),
+      scene(ink(Uses(when: [((n9.words[4]) - 67.30) / 21.4, ((n10.words[1]) - 67.30) / 21.4, ((n11.words[2]) - 67.30) / 21.4], pwhex: PWHEX, githex: GITHEX, filehex: FILEHEX, accent: 0), Uses(when: [((n9.words[4]) - 67.30) / 21.4, ((n10.words[1]) - 67.30) / 21.4, ((n11.words[2]) - 67.30) / 21.4], pwhex: PWHEX, githex: GITHEX, filehex: FILEHEX, accent: 1)), 21.4),  wipe(0.8, angle: 180, softness: 0.12),
+      scene(ink(Koan(draw0: ((m4.start) - 88.70) / 18.5, draw1: ((m6.end) - 88.70) / 18.5, word: ((m6.start + 0.5) - 88.70) / 18.5, title: ((m6.end + 0.6) - 88.70) / 18.5, kana: ["ハ", "ッ", "シ", "ュ"], episode: "03  ·  hash", big: "2df1", big2: hexv[v], swap: 1, bigsize: 0.13, bigat: [((m4.start + 0.3) - 88.70) / 18.5, ((m5.start + 0.5) - 88.70) / 18.5], bigoff: ((m5.end + 0.3) - 88.70) / 18.5, accent: 0), Koan(draw0: ((m4.start) - 88.70) / 18.5, draw1: ((m6.end) - 88.70) / 18.5, word: ((m6.start + 0.5) - 88.70) / 18.5, title: ((m6.end + 0.6) - 88.70) / 18.5, kana: ["ハ", "ッ", "シ", "ュ"], episode: "03  ·  hash", big: "2df1", big2: hexv[v], swap: 1, bigsize: 0.13, bigat: [((m4.start + 0.3) - 88.70) / 18.5, ((m5.start + 0.5) - 88.70) / 18.5], bigoff: ((m5.end + 0.3) - 88.70) / 18.5, accent: 1)), 18.5),  morph(1.2, amount: 0.2),
   ], loop: 1)
 
   // ── over it: the series, the step, the captions (the master's, translated, in vermilion) ──
@@ -146,6 +146,6 @@ work Hachage {
     notes(reel.cues, instrument: brush, scale: "chromatic", key: 100, gain: 0.3),
   ]
 
-  render image(look, width: 1080, height: 1920, at: 0.4738)
-  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.45, echo: 0.12)
+  render image(look, width: 1080, height: 1920, at: 0.4750)
+  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.12, echo: 0)
 }

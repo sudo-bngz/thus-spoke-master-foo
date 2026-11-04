@@ -1,0 +1,38 @@
+// Oneway — forward is easy, backward is not. The same clock; from 1, `a`
+// jumps of × 5 land on `A`: the chords drawn one by one, the count. Then
+// the way back: from `A`, how many jumps? A counter tries 1, 2, 3… and the
+// chords are redrawn for every try, until it finds `a`. Then the clock
+// grows huge: a clock of hundreds of digits. `path` is the hours on the
+// way (gen.py). `accent: 1` gives only the hour landed on and the question
+// mark. Times are the scene's own (0 to 1). What it returns: 0 paper, up
+// to 1 ink.
+
+work Oneway(path = [1, 5, 2, 10, 4, 20, 8], a = 6, A = 8, fwd0 = 0.05, fwd1 = 0.25, back0 = 0.4, back1 = 0.75, big = 0.85, accent = 0) {
+  let cx = 0.5
+  let cy = 0.62
+  let grown = 1 + 2.2 * ease(progress(big, big + 0.12), "in")
+  let R = 0.3 * grown
+  let P(h) = [cx + R * sin(tau * h / 23), cy - R * cos(tau * h / 23)]
+  let Q(h) = [cx + (R + 0.05) * sin(tau * h / 23), cy - (R + 0.05) * cos(tau * h / 23)]
+  let faded = 1 - 0.25 * progress(big, big + 0.12)
+  let face = cut(circle(cx, cy, 2 * R, 0.003), circle(cx, cy, 2 * R - 0.006, 0.003)) * 0.5
+  let ticks = merge([circle(P(h).x, P(h).y, 0.014, 0.002) for h in range(23)]) * 0.5
+  let numbers = merge([text("{h}", Q(h).x, Q(h).y, 0.024, 0, "mono") for h in range(23)]) * 0.6 * (t < big)
+  // forward: the chords one by one
+  let K = floor((a + 0.999) * clamp((t - fwd0) / (fwd1 - fwd0), 0, 1))
+  let chord(k) = line(P(path[k]).x, P(path[k]).y, P(path[k + 1]).x, P(path[k + 1]).y, 0.005, 0.002)
+  let fwd = merge([chord(k) * (k < K) for k in range(a)]) * 0.5
+  let landed = circle(P(A).x, P(A).y, 0.034, 0.002) * (K >= a)
+  let fwdtext = merge(text("1  × 5, {a} times", 0.5, 1.08, 0.04, 0, "mono") * smoothstep(fwd0, fwd0 + 0.03, t),
+                      text("= {A}", 0.5, 1.16, 0.05, 0, "mono") * (K >= a)) * (t < back0) * 0.8
+  // backward: trying 1, 2, 3… jumps from 1, until it lands on A
+  let tries = floor((a + 0.999) * clamp((t - back0) / (back1 - back0), 0, 1))
+  let trying = merge([chord(k) * (k < tries) for k in range(a)]) * 0.5 * (t >= back0) * (t < big)
+  let ask = text("?", P(A).x, P(A).y - 0.07, 0.07, 0, "serif") * smoothstep(back0 - 0.08, back0 - 0.05, t) * (t < big)
+  let backtext = merge(text("{A}  ← how many jumps?", 0.5, 1.08, 0.04, 0, "mono") * smoothstep(back0 - 0.08, back0 - 0.05, t),
+                       merge([text("try {k + 1}", 0.5, 1.16, 0.04, 0, "mono") * (tries == k + 1) * (k + 1 < a) for k in range(a)]),
+                       text("try {a}: found", 0.5, 1.16, 0.04, 0, "mono") * (tries >= a)) * (t >= back0 - 0.08) * (t < big) * 0.8
+  let bigtext = merge(text("a clock of", 0.5, 1.08, 0.04, 0, "mono"), text("hundreds of digits", 0.5, 1.16, 0.04, 0, "mono")) * smoothstep(big + 0.04, big + 0.08, t) * 0.8
+  output accent * merge(landed, ask * 0.8)
+         + (1 - accent) * merge(merge(face, ticks) * faded, numbers, fwd * (t < back0), fwdtext, trying, backtext, bigtext)
+}

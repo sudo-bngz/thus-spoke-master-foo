@@ -1,0 +1,43 @@
+// Clock — arithmetic on a clock of 23 hours. The hours around a circle;
+// a hand at 20 that moves 5 hours and lands on 2; the 23 hours as a row
+// of dots that will not fold into equal rows (the rest in vermilion:
+// prime); then the jumps: from 1, times 5, again and again, a chord to each
+// new hour, until every hour is lit. `seq` is 5, 25, 125… mod 23 (gen.py).
+// `accent: 1` gives only the hand, the rest of the fold and the hour just
+// reached. Times are the scene's own (0 to 1). What it returns: 0 paper,
+// up to 1 ink.
+
+work Clock(seq = [5, 2, 10, 4, 20, 8, 17, 16, 11, 9, 22, 18, 21, 13, 19, 3, 15, 6, 7, 12, 14, 1], add0 = 0.1, add1 = 0.2, prime0 = 0.35, jump0 = 0.55, jump1 = 0.9, accent = 0) {
+  let cx = 0.5
+  let cy = 0.62
+  let R = 0.3
+  let P(h) = [cx + R * sin(tau * h / 23), cy - R * cos(tau * h / 23)]
+  let Q(h) = [cx + (R + 0.05) * sin(tau * h / 23), cy - (R + 0.05) * cos(tau * h / 23)]
+  let face = cut(circle(cx, cy, 2 * R, 0.003), circle(cx, cy, 2 * R - 0.006, 0.003)) * 0.5
+  let ticks = merge([circle(P(h).x, P(h).y, 0.014, 0.002) for h in range(23)]) * 0.5
+  let numbers = merge([text("{h}", Q(h).x, Q(h).y, 0.024, 0, "mono") for h in range(23)]) * 0.6
+  // the hand: at 20, then 5 hours on, to 2
+  let moved = ease(progress(add0, add1), "in-out") * 5
+  let hand = line(cx, cy, P(20 + moved).x, P(20 + moved).y, 0.008, 0.002) * (t > add0 - 0.05) * (t < prime0)
+  let sum = merge(text("20 + 5", 0.5, 1.08, 0.05, 0, "mono") * smoothstep(add0 - 0.05, add0 - 0.02, t),
+                  text("= 2", 0.5, 1.16, 0.05, 0, "mono") * smoothstep(add1, add1 + 0.03, t)) * (t < prime0) * 0.8
+  // prime: 23 dots in rows of 4, the last row short
+  let dot(k) = circle(0.17 + 0.09 * (k % 4), 1.0 + 0.045 * floor(k / 4), 0.022, 0.002) * smoothstep(prime0 + k * 0.006, prime0 + k * 0.006 + 0.01, t)
+  let folded = merge([dot(k) * (k < 20) for k in range(23)]) * (t < jump0)
+  let rest = merge([dot(k) * (k >= 20) for k in range(23)]) * (t < jump0)
+  let primeword = merge(text("23", 0.72, 1.07, 0.09, 0, "serif"), text("prime", 0.72, 1.15, 0.034, 0, "mono") * 0.7) * smoothstep(prime0 + 0.15, prime0 + 0.18, t) * (t < jump0)
+  // the jumps: times 5, from 1; chord by chord
+  let K = floor(22 * clamp((t - jump0) / (jump1 - jump0), 0, 1) ^ 1.6)
+  let from(k) = (k == 0) * 1 + (k > 0) * seq[max(k - 1, 0)]
+  let chord(k) = line(P(from(k)).x, P(from(k)).y, P(seq[k]).x, P(seq[k]).y, 0.004, 0.002) * (k < K) * 0.45
+  let lit(k) = circle(P(seq[k]).x, P(seq[k]).y, 0.03, 0.002) * (k < K)
+  let chords = merge([chord(k) for k in range(22)])
+  let visited = merge([lit(k) * (k < K - 1) for k in range(22)])
+  let newest = merge([lit(k) * (k == K - 1) for k in range(22)])
+  let start = circle(P(1).x, P(1).y, 0.03, 0.002) * (t > jump0)
+  let times = text("× 5", 0.5, 1.1, 0.07, 0, "mono") * smoothstep(jump0, jump0 + 0.03, t) * 0.8
+  let count = merge([text("{k + 1}", 0.5, 1.19, 0.034, 0, "mono") * (K == k + 1) for k in range(22)]) * 0.6
+  let all = text("every hour, once", 0.5, 1.26, 0.03, 0, "mono") * (K >= 22) * 0.6
+  output accent * merge(hand, rest, newest)
+         + (1 - accent) * merge(face, ticks, numbers, sum, folded, primeword, chords, visited, start, times, count, all)
+}

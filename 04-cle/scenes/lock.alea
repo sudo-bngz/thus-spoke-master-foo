@@ -1,0 +1,25 @@
+// Lock — the lock in the address bar: the bar from Requête with its small
+// padlock; then, large, the two rings that mesh and the lock that closes,
+// the key inside. Then a last line. `closing` is how long the lock takes.
+// `accent: 1` gives only the small padlock in the bar and the key inside
+// the lock. Times are the scene's own (0 to 1). What it returns: 0 paper,
+// up to 1 ink.
+
+work Lock(key = 2, bar0 = 0.05, lock0 = 0.25, closing = 0.2, accent = 0) {
+  let barw = 0.86
+  let bar = cut(rect(0.5, 0.3, barw, 0.1, 0, 0.002), rect(0.5, 0.3, barw - 0.008, 0.1 - 0.008, 0, 0.002)) * 0.6 * smoothstep(bar0, bar0 + 0.03, t)
+  let address = text("alea.bngz.io", 0.52, 0.3, 0.04, 0, "mono") * smoothstep(bar0, bar0 + 0.03, t)
+  let small = merge(ring(0.14, 0.295, 0.026, 0.005, 0.001) * (y < 0.295), rect(0.14, 0.31, 0.034, 0.024, 0, 0.001)) * smoothstep(bar0 + 0.05, bar0 + 0.08, t)
+  // the lock, large: two rings that mesh, then close
+  let tls = clamp((t - lock0) / closing, 0, 1)
+  let cy = 0.78
+  let ra = rotate(ring(0.5 - 0.08 * (1 - tls), cy, 0.22, 0.016, 0.002) * (0.6 + 0.4 * (fract(atan2(y - cy, x - 0.5) / tau * 6) < 0.5)), angle: tls * 180, x: 0.5, y: cy)
+  let rb = rotate(ring(0.5 + 0.08 * (1 - tls), cy, 0.22, 0.016, 0.002) * (0.6 + 0.4 * (fract(atan2(y - cy, x - 0.5) / tau * 6) > 0.5)), angle: -tls * 180, x: 0.5, y: cy)
+  let shackle = ring(0.5, cy - 0.04, 0.14, 0.018, 0.002) * (y < cy - 0.04) * (tls > 0.9)
+  let body = cut(rect(0.5, cy + 0.07, 0.2, 0.15, 0, 0.002), rect(0.5, cy + 0.07, 0.19, 0.14, 0, 0.002)) * (tls > 0.9)
+  let inside = text("{key}", 0.5, cy + 0.07, 0.07, 0, "mono") * smoothstep(lock0 + closing, lock0 + closing + 0.04, t)
+  let label = text("TLS", 0.5, 1.05, 0.034, 0, "mono") * smoothstep(lock0 + closing + 0.02, lock0 + closing + 0.06, t) * 0.6
+  let last = merge(text("hundreds of digits,", 0.5, 1.15, 0.032, 0, "mono"), text("the same idea", 0.5, 1.2, 0.032, 0, "mono")) * smoothstep(lock0 + closing + 0.12, lock0 + closing + 0.16, t) * 0.7
+  output accent * merge(small, inside)
+         + (1 - accent) * merge(bar, address, (ra + rb) * (t > lock0 - 0.02) * (tls < 0.9), shackle, body, label, last)
+}

@@ -16,7 +16,7 @@ SEED = "0xa162"
 EN_ENGINE = "../voices/kokoro.py"
 JA_ENGINE = "../voices/kokoro-ja.py"
 NARRATOR = ("af_heart", 0.95)
-MASTER = ("jm_kumo", 0.85)
+MASTER = ("jm_kumo", 0.82)
 
 SENTENCE = "thus spoke master foo"
 # the letter changed, for the edition to choose from: (index, new sentence)
@@ -232,7 +232,7 @@ def main():
   ]
 """)
     w(f"  render image(look, width: 1080, height: 1920, at: {(S['avalanche'] + L['avalanche'] * 0.85) / total:.4f})")
-    w("  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.45, echo: 0.12)")
+    w("  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.12, echo: 0)")
     w("}")
     with open(os.path.join(HERE, "hachage.alea"), "w") as f:
         f.write("\n".join(out) + "\n")
