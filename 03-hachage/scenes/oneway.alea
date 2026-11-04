@@ -1,0 +1,29 @@
+// Oneway — no way back: the text above, the fingerprint below, the arrow
+// down; then an arrow back up that ends in a question mark, struck
+// through. Then the trying: texts flash past under the fingerprint, each
+// with its own fingerprint, none the right one, faster and faster. `bits`
+// is the fingerprint (gen.py). `accent: 1` gives only the stroke through
+// the arrow back. Times are the scene's own (0 to 1). What it returns: 0
+// paper, up to 1 ink.
+
+use "digest.alea"
+
+work Oneway(bits = [0], back = 0.3, strike = 0.45, trying = 0.6, accent = 0) {
+  let words = text("thus spoke master foo", 0.5, 0.18, 0.03, 0, "mono") * smoothstep(0.02, 0.05, t)
+  let down = merge(line(0.5, 0.23, 0.5, 0.36, 0.003, 0.001), line(0.5, 0.36, 0.48, 0.335, 0.003, 0.001), line(0.5, 0.36, 0.52, 0.335, 0.003, 0.001)) * 0.5 * smoothstep(0.05, 0.1, t)
+  let g = Digest(bits: bits, x0: 0.5, y0: 0.6, cell: 0.024, t0: 0.08, t1: 0.2)
+  // the way back
+  let up = merge(line(0.8, 0.78, 0.8, 0.26, 0.003, 0.001), line(0.8, 0.26, 0.78, 0.285, 0.003, 0.001), line(0.8, 0.26, 0.82, 0.285, 0.003, 0.001))
+           * (y > 0.78 - 0.52 * clamp((t - back) / 0.08, 0, 1)) * 0.5 * (t > back)
+  let ask = text("?", 0.8, 0.2, 0.06, 0, "serif") * smoothstep(back + 0.08, back + 0.1, t)
+  let slash = line(0.74, 0.5, 0.74 + 0.12 * clamp((t - strike) / 0.03, 0, 1), 0.5 - 0.12 * clamp((t - strike) / 0.03, 0, 1), 0.012, 0.002) * (t > strike)
+  // the trying: candidate texts, one after another, each a wrong fingerprint
+  let N = 24
+  let w(k) = ["a", "b", "aa", "ab", "foo", "bar", "master", "hello", "zen", "koan", "alea", "seed", "seven", "eight", "thus", "spoke", "fooo", "foo bar", "novice", "letter", "envelope", "wrong", "again", "..."][k]
+  let when(k) = trying + 0.4 * (k / N) ^ 0.6
+  let showing(k) = (t >= when(k)) * (t < when(k + 1) + (k == N - 1) * 10)
+  let tries = merge([text(w(k), 0.5, 0.95, 0.03, 0, "mono") * showing(k) for k in range(N)])
+  let miss = merge([Digest(bits: [fract(sin(k * 12.9898 + q * 78.233) * 43758.5453) > 0.5 for q in range(256)], x0: 0.5, y0: 1.12, cell: 0.009, t0: -1, t1: -0.5) * showing(k) for k in range(N)]) * 0.5
+  let wrong = text("no", 0.62, 1.12, 0.026, 0, "mono") * (t > trying + 0.05) * (fract(t * 25) < 0.5) * 0.5
+  output accent * slash + (1 - accent) * merge(words, down, g, up, ask, tries, miss, wrong)
+}

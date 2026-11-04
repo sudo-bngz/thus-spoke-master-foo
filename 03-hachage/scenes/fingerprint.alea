@@ -1,0 +1,45 @@
+// Fingerprint — a text goes into a box and a fingerprint comes out. Three
+// times: the sentence, typed, goes in and its 256 bits come out as a grid,
+// with the hex under; a long text, many lines, goes in and a fingerprint
+// of the same size comes out; the sentence again, and the same fingerprint
+// again. `short` and `long` are the two fingerprints' bits (gen.py: real
+// SHA-256). `accent: 1` gives only the light that travels into the box
+// (vermilion). Times are the scene's own (0 to 1). What it returns: 0
+// paper, up to 1 ink.
+
+use "digest.alea"
+
+work Fingerprint(sentence = "thus spoke master foo", hex1 = "", hex2 = "", short = [0], long = [0],
+                 type0 = 0.05, type1 = 0.15, in1 = 0.2, out1 = 0.25, book = 0.35, in2 = 0.42, out2 = 0.48, size = 0.55,
+                 again = 0.7, in3 = 0.76, out3 = 0.82, accent = 0) {
+  let adv = 0.0155
+  let fast = 0.03
+  // the sentence, typed, in a box; shown from type0 to book, and again from `again`
+  let typed = clamp((t - type0) / (type1 - type0), 0, 1) * (t < book) + (t >= again)
+  let shown1 = smoothstep(type0 - 0.03, type0, t) * (1 - smoothstep(book - 0.03, book, t)) + smoothstep(again - 0.02, again, t)
+  let words = text(sentence, 0.5, 0.2, 0.03, 0, "mono") * (x < 0.5 - 21 * adv / 2 + 21 * adv * typed + 0.004)
+  let frame = cut(rect(0.5, 0.2, 0.5, 0.08, 0, 0.002), rect(0.5, 0.2, 0.494, 0.074, 0, 0.002)) * 0.5
+  let text1 = merge(words, frame) * shown1
+  // the book: a block of lines, from book to again
+  let pages = merge([line(0.28, 0.14 + 0.012 * r, 0.28 + 0.44 * (0.6 + 0.4 * fract(r * 0.37 + 0.1)), 0.14 + 0.012 * r, 0.004, 0.001) for r in range(11)]) * 0.5
+              * smoothstep(book, book + 0.04, t) * (1 - smoothstep(again - 0.03, again - 0.01, t))
+  // the box: hash
+  let by = 0.42
+  let hbox = cut(rect(0.5, by, 0.22, 0.1, 0, 0.002), rect(0.5, by, 0.212, 0.092, 0, 0.002))
+  let hlabel = text("hash", 0.5, by, 0.034, 0, "mono")
+  let wire1 = line(0.5, 0.24, 0.5, by - 0.05, 0.003, 0.002) * 0.4
+  let wire2 = line(0.5, by + 0.05, 0.5, 0.56, 0.003, 0.002) * 0.4
+  let going(start) = glow(x: 0.5, y: 0.24 + (by - 0.05 - 0.24) * clamp((t - start) / fast, 0, 1), size: 0.06) * (t > start) * (t < start + fast)
+  let busy(start) = rect(0.5, by, 0.212, 0.092, 0, 0.002) * 0.25 * (t > start + fast) * (t < start + fast + 0.02)
+  // the fingerprints, each wiping the one before
+  let draw = 0.08
+  let g1 = Digest(bits: short, x0: 0.5, y0: 0.8, cell: 0.027, t0: out1, t1: out1 + draw) * (t < out2)
+  let g2 = Digest(bits: long, x0: 0.5, y0: 0.8, cell: 0.027, t0: out2, t1: out2 + draw) * (t < out3)
+  let g3 = Digest(bits: short, x0: 0.5, y0: 0.8, cell: 0.027, t0: out3, t1: out3 + draw)
+  let hexa(h, start, stop) = text(h, 0.5, 1.055, 0.0205, 0, "mono") * smoothstep(start + draw, start + draw + 0.02, t) * (t < stop) * 0.75
+  let hexes = merge(hexa(hex1, out1, out2), hexa(hex2, out2, out3), hexa(hex1, out3, 2))
+  let sizelabel = text("256 bits, always", 0.5, 1.11, 0.028, 0, "mono") * smoothstep(size, size + 0.03, t) * (1 - smoothstep(out3 + draw - 0.01, out3 + draw, t)) * 0.6
+  let same = text("the same", 0.5, 1.11, 0.028, 0, "mono") * smoothstep(out3 + draw, out3 + draw + 0.03, t) * 0.6
+  output accent * merge(going(in1), going(in2), going(in3), busy(in1), busy(in2), busy(in3))
+         + (1 - accent) * merge(text1, pages, hbox, hlabel, wire1, wire2, g1, g2, g3, hexes, sizelabel, same)
+}

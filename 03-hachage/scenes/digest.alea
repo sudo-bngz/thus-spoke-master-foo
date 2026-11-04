@@ -1,0 +1,18 @@
+// Digest — a fingerprint: 256 bits as a 16 × 16 grid of cells, filled where
+// the bit is 1, drawn cell by cell from `t0` to `t1` (the scene's own
+// time); the cells are `cell` wide, the grid centred on x, y. `bits` is
+// the list of 256 bits (from gen.py: a real SHA-256). What it returns:
+// 0 paper, up to 1 ink.
+
+work Digest(bits = [0], x0 = 0.5, y0 = 0.5, cell = 0.03, t0 = 0, t1 = 0.3) {
+  let left = x0 - 8 * cell
+  let top = y0 - 8 * cell
+  let col = floor((x - left) / cell)
+  let row = floor((y - top) / cell)
+  let k = row * 16 + col
+  let inside = (x >= left) * (x < left + 16 * cell) * (y >= top) * (y < top + 16 * cell)
+  let shape = (fract((x - left) / cell) > 0.12) * (fract((y - top) / cell) > 0.12)
+  let bit = sum([bits[q] * (k == q) for q in range(256)])
+  let drawn = k < 256 * clamp((t - t0) / (t1 - t0), 0, 1)
+  output bit * inside * shape * drawn
+}

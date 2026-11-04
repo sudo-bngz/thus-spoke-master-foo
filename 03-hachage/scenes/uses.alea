@@ -1,0 +1,28 @@
+// Uses — three places a fingerprint works, one under the other, each lit
+// on its word: a password, kept only as its hash on the server; a git
+// commit, named by its hash; a file, its fingerprint checked after the
+// download (a match: the seal holds). `when` are the three moments; the
+// hex are short real hashes (gen.py). `accent: 1` gives only the matching
+// check mark and the password's dots. Times are the scene's own (0 to 1).
+// What it returns: 0 paper, up to 1 ink.
+
+work Uses(when = [0.1, 0.4, 0.7], pwhex = "", githex = "", filehex = "", accent = 0) {
+  let on(k) = smoothstep(when[k], when[k] + 0.04, t)
+  let ys = [0.26, 0.56, 0.86]
+  let head(k, s) = text(s, 0.08, ys[k] - 0.07, 0.026, 0, "mono", "left") * 0.55 * on(k)
+  // the password: the word typed, then only its hash kept
+  let pw = text("correct horse battery", 0.08, ys[0], 0.03, 0, "mono", "left") * on(0) * (1 - smoothstep(when[0] + 0.1, when[0] + 0.13, t))
+  let dots = merge([circle(0.08 + 0.02 * k, ys[0], 0.012, 0.002) for k in range(12)]) * smoothstep(when[0] + 0.1, when[0] + 0.13, t)
+  let arrow(k) = merge(line(0.5, ys[k], 0.58, ys[k], 0.003, 0.001), line(0.58, ys[k], 0.565, ys[k] - 0.012, 0.003, 0.001), line(0.58, ys[k], 0.565, ys[k] + 0.012, 0.003, 0.001)) * 0.4 * on(k)
+  let kept = text("server keeps  {pwhex}…", 0.62, ys[0], 0.024, 0, "mono", "left") * smoothstep(when[0] + 0.06, when[0] + 0.1, t) * 0.8
+  // git: a commit, and its name
+  let commit = merge(circle(0.1, ys[1], 0.03, 0.002), line(0.1, ys[1] - 0.06, 0.1, ys[1] + 0.06, 0.004, 0.001) * 0.5, text("feat(exhibition): hachage", 0.15, ys[1], 0.024, 0, "mono", "left")) * on(1)
+  let named = text("commit  {githex}", 0.62, ys[1], 0.024, 0, "mono", "left") * smoothstep(when[1] + 0.06, when[1] + 0.1, t) * 0.8
+  // the file: downloaded, its fingerprint compared
+  let doc = merge(cut(rect(0.11, ys[2], 0.06, 0.08, 0, 0.002), rect(0.11, ys[2], 0.052, 0.072, 0, 0.002)), merge([line(0.09, ys[2] - 0.02 + 0.014 * r, 0.13, ys[2] - 0.02 + 0.014 * r, 0.003, 0.001) for r in range(4)]) * 0.5) * on(2)
+  let got = text("got       {filehex}", 0.17, ys[2] - 0.02, 0.024, 0, "mono", "left") * smoothstep(when[2] + 0.06, when[2] + 0.09, t) * 0.8
+  let expected = text("expected  {filehex}", 0.17, ys[2] + 0.02, 0.024, 0, "mono", "left") * smoothstep(when[2] + 0.09, when[2] + 0.12, t) * 0.8
+  let check = merge(line(0.78, ys[2] + 0.01, 0.8, ys[2] + 0.03, 0.008, 0.002), line(0.8, ys[2] + 0.03, 0.84, ys[2] - 0.03, 0.008, 0.002)) * smoothstep(when[2] + 0.14, when[2] + 0.17, t)
+  output accent * merge(dots, check)
+         + (1 - accent) * merge(head(0, "a password"), pw, arrow(0), kept, head(1, "a commit"), commit, named, head(2, "a download"), doc, got, expected)
+}

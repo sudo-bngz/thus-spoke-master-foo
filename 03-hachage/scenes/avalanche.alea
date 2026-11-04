@@ -1,0 +1,30 @@
+// Avalanche — the same sentence twice, one letter changed in the second
+// (in vermilion), their two fingerprints side by side; then the cells that
+// differ light up, and the count. `a` and `b` are the two fingerprints'
+// bits, `pos` the index of the changed letter, `changed` how many bits
+// differ (gen.py, from real SHA-256). `accent: 1` gives only the changed
+// letter and the differing cells. Times are the scene's own (0 to 1).
+// What it returns: 0 paper, up to 1 ink.
+
+use "digest.alea"
+
+work Avalanche(s1 = "thus spoke master foo", s2 = "thus spoke master fou", pos = 20, a = [0], b = [0], changed = 128, show1 = 0.05, show2 = 0.3, flip = 0.6, tally = 0.8, accent = 0) {
+  let adv = 0.0181
+  let L = 21
+  let left(cx) = cx - L * adv / 2
+  let line1 = text(s1, 0.27, 0.2, 0.035, 0, "mono") * smoothstep(show1, show1 + 0.03, t)
+  let line2 = text(s2, 0.73, 0.2, 0.035, 0, "mono") * smoothstep(show2, show2 + 0.03, t)
+  // the changed letter: masked out of the second line, drawn in vermilion
+  let lx = left(0.73) + (pos + 0.5) * adv
+  let mask = rect(lx, 0.2, adv, 0.05, 0, 0.001)
+  let letter = text(s2, 0.73, 0.2, 0.035, 0, "mono") * mask * smoothstep(show2, show2 + 0.03, t)
+  let arrow = merge(line(0.27, 0.24, 0.27, 0.34, 0.003, 0.001), line(0.73, 0.24, 0.73, 0.34, 0.003, 0.001)) * 0.4
+  let g1 = Digest(bits: a, x0: 0.27, y0: 0.62, cell: 0.026, t0: show1 + 0.05, t1: show1 + 0.17)
+  let g2 = Digest(bits: b, x0: 0.73, y0: 0.62, cell: 0.026, t0: show2 + 0.05, t1: show2 + 0.17)
+  // the cells that differ, over the second grid
+  let diff = [abs(a[q] - b[q]) for q in range(256)]
+  let lit = Digest(bits: diff, x0: 0.73, y0: 0.62, cell: 0.026, t0: flip, t1: flip + 0.1)
+  let tallyline = text("{changed} of 256 bits changed", 0.5, 0.95, 0.03, 0, "mono") * smoothstep(tally, tally + 0.03, t) * 0.75
+  output accent * merge(letter, lit)
+         + (1 - accent) * cut(merge(line1, line2, arrow * smoothstep(show1, show1 + 0.03, t), g1, g2, tallyline), merge(mask * smoothstep(show2, show2 + 0.03, t), lit))
+}

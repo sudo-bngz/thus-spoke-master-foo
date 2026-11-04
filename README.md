@@ -20,6 +20,7 @@ captions translate him.
 |---|---|---|---|
 | 01 | [Algorithme](01-algorithme/) | What is an algorithm? A recipe: steps, in order, until the work is done. Two recipes sort the same sixteen cards (insertion, merging); a counter adds up their comparisons, and for a thousand cards the difference is a large square against a small one. | 1 min 40 |
 | 02 | [Aléa](02-alea/) | Can a computer roll a die? It fakes chance: fifteen bits slide along a register, the last two mixed and fed back (an LFSR, the noise of old game consoles), grown step by step in alea from the edition's own seed. Same seed, same numbers; one bit changed, another tape. Real chance comes from the world. Master Foo speaks Japanese. | 1 min 47 |
+| 03 | [Hachage](03-hachage/) | What is a hash? A fingerprint for data: any text in, 256 bits out, always the same for the same text; change one letter and half the bits flip; no way back. A password kept as its hash, a git commit named by it, a download checked by it. The fingerprints are real SHA-256 digests, to check with `sha256sum`. | 1 min 46 |
 
 ## Render
 
@@ -39,6 +40,10 @@ alea algorithme.alea --seed 0xa160 -o out/         # the cover (png) and the 108
 cd ../02-alea
 python3 gen.py
 alea alea.alea --seed 0xa161 -o out/               # the seed shown in the film
+
+cd ../03-hachage
+python3 gen.py
+alea hachage.alea --seed 0xa162 -o out/
 ```
 
 Master Foo's Japanese needs misaki, Kokoro's pronunciation library:
@@ -62,6 +67,11 @@ fonts/                  Noto Sans JP (subset, OFL), for the katakana and the sea
   gen.py                the script, Master Foo's lines in Japanese with their English
   alea.alea             the Reel, and the register: grown with `grow`, from the edition's seed
   scenes/               koan, machine, lfsr, seed, entropy
+03-hachage/
+  gen.py                the script, and the SHA-256 digests of the texts shown, as bits
+  hachage.alea          the Reel; the edition chooses which letter the avalanche changes
+  scenes/               koan, digest, fingerprint, avalanche, oneway, uses
+lib/episode.py          what the generators share: the voice measured, the captions typed, the layout
 ```
 
 ## The voices
