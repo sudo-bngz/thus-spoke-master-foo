@@ -156,16 +156,14 @@ def main():
         prev = vid
     w("""
   // ── the register: fifteen bits from the edition's seed; at each generation
-  // they slide right and the last two, mixed, come back at the start. Every
-  // row of the grid is a register of its own; the scenes read the middle one.
-  // `twin` starts from the same bits but one, cell 3, changed. ──
+  // they slide right and the last two, mixed, come back at the start. Each row
+  // of the grid is a register: row 7 (y = 0.5) is the one shown; row 8 starts
+  // from the same bits but one, cell 3, changed (its twin). ──
   let seedbits = ~~uniform(0, 1) < 0.5
-  let flipped = abs(seedbits - (x > 3 / 15) * (x < 4 / 15))
+  let first = move(seedbits, x: 0, y: y - 0.5)
   grow over 15 for 575 {
-    reg = seedbits
+    reg = abs(first - (y > 8 / 15) * (y < 9 / 15) * (x > 3 / 15) * (x < 4 / 15))
       then (x < 1 / 15) * abs(move(reg, x: -13 / 15, y: 0) - move(reg, x: -14 / 15, y: 0)) + (x >= 1 / 15) * move(reg, x: 1 / 15, y: 0)
-    twin = flipped
-      then (x < 1 / 15) * abs(move(twin, x: -13 / 15, y: 0) - move(twin, x: -14 / 15, y: 0)) + (x >= 1 / 15) * move(twin, x: 1 / 15, y: 0)
   }
   // the steps: slowly, then faster and faster, from "Fifteen" to the end of the noise
   let s0 = n4.words[0]
@@ -185,7 +183,7 @@ def main():
         "machine": lambda a: f'Machine(die: {lt("n1.words[3]", "machine")}, strike: {lt("n1.end", "machine")}, box: {lt("n2.words[3]", "machine")}, '
                              f'runs: [{lt("n2.words[7]", "machine")}, {lt("n2.words[9]", "machine")}, {lt("n2.words[12]", "machine")}], accent: {a})',
         "lfsr": lambda a: f'Lfsr(reg: reg, s0: {lt("s0", "lfsr")}, s1: {lt("s1", "lfsr")}, mix: {lt("n4.words[10]", "lfsr")}, period: {lt("n7.words[2]", "lfsr")}, accent: {a})',
-        "seed": lambda a: f'Seed(a: reg, c: twin, flip: 3, show: [{lt("n8.words[7]", "seed")}, {lt("n9.words[0]", "seed")}, {lt("n10.words[3]", "seed")}], fill: 1.6 / {L["seed"]}, '
+        "seed": lambda a: f'Seed(r: reg, flip: 3, show: [{lt("n8.words[7]", "seed")}, {lt("n9.words[0]", "seed")}, {lt("n10.words[3]", "seed")}], fill: 1.6 / {L["seed"]}, '
                           f'cmd: "$ alea alea.alea --seed {SEED}", typed: [{lt("n11.words[8]", "seed")}, {lt("n11.end", "seed")}], accent: {a})',
         "entropy": lambda a: f'Entropy(when: [{lt("n13.words[4]", "entropy")}, {lt("n13.words[9]", "entropy")}, {lt("n13.words[15]", "entropy")}], stir: {lt("n14.words[1]", "entropy")}, seed: {lt("n14.words[5]", "entropy")}, accent: {a})',
         "end": lambda a: f'Koan(draw0: {lt("m4.start", "end")}, draw1: {lt("m5.end", "end")}, word: {lt("m4.start + 1.0", "end")}, title: {lt("m5.end + 0.6", "end")}, '

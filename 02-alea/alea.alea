@@ -42,16 +42,14 @@ work Alea {
   let m5 = say("その時、弟子は悟った。", at: m4.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.85, gain: 2.3)
 
   // ── the register: fifteen bits from the edition's seed; at each generation
-  // they slide right and the last two, mixed, come back at the start. Every
-  // row of the grid is a register of its own; the scenes read the middle one.
-  // `twin` starts from the same bits but one, cell 3, changed. ──
+  // they slide right and the last two, mixed, come back at the start. Each row
+  // of the grid is a register: row 7 (y = 0.5) is the one shown; row 8 starts
+  // from the same bits but one, cell 3, changed (its twin). ──
   let seedbits = ~~uniform(0, 1) < 0.5
-  let flipped = abs(seedbits - (x > 3 / 15) * (x < 4 / 15))
+  let first = move(seedbits, x: 0, y: y - 0.5)
   grow over 15 for 575 {
-    reg = seedbits
+    reg = abs(first - (y > 8 / 15) * (y < 9 / 15) * (x > 3 / 15) * (x < 4 / 15))
       then (x < 1 / 15) * abs(move(reg, x: -13 / 15, y: 0) - move(reg, x: -14 / 15, y: 0)) + (x >= 1 / 15) * move(reg, x: 1 / 15, y: 0)
-    twin = flipped
-      then (x < 1 / 15) * abs(move(twin, x: -13 / 15, y: 0) - move(twin, x: -14 / 15, y: 0)) + (x >= 1 / 15) * move(twin, x: 1 / 15, y: 0)
   }
   // the steps: slowly, then faster and faster, from "Fifteen" to the end of the noise
   let s0 = n4.words[0]
@@ -66,7 +64,7 @@ work Alea {
       scene(ink(Koan(draw0: ((m1.start) - 0.00) / 16.9, draw1: ((m1.end) - 0.00) / 16.9, word: ((m3.end + 0.8) - 0.00) / 16.9, title: ((m3.end + 1.0) - 0.00) / 16.9, kana: ["ラ", "ン", "ダ", "ム"], episode: "02  ·  chance", big: "7", bigat: [((m2.end - 0.5) - 0.00) / 16.9, ((m3.end - 0.5) - 0.00) / 16.9], bigoff: ((m3.end + 0.5) - 0.00) / 16.9, accent: 0), Koan(draw0: ((m1.start) - 0.00) / 16.9, draw1: ((m1.end) - 0.00) / 16.9, word: ((m3.end + 0.8) - 0.00) / 16.9, title: ((m3.end + 1.0) - 0.00) / 16.9, kana: ["ラ", "ン", "ダ", "ム"], episode: "02  ·  chance", big: "7", bigat: [((m2.end - 0.5) - 0.00) / 16.9, ((m3.end - 0.5) - 0.00) / 16.9], bigoff: ((m3.end + 0.5) - 0.00) / 16.9, accent: 1)), 16.9),  wipe(0.8, angle: 0, softness: 0.12),
       scene(ink(Machine(die: ((n1.words[3]) - 16.90) / 11.7, strike: ((n1.end) - 16.90) / 11.7, box: ((n2.words[3]) - 16.90) / 11.7, runs: [((n2.words[7]) - 16.90) / 11.7, ((n2.words[9]) - 16.90) / 11.7, ((n2.words[12]) - 16.90) / 11.7], accent: 0), Machine(die: ((n1.words[3]) - 16.90) / 11.7, strike: ((n1.end) - 16.90) / 11.7, box: ((n2.words[3]) - 16.90) / 11.7, runs: [((n2.words[7]) - 16.90) / 11.7, ((n2.words[9]) - 16.90) / 11.7, ((n2.words[12]) - 16.90) / 11.7], accent: 1)), 11.7),  glitch(0.6, amount: 0.5),
       scene(ink(Lfsr(reg: reg, s0: ((s0) - 28.60) / 29.3, s1: ((s1) - 28.60) / 29.3, mix: ((n4.words[10]) - 28.60) / 29.3, period: ((n7.words[2]) - 28.60) / 29.3, accent: 0), Lfsr(reg: reg, s0: ((s0) - 28.60) / 29.3, s1: ((s1) - 28.60) / 29.3, mix: ((n4.words[10]) - 28.60) / 29.3, period: ((n7.words[2]) - 28.60) / 29.3, accent: 1)), 29.3),  wipe(0.7, angle: 90, softness: 0.1),
-      scene(ink(Seed(a: reg, c: twin, flip: 3, show: [((n8.words[7]) - 57.90) / 19.3, ((n9.words[0]) - 57.90) / 19.3, ((n10.words[3]) - 57.90) / 19.3], fill: 1.6 / 19.3, cmd: "$ alea alea.alea --seed 0xa161", typed: [((n11.words[8]) - 57.90) / 19.3, ((n11.end) - 57.90) / 19.3], accent: 0), Seed(a: reg, c: twin, flip: 3, show: [((n8.words[7]) - 57.90) / 19.3, ((n9.words[0]) - 57.90) / 19.3, ((n10.words[3]) - 57.90) / 19.3], fill: 1.6 / 19.3, cmd: "$ alea alea.alea --seed 0xa161", typed: [((n11.words[8]) - 57.90) / 19.3, ((n11.end) - 57.90) / 19.3], accent: 1)), 19.3),  morph(0.8, amount: 0.15),
+      scene(ink(Seed(r: reg, flip: 3, show: [((n8.words[7]) - 57.90) / 19.3, ((n9.words[0]) - 57.90) / 19.3, ((n10.words[3]) - 57.90) / 19.3], fill: 1.6 / 19.3, cmd: "$ alea alea.alea --seed 0xa161", typed: [((n11.words[8]) - 57.90) / 19.3, ((n11.end) - 57.90) / 19.3], accent: 0), Seed(r: reg, flip: 3, show: [((n8.words[7]) - 57.90) / 19.3, ((n9.words[0]) - 57.90) / 19.3, ((n10.words[3]) - 57.90) / 19.3], fill: 1.6 / 19.3, cmd: "$ alea alea.alea --seed 0xa161", typed: [((n11.words[8]) - 57.90) / 19.3, ((n11.end) - 57.90) / 19.3], accent: 1)), 19.3),  morph(0.8, amount: 0.15),
       scene(ink(Entropy(when: [((n13.words[4]) - 77.20) / 17.5, ((n13.words[9]) - 77.20) / 17.5, ((n13.words[15]) - 77.20) / 17.5], stir: ((n14.words[1]) - 77.20) / 17.5, seed: ((n14.words[5]) - 77.20) / 17.5, accent: 0), Entropy(when: [((n13.words[4]) - 77.20) / 17.5, ((n13.words[9]) - 77.20) / 17.5, ((n13.words[15]) - 77.20) / 17.5], stir: ((n14.words[1]) - 77.20) / 17.5, seed: ((n14.words[5]) - 77.20) / 17.5, accent: 1)), 17.5),  wipe(0.8, angle: 180, softness: 0.12),
       scene(ink(Koan(draw0: ((m4.start) - 94.70) / 12.5, draw1: ((m5.end) - 94.70) / 12.5, word: ((m4.start + 1.0) - 94.70) / 12.5, title: ((m5.end + 0.6) - 94.70) / 12.5, kana: ["ラ", "ン", "ダ", "ム"], episode: "02  ·  chance", accent: 0), Koan(draw0: ((m4.start) - 94.70) / 12.5, draw1: ((m5.end) - 94.70) / 12.5, word: ((m4.start + 1.0) - 94.70) / 12.5, title: ((m5.end + 0.6) - 94.70) / 12.5, kana: ["ラ", "ン", "ダ", "ム"], episode: "02  ·  chance", accent: 1)), 12.5),  morph(1.2, amount: 0.2),
   ], loop: 1)

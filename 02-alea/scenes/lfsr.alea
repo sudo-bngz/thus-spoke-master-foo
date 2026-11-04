@@ -16,8 +16,10 @@ work Lfsr(reg = 0, s0 = 0.1, s1 = 0.8, mix = 0.3, period = 0.9, accent = 0) {
   let ry = 0.3
   let X(c) = 0.115 + 0.055 * c
   let box(c) = cut(rect(X(c), ry, 0.046, 0.046, 0, 0.001), rect(X(c), ry, 0.038, 0.038, 0, 0.001)) * 0.6
-  let bit(c) = rect(X(c), ry, 0.03, 0.03, 0, 0.001) * cell(c, gen)
-  let row = merge([max(box(c), bit(c)) for c in range(15)])
+  // one look into the register per point: the cell under it
+  let under = clamp(floor((x - X(0) + 0.0275) / 0.055), 0, 14)
+  let bits = merge([rect(X(c), ry, 0.03, 0.03, 0, 0.001) for c in range(15)]) * cell(under, gen)
+  let row = merge(merge([box(c) for c in range(15)]), bits)
   let names = merge(text("in", X(0), ry - 0.055, 0.024, 0, "mono"), text("out", X(14), ry - 0.055, 0.024, 0, "mono")) * 0.5
   // the feedback: down from the last two, mixed, back to the start
   let fy = 0.4
