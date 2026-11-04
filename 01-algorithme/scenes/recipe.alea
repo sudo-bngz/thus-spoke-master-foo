@@ -1,0 +1,31 @@
+// Recipe — an algorithm written down: four lines, the recipe for sorting
+// cards by insertion, appearing one by one; then a cursor runs through
+// them, line after line, as a machine would, faster and faster. `accent: 1`
+// gives only the cursor (vermilion). Times are the scene's own (0 to 1).
+// What it returns: 0 paper, up to 1 ink.
+
+work Recipe(show = [0.1, 0.15, 0.2, 0.25], run0 = 0.5, run1 = 0.95, accent = 0) {
+  let lines = ["take the next card",
+               "while the card on its left",
+               "    is bigger: swap them",
+               "repeat until no card is left"]
+  let top = 0.36
+  let gap = 0.1
+  let numbers = merge([text("{k + 1}", 0.1, top + k * gap, 0.036, 0, "mono", "left") * smoothstep(show[k], show[k] + 0.03, t) * 0.45 for k in range(4)])
+  let body = merge([text(lines[k], 0.17, top + k * gap, 0.036, 0, "mono", "left") * smoothstep(show[k], show[k] + 0.03, t) for k in range(4)])
+  let rule = line(0.135, top - 0.06, 0.135, top + 3 * gap + 0.05, 0.002, 0.002) * smoothstep(show[0], show[0] + 0.05, t) * 0.4
+  // the cursor's walk: what a machine does with these lines, for a few cards
+  let trace = [0, 1, 2, 1, 3, 0, 1, 3, 0, 1, 2, 1, 2, 1, 3, 0, 1, 2, 1, 3, 0, 1, 3, 0, 1, 2, 1, 2, 1, 2, 1, 3,
+               0, 1, 2, 1, 3, 0, 1, 3, 0, 1, 2, 1, 2, 1, 3, 0, 1, 2, 1, 3, 0, 1, 2, 1, 2, 1, 2, 1, 2, 1, 3]
+  let S = count(trace)
+  // the steps come faster and faster: step s at run0 + (run1 - run0) × (s / S)^0.55
+  let when(s) = run0 + (run1 - run0) * (s / S) ^ 0.55
+  let row = sum([(t >= when(s)) * (trace[s] - (s > 0) * trace[max(s - 1, 0)]) for s in range(S)])
+  let running = (t >= run0)
+  let cursor = merge(rect(0.06, top + row * gap, 0.022, 0.036, 0, 0.001),
+                     rect(0.5, top + row * gap, 0.86, 0.07, 0, 0.002) * 0.18) * running
+  // a counter of the steps taken, in the corner
+
+  let steps = merge([text("steps  {s + 1}", 0.9, top + 4 * gap + 0.05, 0.026, 0, "mono", "right") * (t >= when(s)) * (t < when(s + 1) + (s == S - 1)) for s in range(S)]) * 0.6
+  output accent * cursor + (1 - accent) * merge(numbers, body, rule, steps)
+}

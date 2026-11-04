@@ -1,0 +1,36 @@
+// Merge — sorting by merging: the deck is cut into pairs, each pair
+// sorted; then two sorted piles become one, pairs make fours, fours make
+// eights, eights the whole deck. After level L, every block of 2^L cards is
+// sorted in place, so a card's place is its block's start plus its rank in
+// the block: a closed form again. Brackets under the bars show the piles
+// being made (vermilion, with `accent: 1`); a counter adds up the
+// comparisons: merging two piles costs one comparison per card placed, but
+// none for the cards left over once a pile runs out. Times are the scene's
+// own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Merge(h = [0.5, 1, 0.25, 0.75], at = [0.2, 0.4, 0.6, 0.8], split = 0.1, move = 0.05, accent = 0) {
+  let N = count(h)
+  let levels = count(at)
+  let pos(q, L) = floor(q / 2 ^ L) * 2 ^ L + sum([(floor(j / 2 ^ L) == floor(q / 2 ^ L)) * (h[j] < h[q]) for j in range(N)])
+  let place(q) = keys(join([[0, q]], [[at[L - 1] + e * move, pos(q, L - 1 + e)] for L in range(1, levels + 1) for e in range(2)]), ease: "in-out")
+  let X(q) = 0.1 + 0.8 * (place(q) + 0.5) / N
+  let Xs(p) = 0.1 + 0.8 * (p + 0.5) / N
+  let cards = merge([rect(X(q), 1.15 - h[q] * 0.36, 0.8 / N * 0.62, h[q] * 0.72, 0, 0.002) for q in range(N)])
+  let floorline = line(0.08, 1.165, 0.92, 1.165, 0.002, 0.002) * 0.35
+  // the piles being made: brackets of 2^(level + 1) cards
+  let level = sum([(t >= at[L] + move * 0.5) for L in range(levels)])
+  let bracket(P, b) = merge(line(Xs(b * P) - 0.02, 1.2, Xs(b * P + P - 1) + 0.02, 1.2, 0.004, 0.001),
+                            line(Xs(b * P) - 0.02, 1.185, Xs(b * P) - 0.02, 1.2, 0.004, 0.001),
+                            line(Xs(b * P + P - 1) + 0.02, 1.185, Xs(b * P + P - 1) + 0.02, 1.2, 0.004, 0.001))
+  let brackets = merge([merge([bracket(2 ^ (L + 1), b) for b in range(N / 2 ^ (L + 1))]) * (level == min(L, levels - 1)) for L in range(levels)]) * (t >= split)
+  // comparisons to merge level L: for each pair of piles, every card, less
+  // those left over above the smaller of the two piles' tops
+  let inb(j, B, b) = (floor(j / B) == b)
+  let top(B, b) = maximum([h[j] * inb(j, B, b) for j in range(N)])
+  let cost(L) = sum([2 ^ L - sum([inb(j, 2 ^ L, b) * (h[j] > min(top(2 ^ (L - 1), 2 * b), top(2 ^ (L - 1), 2 * b + 1))) for j in range(N)]) for b in range(N / 2 ^ L)])
+  let costs = [cost(L) for L in range(1, levels + 1)]
+  let total(L) = sum(slice(costs, 0, L))
+  let counter = merge(join([text("comparisons  0", 0.9, 1.25, 0.03, 0, "mono", "right") * (t < at[0] + move)],
+                           [text("comparisons  {total(L)}", 0.9, 1.25, 0.03, 0, "mono", "right") * (t >= at[L - 1] + move) * ((L == levels) + (t < at[min(L, levels - 1)] + move)) for L in range(1, levels + 1)])) * 0.75
+  output accent * brackets + (1 - accent) * merge(cards, floorline, counter)
+}

@@ -1,0 +1,29 @@
+// Insertion — sorting by insertion: the cards are bars, as tall as their
+// value; one after another, each card is lifted and slides left past every
+// bigger one. After k cards, the first k are sorted, so a card's place is
+// its rank among them: no simulation, a closed form. A counter adds up the
+// comparisons. `accent: 1` gives only the card in hand (vermilion). Times
+// are the scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Insertion(h = [0.5, 1, 0.25, 0.75], starts = [0.2, 0.4, 0.6], move = 0.05, accent = 0) {
+  let N = count(h)
+  // where card q stands once the first k cards are sorted
+  let pos(q, k) = (q < k) * sum([(j < k) * (h[j] < h[q]) for j in range(N)]) + (q >= k) * q
+  // card k (k ≥ 1) is taken at starts[k - 1] and settles move later
+  let place(q) = keys(join([[0, q]], [[starts[k - 1] + e * move, pos(q, k + e)] for k in range(1, N) for e in range(2)]), ease: "in-out")
+  let inhand(q) = (q > 0) * (t >= starts[max(q - 1, 0)]) * (t < starts[max(q - 1, 0)] + move + 0.012)
+  let lift(q) = 0.035 * inhand(q)
+  let X(q) = 0.1 + 0.8 * (place(q) + 0.5) / N
+  let bar(q) = rect(X(q), 1.15 - h[q] * 0.36 - lift(q), 0.8 / N * 0.62, h[q] * 0.72, 0, 0.002)
+  let floorline = line(0.08, 1.165, 0.92, 1.165, 0.002, 0.002) * 0.35
+  let cards = merge([bar(q) * (1 - inhand(q)) for q in range(N)])
+  let held  = merge([bar(q) * inhand(q) for q in range(N)])
+  // the comparisons: card k is compared with every bigger card before it,
+  // and once more with the first smaller one, unless it reaches the front
+  let bigger(k) = sum([(j < k) * (h[j] > h[k]) for j in range(N)])
+  let comps = [bigger(k) + (bigger(k) < k) for k in range(1, N)]
+  let total(k) = sum(slice(comps, 0, k))
+  let counter = merge(join([text("comparisons  0", 0.9, 1.25, 0.03, 0, "mono", "right") * (t < starts[0] + move)],
+                           [text("comparisons  {total(k)}", 0.9, 1.25, 0.03, 0, "mono", "right") * (t >= starts[k - 1] + move) * ((k == N - 1) + (t < starts[min(k, N - 2)] + move)) for k in range(1, N)])) * 0.75
+  output accent * held + (1 - accent) * merge(cards, floorline, counter)
+}

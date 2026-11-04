@@ -1,0 +1,28 @@
+// Cost — what the two recipes cost. First the sixteen cards just sorted,
+// the two counts side by side; then a thousand cards, each comparison a dot:
+// insertion fills a large square (about a quarter of a million, on
+// average), merging a small one (fewer than ten thousand, at worst). The
+// squares' areas keep the ratio. `accent: 1` gives only the small square
+// (vermilion). Times are the scene's own (0 to 1). What it returns: 0 paper,
+// up to 1 ink.
+
+work Cost(counts = [70, 45], show16 = 0.1, grow1 = 0.4, grow2 = 0.7, span = 0.15, accent = 0) {
+  let s16 = smoothstep(show16, show16 + 0.04, t) * (1 - smoothstep(grow1 - 0.06, grow1 - 0.01, t))
+  let head = text("sixteen cards", 0.5, 0.45, 0.034, 0, "mono") * 0.55
+  let left = merge(text("insertion", 0.3, 0.58, 0.03, 0, "mono"), text("{counts[0]}", 0.3, 0.7, 0.09, 0, "bold"))
+  let right = merge(text("merging", 0.7, 0.58, 0.03, 0, "mono"), text("{counts[1]}", 0.7, 0.7, 0.09, 0, "bold"))
+  let sixteen = merge(head, left, right) * s16
+  // a thousand cards: the dots fill each square, row by row
+  let base = 1.0
+  let big = 0.56
+  let small = big * sqrt(9000 / 250000)
+  let fill(cx, side, start) = rect(cx, base - side / 2, side, side, 0, 0.001) * (y > base - side * clamp((t - start) / span, 0, 1)) * (t >= start)
+  let grid = dots(130, 0.55, 0.05)
+  let A = fill(0.34, big, grow1) * grid
+  let B = fill(0.8, small, grow2) * grid
+  let frameA = cut(rect(0.34, base - big / 2, big + 0.01, big + 0.01, 0, 0.001), rect(0.34, base - big / 2, big + 0.004, big + 0.004, 0, 0.001)) * (t >= grow1) * 0.5
+  let head2 = text("a thousand cards", 0.5, base - big - 0.09, 0.034, 0, "mono") * 0.55 * smoothstep(grow1, grow1 + 0.04, t)
+  let labA = merge(text("insertion", 0.34, base + 0.05, 0.03, 0, "mono"), text("~ 250 000", 0.34, base + 0.11, 0.045, 0, "bold")) * smoothstep(grow1 + span, grow1 + span + 0.04, t)
+  let labB = merge(text("merging", 0.8, base + 0.05, 0.03, 0, "mono"), text("< 10 000", 0.8, base + 0.11, 0.045, 0, "bold")) * smoothstep(grow2 + span * 0.3, grow2 + span * 0.3 + 0.04, t)
+  output accent * B + (1 - accent) * merge(sixteen, A, frameA, head2, labA, labB)
+}
