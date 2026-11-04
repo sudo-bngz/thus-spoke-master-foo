@@ -1,0 +1,43 @@
+// Lfsr — a fake die: fifteen bits in a row (a linear-feedback shift
+// register). At each step they slide one place to the right; the last two
+// are mixed (exclusive or: 1 if they differ) and the result comes back at
+// the start. The bit that falls out at the end is written on a tape, 24 by
+// 24, left to right, top to bottom: chance, to the eye. The steps come
+// slowly, then faster and faster. `reg` is the register, grown by the
+// caller (a field: cell c at x = (c + 0.5) / 15, generation g at t = g / 575).
+// `accent: 1` gives only the feedback, in vermilion, and the period. Times
+// are the scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Lfsr(reg = 0, s0 = 0.1, s1 = 0.8, mix = 0.3, period = 0.9, accent = 0) {
+  let G = 575
+  let gen = floor(G * clamp((t - s0) / (s1 - s0), 0, 1) ^ 3)
+  let cell(c, g) = at(move(reg, x: x - (c + 0.5) / 15, y: y - 0.5), time: g / G)
+  // the register
+  let ry = 0.3
+  let X(c) = 0.115 + 0.055 * c
+  let box(c) = cut(rect(X(c), ry, 0.046, 0.046, 0, 0.001), rect(X(c), ry, 0.038, 0.038, 0, 0.001)) * 0.6
+  let bit(c) = rect(X(c), ry, 0.03, 0.03, 0, 0.001) * cell(c, gen)
+  let row = merge([max(box(c), bit(c)) for c in range(15)])
+  let names = merge(text("in", X(0), ry - 0.055, 0.024, 0, "mono"), text("out", X(14), ry - 0.055, 0.024, 0, "mono")) * 0.5
+  // the feedback: down from the last two, mixed, back to the start
+  let fy = 0.4
+  let shown = smoothstep(mix, mix + 0.03, t)
+  let back = merge(line(X(13), ry + 0.025, X(13), fy, 0.003, 0.001), line(X(14), ry + 0.025, X(14), fy, 0.003, 0.001),
+                   line(X(0), fy, X(14), fy, 0.003, 0.001), line(X(0), fy, X(0), ry + 0.025, 0.003, 0.001)) * shown
+  let xor = merge(cut(circle(X(13.5), fy, 0.05, 0.002), circle(X(13.5), fy, 0.038, 0.002)),
+                  line(X(13.5) - 0.016, fy, X(13.5) + 0.016, fy, 0.004, 0.001), line(X(13.5), fy - 0.016, X(13.5), fy + 0.016, 0.004, 0.001)) * shown
+  let blank = circle(X(13.5), fy, 0.038, 0.002) * shown
+  // the tape: bit k is what fell out at step k
+  let tx = 0.176
+  let ty = 0.55
+  let cw = 0.027
+  let col = floor((x - tx) / cw)
+  let rw = floor((y - ty) / cw)
+  let k = rw * 24 + col
+  let inside = (x > tx) * (x < tx + 24 * cw) * (y > ty) * (y < ty + 24 * cw)
+  let cellshape = (fract((x - tx) / cw) > 0.1) * (fract((y - ty) / cw) > 0.1)
+  let tape = cell(14, k) * inside * (k <= gen) * cellshape
+  let tapeframe = cut(rect(0.5, ty + 12 * cw, 24 * cw + 0.016, 24 * cw + 0.016, 0, 0.001), rect(0.5, ty + 12 * cw, 24 * cw + 0.01, 24 * cw + 0.01, 0, 0.001)) * 0.35 * smoothstep(s0, s0 + 0.03, t)
+  let label = text("period  32 767", 0.5, ty + 24 * cw + 0.06, 0.034, 0, "mono") * smoothstep(period, period + 0.03, t)
+  output accent * merge(back, xor, label) + (1 - accent) * cut(merge(row, names, tape, tapeframe), blank)
+}

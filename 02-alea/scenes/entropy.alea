@@ -1,0 +1,37 @@
+// Entropy — real chance: three sources from the world flow into a pool,
+// are stirred together, and a seed comes out that no one can guess. The
+// keys: their taps, unevenly spaced; the mouse: a wandering trail; the
+// circuits: their noise, a grain. They light up on their words (`when`), the
+// pool turns, the seed's bits appear one by one at `seed` (in vermilion,
+// with `accent: 1`). Times are the scene's own (0 to 1). What it returns:
+// 0 paper, up to 1 ink.
+
+work Entropy(when = [0.2, 0.35, 0.5], stir = 0.6, seed = 0.75, accent = 0) {
+  let on(k) = smoothstep(when[k], when[k] + 0.03, t)
+  let sx = 0.22
+  let ys = [0.3, 0.52, 0.74]
+  // the keys: little caps, pressed at uneven moments
+  let press(j) = exp(-fract(t * (7 + j * 2.3) + j * 0.37) * 9)
+  let keys = merge([cut(rect(sx - 0.09 + 0.06 * j, ys[0], 0.05, 0.05, 0, 0.006), rect(sx - 0.09 + 0.06 * j, ys[0], 0.04, 0.04, 0, 0.005)) * 0.6
+                    + rect(sx - 0.09 + 0.06 * j, ys[0], 0.04, 0.04, 0, 0.005) * press(j) * 0.8 for j in range(4)]) * on(0)
+  // the mouse: a trail that wanders
+  let trail = path([[sx - 0.12 + 0.016 * s, ys[1] + 0.05 * noise(s * 0.3, 7, 1)] for s in range(16)], 0.004, 0.002) * (x < sx - 0.12 + 0.24 * clamp((t - when[1]) / 0.12, 0, 1)) * on(1)
+  let pointer = glow(x: sx - 0.12 + 0.24 * clamp((t - when[1]) / 0.12, 0, 1), y: ys[1], size: 0.05) * on(1) * 0.7
+  // the circuits: noise in a strip, alive
+  let hiss = (~~uniform(0, 1) > 0.55) * rect(sx, ys[2], 0.24, 0.06, 0, 0.002) * on(2) * 0.8
+  let names = merge(text("keys", sx, ys[0] + 0.065, 0.026, 0, "mono") * on(0), text("mouse", sx, ys[1] + 0.065, 0.026, 0, "mono") * on(1), text("circuits", sx, ys[2] + 0.065, 0.026, 0, "mono") * on(2)) * 0.6
+  // into the pool, stirred
+  let px = 0.66
+  let py = 0.52
+  let flows = merge([line(sx + 0.14, ys[k], px - 0.13, py + (ys[k] - py) * 0.3, 0.003, 0.001) * on(k) * 0.4 for k in range(3)])
+  let pool = cut(circle(px, py, 0.26, 0.003), circle(px, py, 0.25, 0.003)) * smoothstep(when[0], when[0] + 0.04, t) * 0.6
+  let swirl = warp(clouds(5, 3), amount: 0.04 * smoothstep(stir, stir + 0.1, t) * sin(t * 40), scale: 3) * circle(px, py, 0.24, 0.02) * 0.7 * (on(0) + on(1) + on(2)) / 3
+  // the seed: fifteen bits, out of the pool
+  let bitv = [choose { 0 | 1 } for k in range(15)]
+  let X(k) = 0.5 - 0.35 + 0.05 * k
+  let seedrow = merge([cut(rect(X(k), 0.98, 0.042, 0.042, 0, 0.001), rect(X(k), 0.98, 0.034, 0.034, 0, 0.001)) * 0.5 * smoothstep(seed - 0.03, seed, t) for k in range(15)])
+  let bits = merge([rect(X(k), 0.98, 0.026, 0.026, 0, 0.001) * bitv[k] * smoothstep(seed + k * 0.008, seed + k * 0.008 + 0.01, t) for k in range(15)])
+  let drop = line(px, py + 0.13, px, 0.93, 0.003, 0.001) * smoothstep(seed - 0.04, seed, t) * 0.4
+  let label = text("seed", 0.5, 1.05, 0.026, 0, "mono") * smoothstep(seed, seed + 0.03, t) * 0.6
+  output accent * bits + (1 - accent) * merge(keys, trail, pointer, hiss, names, flows, pool, swirl, seedrow, drop, label)
+}

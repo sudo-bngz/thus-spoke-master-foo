@@ -1,0 +1,27 @@
+// Machine — a computer can't roll a die: a die, struck through; then a
+// recipe, a box, run three times: each time something goes in, the box
+// works, and the same 7 comes out, under the last. `accent: 1` gives only
+// the stroke through the die (vermilion). Times are the scene's own (0 to
+// 1). What it returns: 0 paper, up to 1 ink.
+
+work Machine(die = 0.1, strike = 0.2, box = 0.35, runs = [0.5, 0.65, 0.8], accent = 0) {
+  // the die, and the stroke through it
+  let dx = 0.5
+  let dy = 0.36
+  let face = cut(rect(dx, dy, 0.2, 0.2, 0, 0.012), rect(dx, dy, 0.19, 0.19, 0, 0.01))
+  let pips = merge([circle(dx + p[0] * 0.055, dy + p[1] * 0.055, 0.03, 0.002) for p in [[-1, -1], [1, 1], [0, 0], [1, -1], [-1, 1]]])
+  let dieshape = merge(face, pips) * smoothstep(die, die + 0.04, t) * (1 - 0.6 * smoothstep(box - 0.04, box, t))
+  let stroke = line(dx - 0.16, dy + 0.16, dx - 0.16 + 0.32 * clamp((t - strike) / 0.04, 0, 1), dy + 0.16 - 0.32 * clamp((t - strike) / 0.04, 0, 1), 0.012, 0.002) * (t > strike) * (1 - 0.6 * smoothstep(box - 0.04, box, t))
+  // the recipe: in, the box, out
+  let by = 0.74
+  let shown = smoothstep(box, box + 0.04, t)
+  let frame = cut(rect(0.5, by, 0.3, 0.14, 0, 0.002), rect(0.5, by, 0.292, 0.132, 0, 0.002))
+  let label = text("recipe", 0.5, by, 0.034, 0, "mono")
+  let wires = merge(line(0.12, by, 0.35, by, 0.003, 0.002), line(0.65, by, 0.75, by, 0.003, 0.002)) * 0.5
+  let run(k) = clamp((t - runs[k]) / 0.05, 0, 1)
+  let going(k) = glow(x: 0.12 + 0.23 * run(k), y: by, size: 0.06) * (t > runs[k]) * (run(k) < 1)
+  let busy(k) = (t > runs[k] + 0.05) * (t < runs[k] + 0.07) * rect(0.5, by, 0.292, 0.132, 0, 0.002) * 0.25
+  let out(k) = text("7", 0.82, by - 0.13 + 0.13 * k, 0.09, 0, "serif") * smoothstep(runs[k] + 0.07, runs[k] + 0.09, t)
+  let recipe = merge(merge(frame, label, wires) * shown, merge([merge(going(k), busy(k), out(k)) for k in range(count(runs))]))
+  output accent * stroke + (1 - accent) * merge(dieshape, recipe)
+}

@@ -1,0 +1,31 @@
+// Seed — the bits a register starts from. Three registers, each with its
+// seed above (its first fifteen bits) and its tape below, 16 by 16: the
+// first two from the same seed, the same tape, bit for bit; the third from
+// the same seed with one bit changed (in vermilion), and its tape has
+// nothing in common. Then the command that drew this film, typed. `a` and
+// `c` are grown registers (as in Lfsr), `flip` the cell changed in `c`.
+// `accent: 1` gives only the changed bit. Times are the scene's own (0 to
+// 1). What it returns: 0 paper, up to 1 ink.
+
+work Seed(a = 0, c = 0, flip = 3, show = [0.1, 0.35, 0.6], fill = 0.12, cmd = "$ alea alea.alea --seed 0xa161", typed = [0.8, 0.9], accent = 0) {
+  let G = 575
+  let cellof(r, k, g) = at(move(r, x: x - (k + 0.5) / 15, y: y - 0.5), time: g / G)
+  let cxs = [0.18, 0.5, 0.82]
+  let regs = [a, a, c]
+  let names = ["seed", "same seed", "one bit changed"]
+  let sy = 0.4
+  let ty = 0.48
+  let cw = 0.017
+  let seedrow(j) = merge([max(cut(rect(cxs[j] - 0.126 + 0.018 * k, sy, 0.015, 0.015, 0, 0.001), rect(cxs[j] - 0.126 + 0.018 * k, sy, 0.011, 0.011, 0, 0.001)) * 0.5,
+                              rect(cxs[j] - 0.126 + 0.018 * k, sy, 0.009, 0.009, 0, 0.001) * cellof(regs[j], k, 0)) for k in range(15)])
+  let tape(j) = cellof(regs[j], 14, floor((y - ty) / cw) * 16 + floor((x - cxs[j] + 8 * cw) / cw))
+                * (x > cxs[j] - 8 * cw) * (x < cxs[j] + 8 * cw) * (y > ty) * (y < ty + 16 * cw)
+                * (fract((x - cxs[j] + 8 * cw) / cw) > 0.12) * (fract((y - ty) / cw) > 0.12)
+                * (floor((y - ty) / cw) * 16 + floor((x - cxs[j] + 8 * cw) / cw) <= 256 * clamp((t - show[j]) / fill, 0, 1))
+  let panel(j) = merge(seedrow(j), tape(j), text(names[j], cxs[j], sy - 0.05, 0.024, 0, "mono") * 0.7) * smoothstep(show[j], show[j] + 0.02, t)
+  let panels = merge([panel(j) for j in range(3)])
+  let mark = rect(cxs[2] - 0.126 + 0.018 * flip, sy, 0.021, 0.021, 0, 0.001) * smoothstep(show[2], show[2] + 0.02, t)
+  let line1 = text(cmd, 0.07, 0.95, 0.03, 0, "mono", "left") * (x < 0.07 + 0.0155 * 31 * clamp((t - typed[0]) / (typed[1] - typed[0]), 0, 1)) * (t > typed[0])
+  let cursor = rect(0.07 + 0.0155 * 31 * clamp((t - typed[0]) / (typed[1] - typed[0]), 0, 1) + 0.01, 0.95, 0.012, 0.03, 0, 0.001) * (fract(t * 40) < 0.5) * (t > typed[0])
+  output accent * mark + (1 - accent) * cut(merge(panels, line1, cursor), mark)
+}
