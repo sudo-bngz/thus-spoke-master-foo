@@ -4,3 +4,4 @@
 *.wav
 out/
 01-algorithme/_s*.alea
+__pycache__/
