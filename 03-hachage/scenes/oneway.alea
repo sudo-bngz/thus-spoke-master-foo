@@ -23,7 +23,14 @@ work Oneway(bits = [0], back = 0.3, strike = 0.45, trying = 0.6, accent = 0) {
   let when(k) = trying + 0.4 * (k / N) ^ 0.6
   let showing(k) = (t >= when(k)) * (t < when(k + 1) + (k == N - 1) * 10)
   let tries = merge([text(w(k), 0.5, 0.95, 0.03, 0, "mono") * showing(k) for k in range(N)])
-  let miss = merge([Digest(bits: [fract(sin(k * 12.9898 + q * 78.233) * 43758.5453) > 0.5 for q in range(256)], x0: 0.5, y0: 1.12, cell: 0.009, t0: -1, t1: -0.5) * showing(k) for k in range(N)]) * 0.5
+  // each try's wrong fingerprint: a small grid of noise, new for each try (no hash computed: it is only wrong)
+  let mc = 0.009
+  let mcol = floor((x - 0.5 + 8 * mc) / mc)
+  let mrow = floor((y - 1.12 + 8 * mc) / mc)
+  let minside = (x > 0.5 - 8 * mc) * (x < 0.5 + 8 * mc) * (y > 1.12 - 8 * mc) * (y < 1.12 + 8 * mc)
+  let mshape = (fract((x - 0.5 + 8 * mc) / mc) > 0.15) * (fract((y - 1.12 + 8 * mc) / mc) > 0.15)
+  let which = sum([k * showing(k) for k in range(N)])
+  let miss = (fract(sin(mcol * 12.9898 + mrow * 78.233 + which * 37.719) * 43758.5453) > 0.5) * minside * mshape * (t >= when(0)) * 0.5
   let wrong = text("no", 0.62, 1.12, 0.026, 0, "mono") * (t > trying + 0.05) * (fract(t * 25) < 0.5) * 0.5
   output accent * slash + (1 - accent) * merge(words, down, g, up, ask, tries, miss, wrong)
 }
