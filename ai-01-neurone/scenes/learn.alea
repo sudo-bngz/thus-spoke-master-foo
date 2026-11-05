@@ -1,0 +1,37 @@
+// Learn — the rule, step by step: the points, the line; one point lit at
+// each step (in vermilion); when it is on the wrong side, the weights move
+// and the line swings. `w1`, `w2`, `b` are the grown weights (a field: at
+// time k / S, their values after k steps), `S` the number of steps; the
+// steps run from `l0` to `l1`, slowly then faster. `done` writes the last
+// word when the steps are over. `accent: 1` gives only the lit point and
+// the line while it moves. Times are the scene's own (0 to 1). What it
+// returns: 0 paper, up to 1 ink.
+
+work Learn(px = [0.3], py = [0.3], lab = [1], w1 = 0, w2 = 0, b = 0, S = 72, l0 = 0.1, l1 = 0.8, done = "never wrong again", accent = 0) {
+  let N = count(px)
+  let X(u) = 0.1 + 0.8 * u
+  let Y(u) = 0.3 + 0.8 * u
+  let K = floor(S * clamp((t - l0) / (l1 - l0), 0, 1) ^ 1.8)
+  let W1 = at(w1, time: K / S)
+  let W2 = at(w2, time: K / S)
+  let B = at(b, time: K / S)
+  let N1 = at(w1, time: min(K + 1, S) / S)
+  let moved = (abs(N1 - W1) + abs(at(w2, time: min(K + 1, S) / S) - W2) + abs(at(b, time: min(K + 1, S) / S) - B)) > 0.0001
+  let dot(q) = circle(X(px[q]), Y(py[q]), 0.036, 0.002) * (0.3 + 0.7 * (lab[q] > 0))
+  let ring(q) = cut(circle(X(px[q]), Y(py[q]), 0.036, 0.002), circle(X(px[q]), Y(py[q]), 0.026, 0.002)) * (lab[q] < 0)
+  let pts = merge([merge(dot(q) * (lab[q] > 0), ring(q)) for q in range(N)])
+  let frame = cut(rect(0.5, 0.7, 0.84, 0.84, 0, 0.002), rect(0.5, 0.7, 0.834, 0.834, 0, 0.002)) * 0.35
+  let u = (x - 0.1) / 0.8
+  let v = (y - 0.3) / 0.8
+  let s = (W1 * u + W2 * v + B) / sqrt(W1 ^ 2 + W2 ^ 2 + 0.0001)
+  let inside = (x > 0.08) * (x < 0.92) * (y > 0.28) * (y < 1.12)
+  let edge = (abs(s) < 0.005) * inside
+  let shade = (s > 0) * inside * 0.12
+  // the point visited at this step: K mod N, lit; a cross if wrong
+  let visiting = (t >= l0) * (K < S)
+  let lit = merge([circle(X(px[q]), Y(py[q]), 0.05, 0.002) * ((K % N) == q) for q in range(N)]) * visiting
+  let counter = merge([text("step {k}", 0.1, 1.2, 0.028, 0, "mono", "left") * (K == k) for k in range(S + 1)]) * 0.6 * (t >= l0)
+  let passes = merge([text("pass {p + 1}", 0.9, 1.2, 0.028, 0, "mono", "right") * (floor(K / N) == p) for p in range(8)]) * 0.6 * (t >= l0) * (K < S)
+  let last = text(done, 0.5, 1.27, 0.03, 0, "mono") * 0.7 * smoothstep(l1, l1 + 0.03, t)
+  output accent * merge(lit, edge * moved * visiting) + (1 - accent) * merge(frame, shade, pts, edge * (1 - moved * visiting), counter, passes, last)
+}

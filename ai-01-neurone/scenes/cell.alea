@@ -1,0 +1,40 @@
+// Cell — one neuron: three inputs on the left, each on a wire whose
+// thickness is its weight; the sum, a bar that fills; the threshold, a
+// mark on the bar; the output on the right, lit when the sum passes it.
+// Twice: once it fires, once it does not. `accent: 1` gives only the
+// output when it fires. Times are the scene's own (0 to 1). What it
+// returns: 0 paper, up to 1 ink.
+
+work Cell(inputs0 = 0.05, wires0 = 0.2, sum0 = 0.4, thresh0 = 0.55, fire0 = 0.65, again0 = 0.8, accent = 0) {
+  let xin = 0.14
+  let ys = [0.38, 0.55, 0.72]
+  let cx = 0.5
+  let cy = 0.55
+  // two sets of inputs: the first fires, the second does not
+  let second = smoothstep(again0, again0 + 0.03, t)
+  let vals1 = [0.9, 0.2, 0.7]
+  let vals2 = [0.1, 0.8, 0.3]
+  let weights = [0.6, 0.15, 0.4]
+  let v(k) = vals1[k] * (1 - second) + vals2[k] * second
+  let on(k) = smoothstep(inputs0 + 0.04 * k, inputs0 + 0.04 * k + 0.03, t)
+  let inputs = merge([merge(circle(xin, ys[k], 0.05, 0.002) * (0.25 + 0.75 * v(k)), text("x{k + 1}", xin, ys[k] - 0.06, 0.024, 0, "mono") * 0.5) * on(k) for k in range(3)])
+  let wire(k) = line(xin + 0.03, ys[k], cx - 0.1, cy, 0.004 + 0.016 * weights[k], 0.002) * smoothstep(wires0 + 0.04 * k, wires0 + 0.04 * k + 0.03, t) * 0.55
+  let wlabel(k) = text("w{k + 1}", (xin + cx - 0.1) / 2, (ys[k] + cy) / 2 - 0.035, 0.022, 0, "mono") * smoothstep(wires0 + 0.04 * k + 0.02, wires0 + 0.04 * k + 0.05, t) * 0.5
+  // the body: a circle with the sum sign; the sum bar under it
+  let body = merge(cut(circle(cx, cy, 0.2, 0.002), circle(cx, cy, 0.19, 0.002)), text("+", cx, cy, 0.14, 0, "sans") * 0.8) * smoothstep(wires0, wires0 + 0.04, t)
+  let total = sum([v(k) * weights[k] for k in range(3)])   // 0.85, then 0.3
+  let filling = clamp((t - sum0) / 0.1, 0, 1) * (1 - second) + second * clamp((t - again0 - 0.04) / 0.1, 0, 1)
+  let barw = 0.5
+  let bar = cut(rect(cx, cy + 0.2, barw, 0.05, 0, 0.002), rect(cx, cy + 0.2, barw - 0.006, 0.044, 0, 0.002)) * 0.5 * smoothstep(sum0 - 0.03, sum0, t)
+  let fill = rect(cx - barw / 2 + barw * total * filling / 2, cy + 0.2, barw * total * filling, 0.036, 0, 0.002) * smoothstep(sum0, sum0 + 0.01, t)
+  let thr = 0.6
+  let mark = merge(line(cx - barw / 2 + barw * thr, cy + 0.16, cx - barw / 2 + barw * thr, cy + 0.24, 0.006, 0.002), text("threshold", cx - barw / 2 + barw * thr, cy + 0.29, 0.024, 0, "mono") * 0.6) * smoothstep(thresh0, thresh0 + 0.03, t)
+  // the output
+  let xout = 0.86
+  let axon = line(cx + 0.1, cy, xout - 0.04, cy, 0.006, 0.002) * smoothstep(wires0 + 0.1, wires0 + 0.14, t) * 0.5
+  let fires = (total * filling > thr)
+  let out = cut(circle(xout, cy, 0.07, 0.002), circle(xout, cy, 0.06, 0.002)) * smoothstep(wires0 + 0.12, wires0 + 0.16, t)
+  let lit = circle(xout, cy, 0.06, 0.002) * fires * (t > fire0)
+  let outlabel = merge(text("1", xout, cy - 0.08, 0.04, 0, "mono") * fires * (t > fire0), text("0", xout, cy - 0.08, 0.04, 0, "mono") * (1 - fires) * (t > again0 + 0.15))
+  output accent * lit + (1 - accent) * merge(inputs, merge([merge(wire(k), wlabel(k)) for k in range(3)]), body, bar, fill, mark, axon, out, outlabel)
+}

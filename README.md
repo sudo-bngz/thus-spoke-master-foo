@@ -24,6 +24,17 @@ captions translate him.
 | 04 | [Clé](04-cle/) | How do two strangers agree on a secret in a square where everyone listens? Arithmetic on a clock of 23 hours, a prime; jumping by 5 visits every hour; forward is easy, backward is the discrete logarithm. Each keeps a secret number of jumps, says the result aloud, and both land on the same key (Diffie–Hellman, with the real numbers). The lock in the browser. | 2 min 10 |
 | 05 | [Token](05-token/) | What is a language model? It reads tokens, pieces of words, each a number; its only job is a probability for every token that could come next; it picks one, adds it, asks again. It rolls a die weighted by the probabilities, and temperature shapes the die. The probabilities come from reading nearly everything, hundreds of billions of knobs turned until the guesses matched. The probabilities shown are illustrative. | 2 min 01 |
 
+### AI, a sub-series
+
+One idea per episode, in the order they build on each other: the neuron,
+layers, how it learns, tokens, attention, the next token, training, the
+context window, hallucination. Episode 05 above was the first attempt to
+say it all in one; these take their time.
+
+| # | Episode | The idea | Length |
+|---|---|---|---|
+| AI 01 | [Neurone](ai-01-neurone/) | The perceptron. Inputs on weighted wires, a sum, a threshold: it fires or not. With two inputs it is a line; the rule (show it a point; if wrong, move the weights toward the answer) swings the line until it is never wrong again. Then the limit: the opposite corners together, which no line separates. The edition draws the points, and the weights are grown by the rule itself, inside alea. | 1 min 46 |
+
 ## Render
 
 You need alea (a clone of `sudo-bngz/alea`, built with `cargo build
@@ -54,6 +65,10 @@ alea cle.alea --seed 0xa163 -o out/
 cd ../05-token
 python3 gen.py
 alea token.alea --seed 0xa164 -o out/
+
+cd ../ai-01-neurone
+python3 gen.py
+alea neurone.alea --seed 0xa1a1 -o out/
 ```
 
 Master Foo's Japanese needs misaki, Kokoro's pronunciation library:
@@ -89,6 +104,10 @@ fonts/                  Noto Sans JP (subset, OFL), for the katakana and the sea
   gen.py                the script, the candidates' probabilities (illustrative) and the die's temperatures
   token.alea            the Reel
   scenes/               koan, tokens, next, dice, knobs
+ai-01-neurone/
+  gen.py                the script; the points and the perceptron rule, grown with `grow`
+  neurone.alea          the Reel
+  scenes/               koan, cell, line, learn (also the XOR corners)
 lib/episode.py          what the generators share: the voice measured, the captions typed, the layout
 ```
 
@@ -112,6 +131,10 @@ cd 04-cle && python3 gen.py && alea cle.alea --seed 0xa163 -o out/
 cd ../05-token
 python3 gen.py
 alea token.alea --seed 0xa164 -o out/
+
+cd ../ai-01-neurone
+python3 gen.py
+alea neurone.alea --seed 0xa1a1 -o out/
 ```
 
 Run `gen.py` and `alea` with the same variables: `gen.py` measures each

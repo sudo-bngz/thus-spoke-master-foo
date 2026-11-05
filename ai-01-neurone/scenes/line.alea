@@ -1,0 +1,28 @@
+// Line — with two inputs, the neuron is a line: the points of two kinds
+// (the edition's, `px`, `py`, `lab` ±1), then the line w1 x + w2 y + b = 0
+// for the starting weights, the side where it fires shaded; then the
+// points on the wrong side ringed in vermilion. `accent: 1` gives only
+// those rings. Times are the scene's own (0 to 1). What it returns: 0
+// paper, up to 1 ink.
+
+work Line(px = [0.3], py = [0.3], lab = [1], w1 = -0.4, w2 = 0.1, b = 0.1, points0 = 0.05, line0 = 0.3, fire0 = 0.45, wrong0 = 0.7, accent = 0) {
+  let N = count(px)
+  let X(u) = 0.1 + 0.8 * u
+  let Y(u) = 0.3 + 0.8 * u
+  let dot(q) = circle(X(px[q]), Y(py[q]), 0.036, 0.002) * (0.3 + 0.7 * (lab[q] > 0))
+  let ring(q) = cut(circle(X(px[q]), Y(py[q]), 0.036, 0.002), circle(X(px[q]), Y(py[q]), 0.026, 0.002)) * (lab[q] < 0)
+  let pts = merge([merge(dot(q) * (lab[q] > 0), ring(q)) * smoothstep(points0 + 0.02 * q, points0 + 0.02 * q + 0.02, t) for q in range(N)])
+  let frame = cut(rect(0.5, 0.7, 0.84, 0.84, 0, 0.002), rect(0.5, 0.7, 0.834, 0.834, 0, 0.002)) * 0.35 * smoothstep(points0, points0 + 0.05, t)
+  // the line, in the points' coordinates
+  let u = (x - 0.1) / 0.8
+  let v = (y - 0.3) / 0.8
+  let s = (w1 * u + w2 * v + b) / sqrt(w1 ^ 2 + w2 ^ 2 + 0.0001)
+  let inside = (x > 0.08) * (x < 0.92) * (y > 0.28) * (y < 1.12)
+  let edge = (abs(s) < 0.005) * inside * smoothstep(line0, line0 + 0.04, t)
+  let shade = (s > 0) * inside * 0.12 * smoothstep(fire0, fire0 + 0.05, t)
+  let firelabel = text("fires", 0.5 + 0.3 * sign(w1), 1.18, 0.028, 0, "mono") * 0.6 * smoothstep(fire0, fire0 + 0.05, t)
+  let wrongq(q) = (lab[q] * (w1 * px[q] + w2 * py[q] + b) <= 0)
+  let wrongs = merge([cut(circle(X(px[q]), Y(py[q]), 0.07, 0.002), circle(X(px[q]), Y(py[q]), 0.06, 0.002)) * wrongq(q) for q in range(N)]) * smoothstep(wrong0, wrong0 + 0.03, t)
+  let wronglabel = text("wrong", 0.5, 1.24, 0.028, 0, "mono") * 0.6 * smoothstep(wrong0, wrong0 + 0.03, t)
+  output accent * wrongs + (1 - accent) * merge(frame, shade, pts, edge, firelabel, wronglabel)
+}
