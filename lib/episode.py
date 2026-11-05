@@ -9,7 +9,7 @@ def measure(text, who, here, narrator, master, en_engine, ja_engine):
     voice, speed = narrator if who == "N" else master
     engine = os.path.join(here, en_engine if who == "N" else ja_engine)
     env = dict(os.environ, ALEA_LANG="en", ALEA_VOICE=voice, ALEA_SPEED=str(speed))
-    wav = subprocess.run([sys.executable, engine], input=text.encode(), capture_output=True, env=env, check=True).stdout
+    wav = subprocess.run([engine], input=text.encode(), capture_output=True, env=env, check=True).stdout
     with wave.open(io.BytesIO(wav)) as w:
         return w.getnframes() / w.getframerate()
 
@@ -26,10 +26,11 @@ def wrap(text, width=33):
     return lines
 
 
-def caption(vid, text, nxt, master):
-    """The narrator's words typed as they are said; the master's English
-    typed evenly while he speaks Japanese."""
-    if master:
+def caption(vid, text, nxt, even):
+    """The words typed as they are said; or, when the shown text is not the
+    spoken one (the master's English, numbers in digits), typed evenly
+    over the line."""
+    if even:
         typed = f"clamp((T - {vid}.start) / ({vid}.duration * 0.92), 0, 1) * {len(text)}"
     else:
         words = text.split()

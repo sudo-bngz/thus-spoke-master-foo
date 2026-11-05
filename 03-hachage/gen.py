@@ -13,10 +13,10 @@ sys.path.insert(0, os.path.join(HERE, "..", "lib"))
 from episode import GAP, caption, layout, measure
 
 SEED = "0xa162"
-EN_ENGINE = "../voices/kokoro.py"
-JA_ENGINE = "../voices/kokoro-ja.py"
-NARRATOR = ("af_heart", 0.95)
-MASTER = ("jm_kumo", 0.82)
+EN_ENGINE = "../voices/narrator.sh"
+JA_ENGINE = "../voices/master.sh"
+NARRATOR = (os.environ.get("NARRATOR_VOICE", "af_heart"), 0.95)
+MASTER = (os.environ.get("MASTER_VOICE", "jm_kumo"), 0.82)   # an ElevenLabs voice id, with ELEVENLABS_API_KEY
 
 SENTENCE = "thus spoke master foo"
 # the letter changed, for the edition to choose from: (index, new sentence)
@@ -32,12 +32,12 @@ SCENES = [
     ("koan", "", [
         ("m1", "M", "ある弟子が、フー師に手紙を託した。", 0, "A novice entrusted Master Foo with a letter."),
         ("m2", "M", "途中で誰かが書き換えたら、どう分かりますか。", 1.0, "If someone changes it on the way, how will I know?"),
-        ("m3", "M", "師は手紙を読み、封筒にひとつの言葉を書いた。", 1.4, "Master Foo read the letter, and wrote one word on the envelope."),
+        ("m3", "M", "師は手紙を読み、封筒にひとつの言葉を書いた。", 1.4, "Master Foo read the letter, and wrote 1 word on the envelope."),
     ], 1.5),
     ("fingerprint", "1 / 4   the fingerprint", [
         ("n1", "N", "A hash is a fingerprint for data.", 0, ""),
         ("n2", "N", "Any text goes in: a word, a sentence, a whole book.", 1.0, ""),
-        ("n3", "N", "Out comes a code, always the same size: two hundred and fifty-six bits.", 1.0, ""),
+        ("n3", "N", "Out comes a code, always the same size: two hundred and fifty-six bits.", 1.0, "Out comes a code, always the same size: 256 bits."),
         ("n4", "N", "The same text always gives the same fingerprint.", 1.6, ""),
     ], 0.5),
     ("avalanche", "2 / 4   the avalanche", [
@@ -55,7 +55,7 @@ SCENES = [
         ("n12", "N", "A hash is a seal. Change one letter, and the seal breaks.", 1.6, ""),
     ], 0.5),
     ("end", "", [
-        ("m4", "M", "手紙は戻ってきた。一文字だけ、変わっていた。", 0, "The letter came back. One letter had changed."),
+        ("m4", "M", "手紙は戻ってきた。一文字だけ、変わっていた。", 0, "The letter came back. 1 letter had changed."),
         ("m5", "M", "封筒の言葉は、もう合わなかった。", 1.2, "The word on the envelope no longer matched."),
         ("m6", "M", "その時、弟子は悟った。", 1.4, "And the novice was enlightened."),
     ], 2.5),
@@ -177,7 +177,7 @@ def main():
     w('  let series = text("thus spoke master foo  ·  03", x: 0.94, y: -0.3, size: 0.024, font: "mono", align: "right") * 0.45')
     for k, vid in enumerate(order):
         nxt = order[k + 1] if k + 1 < len(order) else None
-        w(caption(vid, english[vid], nxt, who[vid] == "M"))
+        w(caption(vid, english[vid], nxt, english[vid] != text[vid]))
     w("  let said = merge(" + ", ".join(f"c_{v}" for v in order if who[v] == "N") + ")")
     w("  let spoken = merge(" + ", ".join(f"c_{v}" for v in order if who[v] == "M") + ")")
     w('  let dark = paint(merge(header, series, said), palette: ["#000000", "#1a1712"], range: [0, 1], alpha: merge(header, series, said))')

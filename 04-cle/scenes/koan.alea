@@ -23,7 +23,7 @@ work Koan(draw0 = 0.05, draw1 = 0.4, word = 0.3, title = 0.5, kana = ["ã‚¢", "ãƒ
   // what the master shows: it appears at bigat[0], is gone a moment before
   // bigat[1] and appears again; the same, or (swap: 1) big2, in vermilion;
   // it leaves at bigoff
-  let shown1 = smoothstep(bigat[0], bigat[0] + 0.015, t) * (t < bigat[1] - 0.05)
+  let shown1 = smoothstep(bigat[0], bigat[0] + 0.015, t) * (t < bigat[1] - 0.05) * (1 - smoothstep(bigoff, bigoff + 0.03, t))
   let shown2 = smoothstep(bigat[1], bigat[1] + 0.015, t) * (1 - smoothstep(bigoff, bigoff + 0.03, t))
   let shownbig = text(big, cx, cy - 0.01, bigsize, 0, "mono") * (shown1 + shown2 * (1 - swap)) * 0.95
   let shownbig2 = text(big2, cx, cy - 0.01, bigsize, 0, "mono") * shown2 * swap

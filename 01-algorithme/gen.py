@@ -13,8 +13,8 @@ are long to write by hand: this writes them.
 import io, os, shutil, subprocess, sys, wave
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ENGINE = "../voices/kokoro.py"
-NARRATOR = ("af_heart", 0.95)       # voice, speed
+ENGINE = "../voices/narrator.sh"
+NARRATOR = (os.environ.get("NARRATOR_VOICE", "af_heart"), 0.95)       # voice, speed
 MASTER = ("bm_george", 0.88)
 
 LEAD, GAP, HOLD = 1.4, 1.0, 2.0     # seconds: picture alone, between sentences, before the cut
@@ -23,7 +23,7 @@ LEAD, GAP, HOLD = 1.4, 1.0, 2.0     # seconds: picture alone, between sentences,
 SCENES = [
     ("koan", "", [
         ("m1", "M", "A novice asked Master Foo: what is an algorithm?", 0),
-        ("m2", "M", "Master Foo shuffled sixteen cards, and said: sort them.", 1.2),
+        ("m2", "M", "Master Foo shuffled sixteen cards, and said: sort them.", 1.2, "Master Foo shuffled 16 cards, and said: sort them."),
     ], 1.0),
     ("recipe", "1 / 4   the recipe", [
         ("n1", "N", "An algorithm is a recipe.", 0),
@@ -41,13 +41,13 @@ SCENES = [
         ("n9", "N", "Fours make eights, eights make sixteen. Sorted, with fewer comparisons.", 1.2),
     ], 0.5),
     ("cost", "4 / 4   the cost", [
-        ("n10", "N", "With sixteen cards, the difference is small.", 0),
-        ("n11", "N", "With a thousand, the first recipe needs about a quarter of a million comparisons.", 1.2),
-        ("n12", "N", "The second, fewer than ten thousand.", 0.8),
+        ("n10", "N", "With sixteen cards, the difference is small.", 0, "With 16 cards, the difference is small."),
+        ("n11", "N", "With a thousand, the first recipe needs about a quarter of a million comparisons.", 1.2, "With 1 000, the first recipe needs about 250 000 comparisons."),
+        ("n12", "N", "The second, fewer than ten thousand.", 0.8, "The second, fewer than 10 000."),
         ("n13", "N", "An algorithm is a way. Some ways are shorter.", 1.6),
     ], 0.5),
     ("end", "", [
-        ("m3", "M", "Then Master Foo shuffled a thousand cards.", 0),
+        ("m3", "M", "Then Master Foo shuffled a thousand cards.", 0, "Then Master Foo shuffled 1 000 cards."),
         ("m4", "M", "And the novice was enlightened.", 1.4),
     ], 2.0),
 ]
@@ -59,7 +59,7 @@ def measure(text, who):
     voice, speed = NARRATOR if who == "N" else MASTER
     engine = os.path.join(HERE, ENGINE)
     env = dict(os.environ, ALEA_LANG="en", ALEA_VOICE=voice, ALEA_SPEED=str(speed))
-    wav = subprocess.run([sys.executable, engine], input=text.encode(), capture_output=True, env=env, check=True).stdout
+    wav = subprocess.run([engine], input=text.encode(), capture_output=True, env=env, check=True).stdout
     with wave.open(io.BytesIO(wav)) as w:
         return w.getnframes() / w.getframerate()
 
@@ -76,10 +76,11 @@ def wrap(text, width=33):
     return lines
 
 
-def caption(vid, text, nxt):
-    """The text typed as it is said: each word's letters appear while it is spoken."""
+def caption(vid, text, nxt, even=False):
+    """The text typed as it is said: each word's letters appear while it is spoken;
+    typed evenly when the shown text is not the spoken one (numbers in digits)."""
     words = text.split()
-    typed = " + ".join(f"clamp((T - {vid}.words[{k}]) / ({vid}.ends[{k}] - {vid}.words[{k}]), 0, 1) * {len(w) + (k < len(words) - 1)}"
+    typed = f"clamp((T - {vid}.start) / ({vid}.duration * 0.92), 0, 1) * {len(text)}" if even else " + ".join(f"clamp((T - {vid}.words[{k}]) / ({vid}.ends[{k}] - {vid}.words[{k}]), 0, 1) * {len(w) + (k < len(words) - 1)}"
                        for k, w in enumerate(words))
     parts, off = [], 0
     for r, ln in enumerate(wrap(text)):
@@ -98,7 +99,8 @@ def main():
     for name, _, lines, extra in SCENES:
         starts.append(clock)
         tt = clock + LEAD
-        for k, (vid, who, text, gap) in enumerate(lines):
+        for k, line in enumerate(lines):
+            vid, who, text, gap = line[:4]
             dur[vid] = measure(text, who)
             tt += (gap or GAP) if k else 0
             at[vid] = tt
@@ -116,6 +118,7 @@ def main():
     who = {l[0]: l[1] for s in SCENES for l in s[2]}
     text = {l[0]: l[2] for s in SCENES for l in s[2]}
     gaps = {l[0]: l[3] for s in SCENES for l in s[2]}
+    shown = {l[0]: (l[4] if len(l) > 4 else l[2]) for s in SCENES for l in s[2]}
 
     out = []
     w = out.append
@@ -200,7 +203,7 @@ def main():
     w('  let series = text("thus spoke master foo  ·  01", x: 0.94, y: -0.3, size: 0.024, font: "mono", align: "right") * 0.45')
     for k, vid in enumerate(order):
         nxt = order[k + 1] if k + 1 < len(order) else None
-        w(caption(vid, text[vid], nxt))
+        w(caption(vid, shown[vid], nxt, shown[vid] != text[vid]))
     w("  let said = merge(" + ", ".join(f"c_{v}" for v in order if who[v] == "N") + ")")
     w("  let spoken = merge(" + ", ".join(f"c_{v}" for v in order if who[v] == "M") + ")")
     w("  let dark = paint(merge(header, series, said), palette: [\"#000000\", \"#1a1712\"], range: [0, 1], alpha: merge(header, series, said))")

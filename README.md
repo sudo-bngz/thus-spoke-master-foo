@@ -85,12 +85,32 @@ lib/episode.py          what the generators share: the voice measured, the capti
 
 ## The voices
 
-- Master Foo: `bm_george` in 01; from 02, `jm_kumo`, in Japanese.
-- The mix keeps a small room (`room: 0.12`) and no echo, so the voices stay clear.
-- The explanation: `af_heart`.
+Two engines, in `voices/`, each a small program that reads the text on its
+standard input and writes a WAV, as alea expects:
 
-The captions are typed as the words are said; `gen.py` writes them, since
-they are long to write by hand.
+- `master.sh`, Master Foo: with `ELEVENLABS_API_KEY` set, ElevenLabs (model
+  `eleven_multilingual_v2`, which speaks Japanese), the voice being the id
+  in `MASTER_VOICE`; without the key, Kokoro's Japanese voice (`jm_kumo`),
+  through `kokoro-ja.py` and misaki.
+- `narrator.sh`, the explanation: ElevenLabs too when `NARRATOR_VOICE` is
+  set as well; otherwise Kokoro (`af_heart`), through alea's own engine.
+
+```sh
+export ELEVENLABS_API_KEY=…
+export MASTER_VOICE=<an ElevenLabs voice id, Japanese>     # and NARRATOR_VOICE=<id>, if wanted
+cd 04-cle && python3 gen.py && alea cle.alea --seed 0xa163 -o out/
+```
+
+Run `gen.py` and `alea` with the same variables: `gen.py` measures each
+line with the engine to lay the scenes out, and alea says each line once and
+keeps it (`~/.cache/alea/voices/`), so a voice change needs both. In 01 the
+master is `bm_george`, in English. The mix keeps a small room (`room: 0.12`)
+and no echo, so the voices stay clear.
+
+The captions are typed as the words are said; `gen.py` writes them. Numbers
+are always shown in digits (the voice is given them in words, which the
+engines read better); a caption whose text differs from the spoken one is
+typed evenly over the line.
 
 ## Licence
 

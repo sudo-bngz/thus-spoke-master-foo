@@ -12,10 +12,10 @@ import io, os, subprocess, sys, wave
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SEED = "0xa161"                     # the edition published; shown in the film
-EN_ENGINE = "../voices/kokoro.py"
-JA_ENGINE = "../voices/kokoro-ja.py"
-NARRATOR = ("af_heart", 0.95)
-MASTER = ("jm_kumo", 0.82)
+EN_ENGINE = "../voices/narrator.sh"
+JA_ENGINE = "../voices/master.sh"
+NARRATOR = (os.environ.get("NARRATOR_VOICE", "af_heart"), 0.95)
+MASTER = (os.environ.get("MASTER_VOICE", "jm_kumo"), 0.82)   # an ElevenLabs voice id, with ELEVENLABS_API_KEY
 
 LEAD, GAP, HOLD = 1.4, 1.0, 2.0
 
@@ -23,8 +23,8 @@ LEAD, GAP, HOLD = 1.4, 1.0, 2.0
 SCENES = [
     ("koan", "", [
         ("m1", "M", "ある弟子が、フー師に乱数をひとつ求めた。", 0, "A novice asked Master Foo for a random number."),
-        ("m2", "M", "師は答えた。七。", 1.0, "Master Foo answered: seven."),
-        ("m3", "M", "弟子はもう一度たずねた。師は答えた。七。", 1.4, "The novice asked again. Master Foo answered: seven."),
+        ("m2", "M", "師は答えた。七。", 1.0, "Master Foo answered: 7."),
+        ("m3", "M", "弟子はもう一度たずねた。師は答えた。七。", 1.4, "The novice asked again. Master Foo answered: 7."),
     ], 1.5),
     ("machine", "1 / 4   a machine can't guess", [
         ("n1", "N", "A computer cannot roll a die.", 0, ""),
@@ -32,10 +32,10 @@ SCENES = [
     ], 1.0),
     ("lfsr", "2 / 4   a fake die", [
         ("n3", "N", "So it fakes chance, with a recipe that scrambles bits.", 0, ""),
-        ("n4", "N", "Fifteen bits slide to the right. The last two are mixed, and the result comes back at the start.", 1.0, ""),
+        ("n4", "N", "Fifteen bits slide to the right. The last two are mixed, and the result comes back at the start.", 1.0, "15 bits slide to the right. The last 2 are mixed, and the result comes back at the start."),
         ("n5", "N", "Step after step, the bits that fall out look like chance.", 1.4, ""),
         ("n6", "N", "Played fast, they are noise: the very noise of an old game console.", 1.6, ""),
-        ("n7", "N", "But after thirty-two thousand, seven hundred and sixty-seven steps, it all starts again.", 1.4, ""),
+        ("n7", "N", "But after thirty-two thousand, seven hundred and sixty-seven steps, it all starts again.", 1.4, "But after 32 767 steps, it all starts again."),
     ], 0.5),
     ("seed", "3 / 4   the seed", [
         ("n8", "N", "The bits it starts from are its seed.", 0, ""),
@@ -61,7 +61,7 @@ def measure(text, who):
     voice, speed = NARRATOR if who == "N" else MASTER
     engine = os.path.join(HERE, EN_ENGINE if who == "N" else JA_ENGINE)
     env = dict(os.environ, ALEA_LANG="en", ALEA_VOICE=voice, ALEA_SPEED=str(speed))
-    wav = subprocess.run([sys.executable, engine], input=text.encode(), capture_output=True, env=env, check=True).stdout
+    wav = subprocess.run([engine], input=text.encode(), capture_output=True, env=env, check=True).stdout
     with wave.open(io.BytesIO(wav)) as w:
         return w.getnframes() / w.getframerate()
 
@@ -202,7 +202,7 @@ def main():
     w('  let series = text("thus spoke master foo  ·  02", x: 0.94, y: -0.3, size: 0.024, font: "mono", align: "right") * 0.45')
     for k, vid in enumerate(order):
         nxt = order[k + 1] if k + 1 < len(order) else None
-        w(caption(vid, english[vid], nxt, who[vid] == "M"))
+        w(caption(vid, english[vid], nxt, english[vid] != text[vid]))
     w("  let said = merge(" + ", ".join(f"c_{v}" for v in order if who[v] == "N") + ")")
     w("  let spoken = merge(" + ", ".join(f"c_{v}" for v in order if who[v] == "M") + ")")
     w('  let dark = paint(merge(header, series, said), palette: ["#000000", "#1a1712"], range: [0, 1], alpha: merge(header, series, said))')

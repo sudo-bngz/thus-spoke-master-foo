@@ -14,10 +14,10 @@ sys.path.insert(0, os.path.join(HERE, "..", "lib"))
 from episode import GAP, caption, layout, measure
 
 SEED = "0xa163"
-EN_ENGINE = "../voices/kokoro.py"
-JA_ENGINE = "../voices/kokoro-ja.py"
-NARRATOR = ("af_heart", 0.95)
-MASTER = ("jm_kumo", 0.82)
+EN_ENGINE = "../voices/narrator.sh"
+JA_ENGINE = "../voices/master.sh"
+NARRATOR = (os.environ.get("NARRATOR_VOICE", "af_heart"), 0.95)
+MASTER = (os.environ.get("MASTER_VOICE", "jm_kumo"), 0.82)   # an ElevenLabs voice id, with ELEVENLABS_API_KEY
 
 P, G, SA, SB = 23, 5, 6, 15
 SEQ = [pow(G, k, P) for k in range(1, P)]           # 5, 2, 10, 4… the generator's walk
@@ -33,23 +33,23 @@ SCENES = [
         ("m3", "M", "あとは、すべて声に出して言え。", 1.0, "Then say everything else out loud."),
     ], 1.0),
     ("clock", "1 / 4   the clock", [
-        ("n1", "N", "Arithmetic on a clock. This one has twenty-three hours.", 0, ""),
-        ("n2", "N", "Twenty plus five is not twenty-five: it is two. Numbers wrap around.", 1.0, ""),
-        ("n3", "N", "Twenty-three is prime: it cannot be cut into equal parts.", 1.2, ""),
-        ("n4", "N", "So jumping by five, again and again, visits every hour before coming back.", 1.2, ""),
+        ("n1", "N", "Arithmetic on a clock. This one has twenty-three hours.", 0, "Arithmetic on a clock. This one has 23 hours."),
+        ("n2", "N", "Twenty plus five is not twenty-five: it is two. Numbers wrap around.", 1.0, "20 + 5 is not 25: it is 2. Numbers wrap around."),
+        ("n3", "N", "Twenty-three is prime: it cannot be cut into equal parts.", 1.2, "23 is prime: it cannot be cut into equal parts."),
+        ("n4", "N", "So jumping by five, again and again, visits every hour before coming back.", 1.2, "So jumping by 5, again and again, visits every hour before coming back."),
     ], 0.8),
     ("oneway", "2 / 4   one way", [
-        ("n5", "N", "Forward is easy: start at one, multiply by five six times. You land on eight.", 0, ""),
-        ("n6", "N", "Backward is not: from eight, how many jumps? You can only try them all.", 1.2, ""),
+        ("n5", "N", "Forward is easy: start at one, multiply by five six times. You land on eight.", 0, "Forward is easy: start at 1, multiply by 5 6 times. You land on 8."),
+        ("n6", "N", "Backward is not: from eight, how many jumps? You can only try them all.", 1.2, "Backward is not: from 8, how many jumps? You can only try them all."),
         ("n7", "N", "On a clock with hundreds of digits, that takes forever. This is the discrete logarithm.", 1.2, ""),
     ], 0.5),
     ("exchange", "3 / 4   the exchange", [
-        ("n8", "N", "Now, two strangers in the square. The clock and the jump are said aloud: twenty-three, five.", 0, ""),
-        ("n9", "N", "Each chooses a secret number of jumps, and tells no one: six, and fifteen.", 1.0, ""),
-        ("n10", "N", "Each jumps their secret, and says the result: eight, and nineteen.", 1.0, ""),
+        ("n8", "N", "Now, two strangers in the square. The clock and the jump are said aloud: twenty-three, five.", 0, "Now, 2 strangers in the square. The clock and the jump are said aloud: 23, 5."),
+        ("n9", "N", "Each chooses a secret number of jumps, and tells no one: six, and fifteen.", 1.0, "Each chooses a secret number of jumps, and tells no one: 6, and 15."),
+        ("n10", "N", "Each jumps their secret, and says the result: eight, and nineteen.", 1.0, "Each jumps their secret, and says the result: 8, and 19."),
         ("n11", "N", "Then each takes the other's number, and jumps their own secret again.", 1.2, ""),
-        ("n12", "N", "Both land on two. The same number: a key, known to them alone.", 1.0, ""),
-        ("n13", "N", "Everyone heard twenty-three, five, eight, nineteen. Without a secret, there is no way to two.", 1.2, ""),
+        ("n12", "N", "Both land on two. The same number: a key, known to them alone.", 1.0, "Both land on 2. The same number: a key, known to them alone."),
+        ("n13", "N", "Everyone heard twenty-three, five, eight, nineteen. Without a secret, there is no way to two.", 1.2, "Everyone heard 23, 5, 8, 19. Without a secret, there is no way to 2."),
     ], 0.5),
     ("lock", "4 / 4   the lock", [
         ("n14", "N", "This is the lock in your browser: the same idea, with numbers of hundreds of digits.", 0, ""),
@@ -57,7 +57,7 @@ SCENES = [
     ], 0.5),
     ("end", "", [
         ("m4", "M", "広場の皆が、すべての言葉を聞いた。", 0, "Everyone in the square heard every word."),
-        ("m5", "M", "そして、鍵を知ったのは二人だけだった。", 1.2, "And only the two of them knew the key."),
+        ("m5", "M", "そして、鍵を知ったのは二人だけだった。", 1.2, "And only the 2 of them knew the key."),
         ("m6", "M", "その時、弟子は悟った。", 1.4, "And the novice was enlightened."),
     ], 2.5),
 ]
@@ -147,7 +147,7 @@ def main():
     w('  let series = text("thus spoke master foo  ·  04", x: 0.94, y: -0.3, size: 0.024, font: "mono", align: "right") * 0.45')
     for k, vid in enumerate(order):
         nxt = order[k + 1] if k + 1 < len(order) else None
-        w(caption(vid, english[vid], nxt, who[vid] == "M"))
+        w(caption(vid, english[vid], nxt, english[vid] != text[vid]))
     w("  let said = merge(" + ", ".join(f"c_{v}" for v in order if who[v] == "N") + ")")
     w("  let spoken = merge(" + ", ".join(f"c_{v}" for v in order if who[v] == "M") + ")")
     w('  let dark = paint(merge(header, series, said), palette: ["#000000", "#1a1712"], range: [0, 1], alpha: merge(header, series, said))')
