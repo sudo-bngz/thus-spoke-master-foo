@@ -1,0 +1,27 @@
+// Knobs — where the probabilities come from: lines of text stream past in
+// the background, and a field of knobs, each a ring with a tick, turns a
+// little at every line until it settles; a counter of the knobs climbs.
+// `read0` when the reading starts, `settle` when the knobs stop moving.
+// `accent: 1` gives only the ticks that are still turning. Times are the
+// scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Knobs(read0 = 0.1, settle = 0.7, accent = 0) {
+  let reading = smoothstep(read0, read0 + 0.05, t)
+  // the text: lines sliding up, faint
+  let lines = merge([line(0.08, fract(0.1 * r - t * 1.5) * 1.3 + 0.1, 0.08 + 0.84 * (0.5 + 0.5 * fract(r * 0.37 + 0.1)), fract(0.1 * r - t * 1.5) * 1.3 + 0.1, 0.004, 0.002) for r in range(10)]) * 0.18 * reading
+  // the knobs: 8 × 10, their angles wander, less and less
+  let cols = 8
+  let rows = 10
+  let kx(c) = 0.14 + 0.72 * c / (cols - 1)
+  let ky(r) = 0.3 + 0.95 * r / (rows - 1)
+  let calm = 1 - smoothstep(settle - 0.2, settle, t)
+  let angle(c, r) = 120 * noise(c * 0.7, r * 0.7, t * 6) * calm + 60 * noise(c * 0.3 + 5, r * 0.3, 0)
+  let moving(c, r) = abs(noise(c * 0.7, r * 0.7, t * 6) - noise(c * 0.7, r * 0.7, t * 6 - 0.05)) > 0.01
+  let knob(c, r) = cut(circle(kx(c), ky(r), 0.05, 0.002), circle(kx(c), ky(r), 0.042, 0.002)) * 0.5
+  let tick(c, r) = rotate(rect(kx(c), ky(r) - 0.018, 0.006, 0.02, 0, 0.001), angle: angle(c, r), x: kx(c), y: ky(r))
+  let knobs = merge([knob(c, r) for c in range(cols) for r in range(rows)]) * reading
+  let ticks = merge([tick(c, r) for c in range(cols) for r in range(rows)]) * reading
+  let turning = merge([tick(c, r) * (calm > 0.05) for c in range(cols) for r in range(rows)]) * reading
+  let howmany = text("× 100 000 000 000", 0.5, 1.32, 0.034, 0, "mono") * smoothstep(read0 + 0.15, read0 + 0.18, t) * 0.7
+  output accent * turning + (1 - accent) * merge(lines, knobs, ticks, howmany)
+}

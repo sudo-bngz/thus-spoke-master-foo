@@ -22,6 +22,7 @@ captions translate him.
 | 02 | [Aléa](02-alea/) | Can a computer roll a die? It fakes chance: fifteen bits slide along a register, the last two mixed and fed back (an LFSR, the noise of old game consoles), grown step by step in alea from the edition's own seed. Same seed, same numbers; one bit changed, another tape. Real chance comes from the world. Master Foo speaks Japanese. | 1 min 47 |
 | 03 | [Hachage](03-hachage/) | What is a hash? A fingerprint for data: any text in, 256 bits out, always the same for the same text; change one letter and half the bits flip; no way back. A password kept as its hash, a git commit named by it, a download checked by it. The fingerprints are real SHA-256 digests, to check with `sha256sum`. | 1 min 46 |
 | 04 | [Clé](04-cle/) | How do two strangers agree on a secret in a square where everyone listens? Arithmetic on a clock of 23 hours, a prime; jumping by 5 visits every hour; forward is easy, backward is the discrete logarithm. Each keeps a secret number of jumps, says the result aloud, and both land on the same key (Diffie–Hellman, with the real numbers). The lock in the browser. | 2 min 10 |
+| 05 | [Token](05-token/) | What is a language model? It reads tokens, pieces of words, each a number; its only job is a probability for every token that could come next; it picks one, adds it, asks again. It rolls a die weighted by the probabilities, and temperature shapes the die. The probabilities come from reading nearly everything, hundreds of billions of knobs turned until the guesses matched. The probabilities shown are illustrative. | 2 min 01 |
 
 ## Render
 
@@ -49,6 +50,10 @@ alea hachage.alea --seed 0xa162 -o out/
 cd ../04-cle
 python3 gen.py
 alea cle.alea --seed 0xa163 -o out/
+
+cd ../05-token
+python3 gen.py
+alea token.alea --seed 0xa164 -o out/
 ```
 
 Master Foo's Japanese needs misaki, Kokoro's pronunciation library:
@@ -80,6 +85,10 @@ fonts/                  Noto Sans JP (subset, OFL), for the katakana and the sea
   gen.py                the script, and the numbers of the exchange, checked (23, 5, 6, 15 → 8, 19 → 2)
   cle.alea              the Reel
   scenes/               koan, clock, oneway, exchange, lock
+05-token/
+  gen.py                the script, the candidates' probabilities (illustrative) and the die's temperatures
+  token.alea            the Reel
+  scenes/               koan, tokens, next, dice, knobs
 lib/episode.py          what the generators share: the voice measured, the captions typed, the layout
 ```
 
@@ -99,6 +108,10 @@ standard input and writes a WAV, as alea expects:
 export ELEVENLABS_API_KEY=…
 export MASTER_VOICE=<an ElevenLabs voice id, Japanese>     # and NARRATOR_VOICE=<id>, if wanted
 cd 04-cle && python3 gen.py && alea cle.alea --seed 0xa163 -o out/
+
+cd ../05-token
+python3 gen.py
+alea token.alea --seed 0xa164 -o out/
 ```
 
 Run `gen.py` and `alea` with the same variables: `gen.py` measures each

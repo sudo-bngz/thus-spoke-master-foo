@@ -1,0 +1,34 @@
+// Tokens — a sentence cut into tokens: each piece in its box, a number under
+// it (the ids are illustrative), the boxes appearing one by one; then a
+// long word cut into three. `accent: 1` gives only the cuts between the
+// pieces (vermilion). Times are the scene's own (0 to 1). What it returns:
+// 0 paper, up to 1 ink.
+
+work Tokens(pieces = ["thus", " spoke", " master", " foo"], ids = [25151, 8734, 4958, 22944], widths = [4, 6, 7, 4], cut0 = 0.15, cut1 = 0.3, word0 = 0.55, accent = 0) {
+  let adv = 0.0238
+  let N = count(pieces)
+  let total = sum(widths)
+  let left = 0.5 - total * adv / 2
+  let x0(k) = left + sum(slice(widths, 0, k)) * adv
+  let xc(k) = x0(k) + widths[k] * adv / 2
+  let yy = 0.4
+  let sentence = merge([text(pieces[k], x0(k), yy, 0.046, 0, "mono", "left") for k in range(N)])
+  let when(k) = cut0 + (cut1 - cut0) * k / max(N - 1, 1)
+  let box(k) = cut(rect(xc(k), yy, widths[k] * adv + 0.004, 0.07, 0, 0.002), rect(xc(k), yy, widths[k] * adv - 0.004, 0.062, 0, 0.002)) * 0.5 * smoothstep(when(k), when(k) + 0.02, t)
+  let cuts = merge([line(x0(k), yy - 0.05, x0(k), yy + 0.05, 0.005, 0.002) * smoothstep(when(k), when(k) + 0.015, t) for k in range(1, N)])
+  let numbers = merge([text("{ids[k]}", xc(k), yy + 0.08, 0.026, 0, "mono") * smoothstep(when(k) + 0.03, when(k) + 0.05, t) for k in range(N)]) * 0.6
+  let howmany = text("{N} tokens", 0.5, yy + 0.16, 0.03, 0, "mono") * smoothstep(cut1 + 0.05, cut1 + 0.08, t) * 0.6
+  // the long word: three pieces
+  let wy = 0.8
+  let parts = ["un", "believ", "able"]
+  let pw = [2, 6, 4]
+  let wl = 0.5 - 12 * adv * 1.6 / 2
+  let wx(k) = wl + sum(slice(pw, 0, k)) * adv * 1.6
+  let wc(k) = wx(k) + pw[k] * adv * 1.6 / 2
+  let shownw = smoothstep(word0, word0 + 0.03, t)
+  let word = merge([text(parts[k], wx(k), wy, 0.064, 0, "mono", "left") for k in range(3)]) * shownw
+  let wcuts = merge([line(wx(k), wy - 0.06, wx(k), wy + 0.06, 0.006, 0.002) * smoothstep(word0 + 0.1 + 0.08 * k, word0 + 0.12 + 0.08 * k, t) for k in range(1, 3)])
+  let wnums = merge([text(["403", "6667", "540"][k], wc(k), wy + 0.1, 0.026, 0, "mono") * smoothstep(word0 + 0.14 + 0.08 * k, word0 + 0.16 + 0.08 * k, t) for k in range(3)]) * 0.6
+  let wcount = text("3 tokens", 0.5, wy + 0.18, 0.03, 0, "mono") * smoothstep(word0 + 0.36, word0 + 0.39, t) * 0.6
+  output accent * merge(cuts, wcuts) + (1 - accent) * merge(sentence, merge([box(k) for k in range(N)]), numbers, howmany, word, wnums, wcount)
+}
