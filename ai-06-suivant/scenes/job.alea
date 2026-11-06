@@ -1,0 +1,37 @@
+// Job — from the last word's point to the probabilities: the point of
+// "a" (the last word of "Once upon a"), an arrow into a box, "one more
+// layer"; out of it a tall column of tiny bars, one per token, 50 000;
+// then the top four grow large, with their percentages, and the rest is
+// named. `top` is when each of the four comes, `rest0` when the rest is
+// named. The probabilities are illustrative. `accent: 1` gives only the
+// bars of the top four. Times are the scene's own (0 to 1). What it
+// returns: 0 paper, up to 1 ink.
+
+work Job(point0 = 0.05, layer0 = 0.2, column0 = 0.35, squeeze0 = 0.55, top = [0.7, 0.74, 0.78, 0.82], rest0 = 0.9, accent = 0) {
+  let px = 0.16
+  let py = 0.5
+  let point = merge(circle(px, py, 0.018, 0.002), text("a", px, py - 0.05, 0.036, 0, "mono") * 0.8, text("Once upon a", px, py + 0.065, 0.028, 0, "mono") * 0.5) * smoothstep(point0, point0 + 0.03, t)
+  let bx = 0.46
+  let box = merge(cut(rect(bx, py, 0.26, 0.1, 0, 0.002), rect(bx, py, 0.254, 0.094, 0, 0.002)) * 0.5, text("one more layer", bx, py, 0.026, 0, "mono") * 0.8) * smoothstep(layer0, layer0 + 0.04, t)
+  let wire1 = line(px + 0.03, py, bx - 0.13, py, 0.003, 0.002) * 0.4 * smoothstep(layer0, layer0 + 0.04, t)
+  let wire2 = line(bx + 0.13, py, 0.66, py, 0.003, 0.002) * 0.4 * smoothstep(column0, column0 + 0.04, t)
+  // the column: tiny bars, one per token
+  let cy0 = 0.28
+  let ch = 0.44
+  let colshown = smoothstep(column0, column0 + 0.06, t)
+  let rows = 48
+  let bars = merge([rect(0.7 + 0.06 * fract(r * 0.37 + 0.2) / 2, cy0 + ch * r / rows, 0.06 * fract(r * 0.37 + 0.2), 0.005, 0, 0.001) for r in range(rows + 1)]) * 0.6 * colshown
+  let colframe = line(0.7, cy0 - 0.01, 0.7, cy0 + ch + 0.01, 0.003, 0.002) * 0.35 * colshown
+  let collabel = text("50 000 scores", 0.78, cy0 + ch + 0.05, 0.024, 0, "mono") * 0.6 * colshown
+  let squeezed = text("squeezed: they add up to 1", 0.5, 0.86, 0.028, 0, "mono") * 0.65 * smoothstep(squeeze0, squeeze0 + 0.04, t)
+  // the top four, large
+  let cand = ["time", "midnight", "the", "dragon"]
+  let prob = [62, 8, 5, 1]
+  let ty(k) = 0.98 + 0.09 * k
+  let grown(k) = clamp((t - top[k]) / 0.06, 0, 1)
+  let big(k) = rect(0.4 + 0.42 * prob[k] / 100 * grown(k) / 2, ty(k), 0.42 * prob[k] / 100 * grown(k), 0.05, 0, 0.002) * (t > top[k])
+  let name(k) = text(cand[k], 0.37, ty(k), 0.036, 0, "mono", "right") * smoothstep(top[k], top[k] + 0.03, t)
+  let pct(k) = text("{prob[k]} %", 0.42 + 0.42 * prob[k] / 100, ty(k), 0.03, 0, "mono", "left") * 0.7 * (t > top[k] + 0.06)
+  let rest = text("and 49 996 others, sharing the rest", 0.5, 1.36, 0.028, 0, "mono") * 0.55 * smoothstep(rest0, rest0 + 0.04, t)
+  output accent * merge([big(k) for k in range(4)]) + (1 - accent) * merge(point, box, wire1, wire2, bars, colframe, collabel, squeezed, merge([merge(name(k), pct(k)) for k in range(4)]), rest)
+}

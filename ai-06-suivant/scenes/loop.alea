@@ -1,0 +1,30 @@
+// Loop — the whole machine in one picture: six stations around a ring,
+// text, tokens, map, layers, probabilities, die, with arrows between them,
+// each lit as it is named (`when`); the return named (`back0`); then a
+// light goes round and round (`round0`). `accent: 1`
+// gives only the light and the station being named. Times are the
+// scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Loop(when = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3], back0 = 0.4, round0 = 0.55, accent = 0) {
+  let cx = 0.5
+  let cy = 0.78
+  let R = 0.3
+  let names = ["text", "tokens", "map", "layers", "probabilities", "die"]
+  let N = 6
+  let ang(k) = -tau / 4 + tau * k / N
+  let px(k) = cx + R * cos(ang(k))
+  let py(k) = cy + R * sin(ang(k))
+  let on(k) = smoothstep(when[k], when[k] + 0.03, t)
+  let node(k) = merge(cut(circle(px(k), py(k), 0.05, 0.002), circle(px(k), py(k), 0.044, 0.002)) * 0.6, text(names[k], cx + (R + 0.12) * cos(ang(k)), cy + (R + 0.12) * sin(ang(k)), 0.026, 0, "mono") * 0.8) * on(k)
+  // the arrows, along the ring, from each station to the next
+  let arc(k) = ring(cx, cy, 2 * R, 0.006, 0.002) * (fract((atan2(y - cy, x - cx) - ang(k)) / tau) < 1 / N - 0.03) * (fract((atan2(y - cy, x - cx) - ang(k)) / tau) > 0.03) * 0.4 * on((k + 1) % N)
+  let arcs = merge([arc(k) for k in range(N)])
+  // the station being named, in vermilion, for a moment
+  let naming(k) = circle(px(k), py(k), 0.044, 0.002) * on(k) * (1 - smoothstep(when[k] + 0.05, when[k] + 0.08, t))
+  // the light going round, faster and faster
+  let laps = 2.2 * clamp((t - round0) / (1 - round0), 0, 1) ^ 1.5
+  let la = -tau / 4 + tau * laps
+  let light = glow(x: cx + R * cos(la), y: cy + R * sin(la), size: 0.1) * (t > round0)
+  let back = text("and the chosen token goes back into the text", cx, cy + R + 0.24, 0.026, 0, "mono") * 0.6 * smoothstep(back0, back0 + 0.04, t)
+  output accent * merge(merge([naming(k) for k in range(N)]), light) + (1 - accent) * merge(merge([node(k) for k in range(N)]), arcs, back)
+}

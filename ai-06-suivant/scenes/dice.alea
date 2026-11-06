@@ -1,0 +1,28 @@
+// Dice — the die, weighted by the probabilities, and the temperature that
+// shapes it: three rows, temperature 0, 0.7, 1.5; in each the same four
+// candidates, their bars reshaped by the temperature (gen.py: p^(1/T),
+// normalised), and the one the die lands on, in vermilion. `probs` are
+// the 3 × 4 reshaped percentages, `picks` which one each row draws, `at`
+// when each row comes. `accent: 1` gives only the landed-on ones. Times
+// are the scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Dice(cand = ["time", "midnight", "the", "dragon"], temps = ["0", "0.7", "1.5"], probs = [100, 0, 0, 0, 72, 11, 8, 3, 38, 23, 20, 12], picks = [0, 0, 3], at = [0.1, 0.4, 0.7], accent = 0) {
+  let top = 0.3
+  let rowh = 0.3
+  let row(r, k) = top + r * rowh + 0.05 * k
+  let on(r) = smoothstep(at[r], at[r] + 0.03, t)
+  let temp(r) = merge(text("temperature", 0.08, top + r * rowh - 0.05, 0.022, 0, "mono", "left") * 0.5, text(temps[r], 0.3, top + r * rowh - 0.05, 0.034, 0, "mono", "left")) * on(r)
+  let grown(r) = clamp((t - at[r] - 0.03) / 0.08, 0, 1)
+  let w(r, k) = 0.42 * probs[4 * r + k] / 100 * grown(r)
+  let label(r, k) = text(cand[k], 0.3, row(r, k), 0.026, 0, "mono", "right") * on(r) * 0.8
+  let bar(r, k) = rect(0.33 + w(r, k) / 2, row(r, k), w(r, k), 0.03, 0, 0.002) * on(r)
+  let rolled(r) = smoothstep(at[r] + 0.16, at[r] + 0.19, t)
+  // the die: a small square that tumbles along the bars, then lands
+  let dx(r) = 0.84
+  let dy(r) = row(r, 0) + (row(r, picks[r]) - row(r, 0)) * ease(progress(at[r] + 0.12, at[r] + 0.17), "out")
+  let die(r) = rotate(cut(rect(dx(r), dy(r), 0.04, 0.04, 0, 0.002), rect(dx(r), dy(r), 0.032, 0.032, 0, 0.002)), angle: 360 * 2 * progress(at[r] + 0.12, at[r] + 0.17), x: dx(r), y: dy(r)) * (t > at[r] + 0.12) * 0.7
+  let landed(r) = merge(rect(0.33 + w(r, picks[r]) / 2, row(r, picks[r]), w(r, picks[r]), 0.03, 0, 0.002), text(cand[picks[r]], 0.3, row(r, picks[r]), 0.026, 0, "mono", "right"), circle(dx(r), dy(r), 0.016, 0.002)) * rolled(r)
+  let rows = merge([merge(temp(r), merge([merge(label(r, k), bar(r, k)) for k in range(4)]), die(r)) for r in range(3)])
+  let lands = merge([landed(r) for r in range(3)])
+  output accent * lands + (1 - accent) * cut(rows, lands)
+}
