@@ -1,0 +1,33 @@
+// Numbers — each token has a place in the vocabulary, a number: the
+// sentence in its boxes, the numbers appearing under them; then the list
+// the machine sees; then the dictionary neighbours: 4958 and 4959, two
+// unrelated words side by side. `accent: 1` gives only the numbers as
+// they arrive and the neighbour. Times are the scene's own (0 to 1). What
+// it returns: 0 paper, up to 1 ink.
+
+work Numbers(ids0 = 0.1, list0 = 0.4, dict0 = 0.65, accent = 0) {
+  let adv = 0.0238
+  let pieces = ["thus", " spoke", " master", " foo"]
+  let ids = ["25151", "8734", "4958", "22944"]
+  let widths = [4, 6, 7, 4]
+  let left = 0.5 - 21 * adv / 2
+  let x0(k) = left + sum(slice(widths, 0, k)) * adv
+  let xc(k) = x0(k) + widths[k] * adv / 2
+  let yy = 0.4
+  let sentence = merge([text(pieces[k], x0(k), yy, 0.046, 0, "mono", "left") for k in range(4)])
+  let boxes = merge([cut(rect(xc(k), yy, widths[k] * adv + 0.004, 0.07, 0, 0.002), rect(xc(k), yy, widths[k] * adv - 0.004, 0.062, 0, 0.002)) for k in range(4)]) * 0.5
+  let when(k) = ids0 + 0.05 * k
+  let number(k) = text(ids[k], xc(k), yy + 0.085, 0.028, 0, "mono") * smoothstep(when(k), when(k) + 0.03, t)
+  let fresh(k) = number(k) * (1 - smoothstep(when(k) + 0.08, when(k) + 0.12, t))
+  // the list the machine sees
+  let listed = text("[ 25151, 8734, 4958, 22944 ]", 0.5, 0.62, 0.036, 0, "mono") * smoothstep(list0, list0 + 0.04, t)
+  let listlabel = text("what the machine sees", 0.5, 0.68, 0.026, 0, "mono") * 0.55 * smoothstep(list0 + 0.04, list0 + 0.08, t)
+  // the dictionary: neighbours by chance
+  let dy = 0.86
+  let rows = [["4957", "massive"], ["4958", "master"], ["4959", "mat"], ["4960", "match"]]
+  let dict = merge([merge(text(rows[r][0], 0.36, dy + 0.06 * r, 0.03, 0, "mono", "right") * 0.6, text(rows[r][1], 0.42, dy + 0.06 * r, 0.03, 0, "mono", "left")) for r in range(4)]) * smoothstep(dict0, dict0 + 0.04, t)
+  let neighbour = text("mat", 0.42, dy + 0.12, 0.03, 0, "mono", "left") * smoothstep(dict0 + 0.1, dict0 + 0.13, t)
+  let note = text("neighbours by chance", 0.5, dy + 0.3, 0.028, 0, "mono") * 0.6 * smoothstep(dict0 + 0.14, dict0 + 0.18, t)
+  output accent * merge(merge([fresh(k) for k in range(4)]), neighbour)
+         + (1 - accent) * merge(sentence, boxes, merge([number(k) * (1 - 0 * k) for k in range(4)]), listed, listlabel, cut(dict, neighbour), note)
+}

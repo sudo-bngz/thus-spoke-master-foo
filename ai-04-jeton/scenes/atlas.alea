@@ -1,0 +1,41 @@
+// Atlas — the map of meaning: a square with two coordinates; words as
+// points, appearing in their clusters (animals, royals, times of the week),
+// each with its name; then the arrows: from man to woman, and the same
+// arrow from king, landing near queen. The places are illustrative, jittered
+// by the edition (`jx`, `jy`). `accent: 1` gives only the arrows and the
+// landing. Times are the scene's own (0 to 1). What it returns: 0 paper,
+// up to 1 ink.
+
+work Atlas(jx = [0], jy = [0], axes0 = 0.02, first0 = 0.1, cluster0 = 0.25, far0 = 0.45, arrow0 = 0.7, same0 = 0.82, land0 = 0.92, accent = 0) {
+  let cx = 0.5
+  let cy = 0.78
+  let side = 0.8
+  let X(u) = cx - side / 2 + side * u
+  let Y(v) = cy + side / 2 - side * v
+  let names = ["cat", "dog", "horse", "cow", "king", "queen", "prince", "princess", "man", "woman", "Tuesday", "March", "noon"]
+  let us = [0.2, 0.28, 0.17, 0.3, 0.7, 0.7, 0.58, 0.58, 0.86, 0.86, 0.22, 0.34, 0.16]
+  let vs = [0.78, 0.84, 0.66, 0.7, 0.3, 0.55, 0.26, 0.51, 0.28, 0.53, 0.18, 0.1, 0.08]
+  let groups = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2]
+  let N = 13
+  let u(k) = us[k] + jx[k]
+  let v(k) = vs[k] + jy[k]
+  // when each word comes: cat and dog first, then the clusters, then the far ones
+  let when(k) = first0 * (k < 2) + (cluster0 + 0.025 * (k - 2)) * (k >= 2) * (groups[k] < 2) + (far0 + 0.03 * (k - 10)) * (groups[k] == 2)
+  let on(k) = smoothstep(when(k), when(k) + 0.03, t)
+  let frame = cut(rect(cx, cy, side + 0.006, side + 0.006, 0, 0.002), rect(cx, cy, side, side, 0, 0.002)) * 0.35 * smoothstep(axes0, axes0 + 0.05, t)
+  let labels = merge(text("coordinate 1  →", cx, cy + side / 2 + 0.05, 0.024, 0, "mono"), text("coordinate 2  →", cx - side / 2 - 0.05, cy, 0.024, -90, "mono")) * 0.6 * smoothstep(axes0, axes0 + 0.05, t)
+  let dot(k) = circle(X(u(k)), Y(v(k)), 0.016, 0.002) * on(k)
+  let name(k) = text(names[k], X(u(k)) + 0.028, Y(v(k)) - 0.03, 0.026, 0, "mono", "left") * 0.8 * on(k)
+  let points = merge([merge(dot(k), name(k)) for k in range(N)])
+  // the arrows: man → woman, then the same from king
+  let arrow(x1, y1, x2, y2, p) = merge(line(x1, y1, x1 + (x2 - x1) * p, y1 + (y2 - y1) * p, 0.006, 0.002), circle(x1 + (x2 - x1) * p, y1 + (y2 - y1) * p, 0.012, 0.002)) * (p > 0.02)
+  let p1 = ease(progress(arrow0, arrow0 + 0.08), "in-out")
+  let a1 = arrow(X(u(8)), Y(v(8)), X(u(9)), Y(v(9)), p1)
+  let dx = u(9) - u(8)
+  let dy = v(9) - v(8)
+  let p2 = ease(progress(same0, same0 + 0.08), "in-out")
+  let a2 = arrow(X(u(4)), Y(v(4)), X(u(4) + dx), Y(v(4) + dy), p2)
+  let landing = cut(circle(X(u(4) + dx), Y(v(4) + dy), 0.045, 0.002), circle(X(u(4) + dx), Y(v(4) + dy), 0.036, 0.002)) * smoothstep(land0, land0 + 0.03, t)
+  let sum = text("king − man + woman ≈ queen", 0.5, cy + side / 2 + 0.12, 0.03, 0, "mono") * 0.75 * smoothstep(land0, land0 + 0.04, t)
+  output accent * merge(a1, a2, landing) + (1 - accent) * merge(frame, labels, points, sum)
+}

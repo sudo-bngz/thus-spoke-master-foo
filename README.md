@@ -36,6 +36,7 @@ say it all in one; these take their time.
 | AI 01 | [Neurone](ai-01-neurone/) | The perceptron. Inputs on weighted wires, a sum, a threshold: it fires or not. With two inputs it is a line; the rule (show it a point; if wrong, move the weights toward the answer) swings the line until it is never wrong again. Then the limit: the opposite corners together, which no line separates. The edition draws the points, and the weights are grown by the rule itself, inside alea. | 2 min 59 |
 | AI 02 | [Couches](ai-02-couches/) | Layers. The opposite corners beat one neuron; two neurons draw two lines and each answers one question; a third neuron takes their answers as its inputs and fires only between the lines: a band, two lines joined. More neurons, any shape; more layers, shapes of shapes: deep. | 2 min 31 |
 | AI 03 | [Erreur](ai-03-erreur/) | How the scales learn. The error as one number (the gaps between answers and right answers, added up); the error as a landscape over the weights; the slope under one's feet and the walk down, step by step (gradient descent, grown by the slope itself, with steps too small and too big beside it); the blame sent backward along the wires (backpropagation). The landscape is the edition's. | 2 min 39 |
+| AI 04 | [Jeton](ai-04-jeton/) | Tokens, and the map of meaning. A token is a piece of text (a sentence of 4, a long word of 3, a vocabulary of 50 000); each has a number, which says nothing about meaning; so each gets a place on a learned map where words used in the same ways sit close (an embedding); and directions mean something: king − man + woman ≈ queen. The ids and places are illustrative. | 2 min 30 |
 
 ## Render
 
@@ -80,6 +81,10 @@ alea couches.alea --seed 0xa1a2 -o out/
 cd ../ai-03-erreur
 python3 gen.py
 alea erreur.alea --seed 0xa1a3 -o out/               # needs alea with PR #39 (a grown field held at a moment)
+
+cd ../ai-04-jeton
+python3 gen.py
+alea jeton.alea --seed 0xa1a4 -o out/
 ```
 
 Master Foo's Japanese needs misaki, Kokoro's pronunciation library:
@@ -127,6 +132,10 @@ ai-03-erreur/
   gen.py                the script; the landscape, and the three walkers grown by the slope
   erreur.alea           the Reel
   scenes/               koan, error, map, landscape, descent, backward, net
+ai-04-jeton/
+  gen.py                the script
+  jeton.alea            the Reel
+  scenes/               koan, pieces, numbers, atlas
 lib/episode.py          what the generators share: the voice measured, the captions typed, the layout
 ```
 
@@ -162,6 +171,10 @@ alea couches.alea --seed 0xa1a2 -o out/
 cd ../ai-03-erreur
 python3 gen.py
 alea erreur.alea --seed 0xa1a3 -o out/               # needs alea with PR #39 (a grown field held at a moment)
+
+cd ../ai-04-jeton
+python3 gen.py
+alea jeton.alea --seed 0xa1a4 -o out/
 ```
 
 Run `gen.py` and `alea` with the same variables: `gen.py` measures each
