@@ -1,0 +1,39 @@
+// Descent — the walk down: the map; the ball, grown step by step by the
+// slope under it (`bx`, `by`: fields, at time k / S the ball after k
+// steps); the arrow of the slope at the ball; the trail. Then the size
+// of the step: two more balls, one with steps too small, one too big.
+// `accent: 1` gives only the ball and the arrow. Times are the scene's
+// own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+use "map.alea"
+
+work Descent(E = 0, bx = 0, by = 0, sx = 0, sy = 0, gx = 0, gy = 0, S = 120, arrow0 = 0.05, l0 = 0.15, l1 = 0.6, size0 = 0.75, accent = 0) {
+  let cx = 0.5
+  let cy = 0.82
+  let side = 0.7
+  let X(u) = cx - side / 2 + side * u
+  let Y(v) = cy + side / 2 - side * v
+  let map = Map(E: E, cx: cx, cy: cy, side: side, show: -1)
+  let K = floor(S * clamp((t - l0) / (l1 - l0), 0, 1) ^ 1.6)
+  let at_k(f, k) = at(f, time: k / S)
+  let ux = at_k(bx, K)
+  let uy = at_k(by, K)
+  // the slope at the ball, from the landscape: the arrow points downhill
+  let h = 0.01
+  let ex = (move(E, x: x - ux - h, y: y - uy) - move(E, x: x - ux + h, y: y - uy)) / (2 * h)
+  let ey = (move(E, x: x - ux, y: y - uy - h) - move(E, x: x - ux, y: y - uy + h)) / (2 * h)
+  let norm = sqrt(ex ^ 2 + ey ^ 2) + 0.0001
+  let ax = X(ux) - 0.09 * ex / norm
+  let ay = Y(uy) + 0.09 * ey / norm
+  let arrow = merge(line(X(ux), Y(uy), ax, ay, 0.006, 0.002), circle(ax, ay, 0.012, 0.002)) * smoothstep(arrow0, arrow0 + 0.04, t) * (K < S)
+  let trail = merge([circle(X(at_k(bx, 3 * k)), Y(at_k(by, 3 * k)), 0.007, 0.002) * (3 * k < K) for k in range(40)]) * 0.5
+  let ball = circle(X(ux), Y(uy), 0.022, 0.002)
+  let steps = merge([text("step {k}", 0.5, cy + side / 2 + 0.11, 0.028, 0, "mono") * (K == k) for k in range(S + 1)]) * 0.6 * (t >= l0)
+  // the size of the step: small and big, from the same start
+  let sized = smoothstep(size0, size0 + 0.04, t)
+  let K2 = floor(S * clamp((t - size0) / (0.98 - size0), 0, 1))
+  let small = merge(circle(X(at_k(sx, K2)), Y(at_k(sy, K2)), 0.018, 0.002), merge([circle(X(at_k(sx, 3 * k)), Y(at_k(sy, 3 * k)), 0.005, 0.002) * (3 * k < K2) for k in range(40)]) * 0.5) * sized
+  let big = merge(circle(X(at_k(gx, K2)), Y(at_k(gy, K2)), 0.018, 0.002), merge([line(X(at_k(gx, k)), Y(at_k(gy, k)), X(at_k(gx, k + 1)), Y(at_k(gy, k + 1)), 0.003, 0.002) * (k < K2) for k in range(40)]) * 0.5) * sized
+  let sizelabels = merge(text("too small", X(at_k(sx, 0)) + 0.03, Y(at_k(sy, 0)) - 0.05, 0.024, 0, "mono", "left"), text("too big", X(at_k(gx, 0)) + 0.03, Y(at_k(gy, 0)) + 0.06, 0.024, 0, "mono", "left")) * 0.7 * sized
+  output accent * merge(ball * (1 - sized), arrow) + (1 - accent) * merge(map, trail, ball * sized, steps * (1 - sized), small, big, sizelabels)
+}

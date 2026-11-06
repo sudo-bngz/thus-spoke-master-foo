@@ -1,0 +1,37 @@
+// Koan — Master Foo's scene: an ensō drawn in one stroke of a dry brush,
+// the word of the day written down its middle in katakana, the series'
+// name under it, and the master's seal. `big` is what the master shows in
+// the circle, before the word comes (`big2`, with `swap: 1`, the second time, in vermilion). `accent: 1` gives only what is
+// printed in vermilion (the seal); 0 everything in ink. Times are the
+// scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Koan(draw0 = 0.05, draw1 = 0.4, word = 0.3, title = 0.5, kana = ["ア", "ル", "ゴ", "リ", "ズ", "ム"], episode = "01  ·  algorithm", big = "·", big2 = "·", swap = 0, bigsize = 0.26, bigat = [2, 2], bigoff = 2, accent = 0) {
+  let cx = 0.5
+  let cy = 0.58
+  let JP = "../../fonts/noto-sans-jp-regular.ttf"
+  // the stroke: from the bottom left, clockwise, almost all the way round;
+  // thick where the brush lands, dry and thin where it lifts
+  let a = fract((atan2(y - cy, x - cx) / tau) + 0.32)
+  let drawn = progress(draw0, draw1)
+  let along = a / 0.93
+  let width = 0.05 * (1 - 0.75 * along) + 0.004
+  let dry = smoothstep(-0.2, 0.5, noise(x * 9, y * 9, 3) + 0.6 - along)    // streaks where the ink runs out
+  let stroke = ring(cx, cy, 0.62, width, 0.004) * (along < drawn) * (along < 1) * (0.5 + 0.5 * dry)
+  // the word, down the middle
+  let K = count(kana)
+  let letters = merge([text(kana[k], cx, cy - 0.055 * (K - 1) / 2 + 0.055 * k, 0.05, 0, JP) * smoothstep(word + k * 0.02, word + k * 0.02 + 0.04, t) for k in range(K)]) * 0.9
+  // what the master shows: it appears at bigat[0], is gone a moment before
+  // bigat[1] and appears again; the same, or (swap: 1) big2, in vermilion;
+  // it leaves at bigoff
+  let shown1 = smoothstep(bigat[0], bigat[0] + 0.015, t) * (t < bigat[1] - 0.05) * (1 - smoothstep(bigoff, bigoff + 0.03, t))
+  let shown2 = smoothstep(bigat[1], bigat[1] + 0.015, t) * (1 - smoothstep(bigoff, bigoff + 0.03, t))
+  let shownbig = text(big, cx, cy - 0.01, bigsize, 0, "mono") * (shown1 + shown2 * (1 - swap)) * 0.95
+  let shownbig2 = text(big2, cx, cy - 0.01, bigsize, 0, "mono") * shown2 * swap
+  // the series, under the circle
+  let name = text("THUS SPOKE MASTER FOO", 0.5, 1.0, 0.04, 0, "serif") * smoothstep(title, title + 0.06, t)
+  let ep   = text(episode, 0.5, 1.07, 0.028, 0, "mono") * smoothstep(title + 0.04, title + 0.1, t) * 0.7
+  // the seal: フー, white in a vermilion square, stamped at the end of the stroke
+  let stamp = smoothstep(draw1, draw1 + 0.03, t)
+  let seal = cut(rect(0.8, 0.86, 0.075, 0.12, 0, 0.002), merge(text("フ", 0.8, 0.835, 0.045, 0, JP), text("ー", 0.8, 0.885, 0.045, 90, JP))) * stamp
+  output accent * merge(seal, shownbig2) + (1 - accent) * merge(stroke, letters, name, ep, shownbig)
+}

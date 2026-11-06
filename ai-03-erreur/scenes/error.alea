@@ -1,0 +1,30 @@
+// Error — how wrong is the network: one number. Four examples, one under
+// the other: the example (a full or hollow point), the network's answer as
+// a bar from 0 to 1, the right answer as a mark (1 for full, 0 for hollow),
+// and the gap between them in vermilion. The gaps add up to the error,
+// written at the bottom. `answers` are the network's four answers. Times
+// are the scene's own (0 to 1). `accent: 1` gives only the gaps. What it
+// returns: 0 paper, up to 1 ink.
+
+work Error(answers = [0.7, 0.4, 0.6, 0.2], first0 = 0.1, gap0 = 0.3, rest0 = 0.5, total0 = 0.75, accent = 0) {
+  let targets = [1, 0, 1, 0]
+  let ys = [0.42, 0.6, 0.78, 0.96]
+  let x0 = 0.3
+  let barw = 0.5
+  let when(k) = first0 * (k == 0) + (rest0 + 0.05 * (k - 1)) * (k > 0)
+  let on(k) = smoothstep(when(k), when(k) + 0.04, t)
+  let point(k) = merge(circle(0.12, ys[k], 0.03, 0.002) * (targets[k] == 1), cut(circle(0.12, ys[k], 0.03, 0.002), circle(0.12, ys[k], 0.022, 0.002)) * (targets[k] == 0)) * on(k)
+  let rail(k) = merge(line(x0, ys[k], x0 + barw, ys[k], 0.003, 0.002) * 0.3, text("0", x0, ys[k] + 0.045, 0.022, 0, "mono") * 0.5, text("1", x0 + barw, ys[k] + 0.045, 0.022, 0, "mono") * 0.5) * on(k)
+  let filled(k) = clamp((t - when(k) - 0.04) / 0.08, 0, 1)
+  let bar(k) = rect(x0 + barw * answers[k] * filled(k) / 2, ys[k], barw * answers[k] * filled(k), 0.03, 0, 0.002) * on(k)
+  let mark(k) = line(x0 + barw * targets[k], ys[k] - 0.035, x0 + barw * targets[k], ys[k] + 0.035, 0.008, 0.002) * on(k)
+  let gapwhen(k) = gap0 * (k == 0) + (when(k) + 0.14) * (k > 0)
+  let gap(k) = rect(x0 + barw * (answers[k] + targets[k]) / 2, ys[k], barw * abs(targets[k] - answers[k]), 0.014, 0, 0.002) * smoothstep(gapwhen(k), gapwhen(k) + 0.03, t)
+  let labels = merge(text("answer", x0 + barw / 2, ys[0] - 0.065, 0.024, 0, "mono") * on(0) * 0.6, text("right answer", x0 + barw, ys[0] - 0.065, 0.024, 0, "mono") * on(0) * 0.6)
+  let gaplabel = text("the gap: its mistake", 0.5, 0.3, 0.028, 0, "mono") * 0.6 * smoothstep(gap0, gap0 + 0.03, t) * (1 - smoothstep(total0 - 0.03, total0, t))
+  let total = sum([abs(targets[k] - answers[k]) for k in range(4)])
+  let totalline = text("error  {total}", 0.5, 1.12, 0.04, 0, "mono") * smoothstep(total0, total0 + 0.04, t)
+  let zero = text("0 would be perfect", 0.5, 1.19, 0.026, 0, "mono") * 0.55 * smoothstep(total0 + 0.12, total0 + 0.16, t)
+  output accent * merge([gap(k) for k in range(4)])
+         + (1 - accent) * merge(merge([merge(point(k), rail(k), bar(k), mark(k)) for k in range(4)]), labels, gaplabel, totalline, zero)
+}

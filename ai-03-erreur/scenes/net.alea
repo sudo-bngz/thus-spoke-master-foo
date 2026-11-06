@@ -1,0 +1,23 @@
+// Net — the network, drawn: two inputs on the left, the hidden neurons A
+// and B in the middle, the output neuron C on the right, wires between
+// them; each part appears at its own time; the neurons that fire are
+// filled. `accent: 1` gives only the neurons lit. Positions: the diagram
+// sits around (cx, cy). What it returns: 0 paper, up to 1 ink.
+
+work Net(cx = 0.5, cy = 0.4, inputs0 = 0, a0 = 0, b0 = 0, c0 = 2, litA = 0, litB = 0, litC = 0, accent = 0) {
+  let xi = cx - 0.3
+  let xh = cx
+  let xo = cx + 0.3
+  let yi = [cy - 0.1, cy + 0.1]
+  let yh = [cy - 0.1, cy + 0.1]
+  let r = 0.045
+  let node(px, py, label, when) = merge(cut(circle(px, py, r, 0.002), circle(px, py, r - 0.006, 0.002)), text(label, px, py, 0.03, 0, "mono") * 0.8) * smoothstep(when, when + 0.04, t)
+  let wire(x1, y1, x2, y2, when) = line(x1 + r, y1, x2 - r, y2, 0.004, 0.002) * 0.45 * smoothstep(when + 0.03, when + 0.08, t)
+  let ins = merge(node(xi, yi[0], "x1", inputs0), node(xi, yi[1], "x2", inputs0))
+  let A = merge(node(xh, yh[0], "A", a0), wire(xi, yi[0], xh, yh[0], a0), wire(xi, yi[1], xh, yh[0], a0))
+  let B = merge(node(xh, yh[1], "B", b0), wire(xi, yi[0], xh, yh[1], b0), wire(xi, yi[1], xh, yh[1], b0))
+  let C = merge(node(xo, cy, "C", c0), wire(xh, yh[0], xo, cy, c0), wire(xh, yh[1], xo, cy, c0))
+  let lit = merge(circle(xh, yh[0], r - 0.01, 0.002) * litA, circle(xh, yh[1], r - 0.01, 0.002) * litB, circle(xo, cy, r - 0.01, 0.002) * litC)
+  let layer = text("layer", xh, cy + 0.2, 0.024, 0, "mono") * 0.5 * smoothstep(c0 + 0.1, c0 + 0.14, t)
+  output accent * lit + (1 - accent) * cut(merge(ins, A, B, C, layer), lit)
+}

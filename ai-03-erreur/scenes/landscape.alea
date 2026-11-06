@@ -1,0 +1,29 @@
+// Landscape — first one weight: the error along a line through the
+// landscape as a curve, with its hills and valley; then two weights: the
+// map, hills and valleys; the ball where the network stands. `E` is the
+// error field, `bx`, `by` where the ball starts. `accent: 1` gives only the
+// ball. Times are the scene's own (0 to 1). What it returns: 0 paper, up
+// to 1 ink.
+
+use "map.alea"
+
+work Landscape(E = 0, bx = 0.15, by = 0.8, cu = 0.6, cv = 0.45, curve0 = 0.05, map0 = 0.35, valley0 = 0.55, here0 = 0.75, accent = 0) {
+  // the curve: the error along v = by, as u goes from 0 to 1
+  let px = 0.12
+  let pw = 0.76
+  let py = 0.5
+  let ph = 0.28
+  let u = (x - px) / pw
+  let e = move(E, x: x - u, y: y - by)
+  let plot = (abs((py + ph / 2 - y) - (e - 0.3) / 2.2 * ph) < 0.006) * (x > px) * (x < px + pw) * (y > py - ph / 2 - 0.02) * (y < py + ph / 2 + 0.02)
+  let drawn = (x < px + pw * clamp((t - curve0) / 0.15, 0, 1))
+  let axes = merge(line(px, py + ph / 2, px + pw, py + ph / 2, 0.003, 0.002), line(px, py - ph / 2, px, py + ph / 2, 0.003, 0.002)) * 0.4
+  let axlabels = merge(text("weight 1  →", px + pw / 2, py + ph / 2 + 0.05, 0.024, 0, "mono"), text("error  →", px - 0.05, py, 0.024, -90, "mono")) * 0.6
+  let curve = merge(plot * drawn, axes, axlabels) * smoothstep(curve0 - 0.03, curve0, t) * (1 - smoothstep(map0 - 0.05, map0, t))
+  // the map, and its words
+  let map = Map(E: E, cx: 0.5, cy: 0.82, side: 0.7, show: map0)
+  let words = merge(text("hill", 0.5 - 0.35 + 0.7 * 0.14, 0.82 + 0.35 - 0.7 * 0.86, 0.028, 0, "mono"), text("valley", 0.5 - 0.35 + 0.7 * cu, 0.82 + 0.35 - 0.7 * cv, 0.028, 0, "mono")) * 0.7 * smoothstep(valley0, valley0 + 0.04, t)
+  let ball = circle(0.5 - 0.35 + 0.7 * bx, 0.82 + 0.35 - 0.7 * by, 0.022, 0.002) * smoothstep(here0, here0 + 0.03, t)
+  let here = text("you are here", 0.5 - 0.35 + 0.7 * bx + 0.02, 0.82 + 0.35 - 0.7 * by - 0.05, 0.024, 0, "mono", "left") * 0.7 * smoothstep(here0, here0 + 0.03, t)
+  output accent * ball + (1 - accent) * merge(curve, map, words, here)
+}

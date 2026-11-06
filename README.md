@@ -35,11 +35,13 @@ say it all in one; these take their time.
 |---|---|---|---|
 | AI 01 | [Neurone](ai-01-neurone/) | The perceptron. Inputs on weighted wires, a sum, a threshold: it fires or not. With two inputs it is a line; the rule (show it a point; if wrong, move the weights toward the answer) swings the line until it is never wrong again. Then the limit: the opposite corners together, which no line separates. The edition draws the points, and the weights are grown by the rule itself, inside alea. | 2 min 59 |
 | AI 02 | [Couches](ai-02-couches/) | Layers. The opposite corners beat one neuron; two neurons draw two lines and each answers one question; a third neuron takes their answers as its inputs and fires only between the lines: a band, two lines joined. More neurons, any shape; more layers, shapes of shapes: deep. | 2 min 31 |
+| AI 03 | [Erreur](ai-03-erreur/) | How the scales learn. The error as one number (the gaps between answers and right answers, added up); the error as a landscape over the weights; the slope under one's feet and the walk down, step by step (gradient descent, grown by the slope itself, with steps too small and too big beside it); the blame sent backward along the wires (backpropagation). The landscape is the edition's. | 2 min 39 |
 
 ## Render
 
 You need alea (a clone of `sudo-bngz/alea`, built with `cargo build
---release`), ffmpeg, and the Kokoro voice (`pip install sherpa-onnx numpy`;
+--release`; from AI 01 on, with [PR #39](https://github.com/sudo-bngz/alea/pull/39),
+which lets a grown field be read at a given moment), ffmpeg, and the Kokoro voice (`pip install sherpa-onnx numpy`;
 the model, about 350 MB, is fetched once; `espeak-ng` for words it doesn't
 know).
 
@@ -74,6 +76,10 @@ alea neurone.alea --seed 0xa1a1 -o out/
 cd ../ai-02-couches
 python3 gen.py
 alea couches.alea --seed 0xa1a2 -o out/
+
+cd ../ai-03-erreur
+python3 gen.py
+alea erreur.alea --seed 0xa1a3 -o out/               # needs alea with PR #39 (a grown field held at a moment)
 ```
 
 Master Foo's Japanese needs misaki, Kokoro's pronunciation library:
@@ -117,6 +123,10 @@ ai-02-couches/
   gen.py                the script
   couches.alea          the Reel
   scenes/               koan, plane, half, net, problem, lines, band, shapes
+ai-03-erreur/
+  gen.py                the script; the landscape, and the three walkers grown by the slope
+  erreur.alea           the Reel
+  scenes/               koan, error, map, landscape, descent, backward, net
 lib/episode.py          what the generators share: the voice measured, the captions typed, the layout
 ```
 
@@ -148,6 +158,10 @@ alea neurone.alea --seed 0xa1a1 -o out/
 cd ../ai-02-couches
 python3 gen.py
 alea couches.alea --seed 0xa1a2 -o out/
+
+cd ../ai-03-erreur
+python3 gen.py
+alea erreur.alea --seed 0xa1a3 -o out/               # needs alea with PR #39 (a grown field held at a moment)
 ```
 
 Run `gen.py` and `alea` with the same variables: `gen.py` measures each

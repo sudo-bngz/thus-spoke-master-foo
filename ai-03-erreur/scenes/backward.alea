@@ -1,0 +1,35 @@
+// Backward — the blame flowing back: a network of three layers (2, 3, 1)
+// drawn large; the answer travels forward as a light along the wires; at
+// the end, the gap to the right answer in vermilion; then the blame
+// travels backward, in vermilion, and each wire thickens or thins as its
+// weight moves. `accent: 1` gives only the gap and the blame. Times are
+// the scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Backward(fwd0 = 0.1, gap0 = 0.3, back0 = 0.45, move0 = 0.65, accent = 0) {
+  let cols = [2, 3, 1]
+  let nx(c) = 0.18 + 0.32 * c
+  let ny(c, k) = 0.75 + (k - (cols[c] - 1) / 2) * 0.22
+  let r = 0.045
+  let nodes = merge([cut(circle(nx(c), ny(c, k), r, 0.002), circle(nx(c), ny(c, k), r - 0.006, 0.002)) for c in range(3) for k in range(cols[c])])
+  // the wires, each with its own weight, that moves at move0
+  let w0(c, k, j) = 0.004 + 0.012 * fract(0.37 * (c * 7 + k * 3 + j) + 0.2)
+  let dw(c, k, j) = 0.008 * (fract(0.61 * (c * 5 + k * 2 + j) + 0.4) - 0.5) * smoothstep(move0, move0 + 0.1, t)
+  let wire(c, k, j) = line(nx(c) + r, ny(c, k), nx(c + 1) - r, ny(c + 1, j), w0(c, k, j) + dw(c, k, j), 0.002) * 0.45
+  let wires = merge([wire(c, k, j) for c in range(2) for k in range(cols[c]) for j in range(cols[c + 1])])
+  // forward: a light that crosses the two gaps between the columns
+  let p = clamp((t - fwd0) / 0.12, 0, 1)
+  let lx = nx(0) + (nx(2) - nx(0)) * p
+  let light = glow(x: lx, y: 0.75, size: 0.14) * (t > fwd0) * (t < fwd0 + 0.14) * 0.8
+  let out = circle(nx(2), ny(2, 0), r - 0.012, 0.002) * smoothstep(fwd0 + 0.12, fwd0 + 0.14, t) * 0.5
+  // the gap at the end
+  let gap = merge(line(nx(2) + r + 0.02, 0.75, nx(2) + r + 0.1, 0.75, 0.014, 0.002), text("gap", nx(2) + r + 0.06, 0.69, 0.024, 0, "mono")) * smoothstep(gap0, gap0 + 0.03, t)
+  // backward: the blame travels right to left, along the wires
+  let q = clamp((t - back0) / 0.14, 0, 1)
+  let bxp = nx(2) - (nx(2) - nx(0)) * q
+  let blame = glow(x: bxp, y: 0.75, size: 0.16) * (t > back0) * (t < back0 + 0.16)
+  let onwires = merge([wire(c, k, j) for c in range(2) for k in range(cols[c]) for j in range(cols[c + 1])]) * (x > bxp - 0.05) * (x < bxp + 0.05) * (t > back0) * (t < back0 + 0.16)
+  let words = merge(text("forward: the answer", 0.5, 0.36, 0.028, 0, "mono") * smoothstep(fwd0, fwd0 + 0.03, t) * (1 - smoothstep(back0 - 0.03, back0, t)),
+                    text("backward: the blame", 0.5, 0.36, 0.028, 0, "mono") * smoothstep(back0, back0 + 0.03, t)) * 0.7
+  let moved = text("each weight moves by its share", 0.5, 1.14, 0.028, 0, "mono") * 0.7 * smoothstep(move0, move0 + 0.04, t)
+  output accent * merge(gap, blame, onwires) + (1 - accent) * merge(nodes, wires, light, out, words, moved)
+}
