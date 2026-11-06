@@ -1,0 +1,22 @@
+// Problem — a word alone means little: the sentence around the ring; `it`
+// in vermilion, with a question mark; the map inset: the point of `it`,
+// the same wherever the word appears. `accent: 1` gives only `it` and the
+// question. Times are the scene's own (0 to 1). What it returns: 0 paper,
+// up to 1 ink.
+
+use "words.alea"
+
+work Problem(show = 0.05, it0 = 0.3, ask0 = 0.45, same0 = 0.7, accent = 0) {
+  let cx = 0.5
+  let cy = 0.72
+  let R = 0.28
+  let words = Words(cx: cx, cy: cy, R: R, show: show, lit: 5, accent: 0)
+  let itword = Words(cx: cx, cy: cy, R: R, show: it0, lit: 5, accent: 1)
+  let ask = text("?", cx, cy, 0.12, 0, "serif") * smoothstep(ask0, ask0 + 0.04, t) * (1 - smoothstep(same0 - 0.04, same0, t))
+  // the inset: the point of `it`, in two sentences, the same point
+  let iy = 1.2
+  let inset = merge(cut(rect(0.5, iy, 0.5, 0.16, 0, 0.002), rect(0.5, iy, 0.494, 0.154, 0, 0.002)) * 0.35,
+                    circle(0.5, iy, 0.016, 0.002), text("it", 0.5, iy - 0.04, 0.026, 0, "mono") * 0.8,
+                    text("the same point, in every sentence", 0.5, iy + 0.12, 0.026, 0, "mono") * 0.6) * smoothstep(same0, same0 + 0.04, t)
+  output accent * merge(itword, ask) + (1 - accent) * merge(words, inset)
+}

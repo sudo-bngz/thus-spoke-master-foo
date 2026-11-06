@@ -1,0 +1,29 @@
+// Keys — where the scores come from: the point of `it` on a small map; two
+// small cards made from it, a question and a label; the label of `cat` and
+// the label of `hungry`; the match between the question and each label,
+// a bar that fills to the score. `accent: 1` gives only the bars. Times
+// are the scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Keys(point0 = 0.05, cards0 = 0.25, labels0 = 0.5, match0 = 0.65, accent = 0) {
+  // the point of `it`
+  let px = 0.2
+  let py = 0.5
+  let point = merge(circle(px, py, 0.018, 0.002), text("it", px, py - 0.045, 0.028, 0, "mono") * 0.8) * smoothstep(point0, point0 + 0.03, t)
+  // the two cards
+  let card(x0, y0, label, when) = merge(cut(rect(x0, y0, 0.2, 0.09, 0, 0.002), rect(x0, y0, 0.194, 0.084, 0, 0.002)) * 0.5, text(label, x0, y0, 0.026, 0, "mono") * 0.8) * smoothstep(when, when + 0.04, t)
+  let arrows = merge(line(px + 0.03, py, 0.42, 0.4, 0.003, 0.002), line(px + 0.03, py, 0.42, 0.6, 0.003, 0.002)) * 0.35 * smoothstep(cards0, cards0 + 0.04, t)
+  let question = card(0.54, 0.4, "question", cards0)
+  let label = card(0.54, 0.6, "label", cards0 + 0.04)
+  let ofwhat = text("made from the point, with weights", 0.5, 0.74, 0.026, 0, "mono") * 0.55 * smoothstep(cards0 + 0.1, cards0 + 0.14, t)
+  // the labels of other words, and the match with the question of `it`
+  let rows = ["cat", "hungry", "the"]
+  let vals = [0.55, 0.12, 0.02]
+  let ry(k) = 0.92 + 0.12 * k
+  let other(k) = merge(text(rows[k], 0.14, ry(k), 0.03, 0, "mono", "left"), card(0.38, ry(k), "label", labels0 + 0.05 * k)) * smoothstep(labels0 + 0.05 * k, labels0 + 0.05 * k + 0.03, t)
+  let rail(k) = line(0.52, ry(k), 0.88, ry(k), 0.003, 0.002) * 0.3 * smoothstep(labels0 + 0.05 * k, labels0 + 0.05 * k + 0.03, t)
+  let filled(k) = clamp((t - match0 - 0.06 * k) / 0.1, 0, 1)
+  let bar(k) = rect(0.52 + 0.36 * vals[k] * filled(k) / 2, ry(k), 0.36 * vals[k] * filled(k), 0.024, 0, 0.002) * (t > match0 + 0.06 * k)
+  let num(k) = text("{vals[k]}", 0.9, ry(k), 0.026, 0, "mono", "left") * 0.7 * smoothstep(match0 + 0.06 * k + 0.1, match0 + 0.06 * k + 0.13, t)
+  let matchlabel = text("the match: the score", 0.5, 0.84, 0.028, 0, "mono") * 0.65 * smoothstep(match0, match0 + 0.04, t)
+  output accent * merge([bar(k) for k in range(3)]) + (1 - accent) * merge(point, arrows, question, label, ofwhat, merge([merge(other(k), rail(k), num(k)) for k in range(3)]), matchlabel)
+}

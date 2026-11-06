@@ -1,0 +1,37 @@
+// Blend — each word becomes a blend of the others, weighted by its scores:
+// on a small map, `it` moves toward `cat`; then the layers: the sentence
+// written three times, one row above the other, chords between the rows,
+// every word looking at every word again at each layer. `accent: 1` gives
+// only `it` and its trail. Times are the scene's own (0 to 1). What it
+// returns: 0 paper, up to 1 ink.
+
+work Blend(move0 = 0.1, moved0 = 0.3, layers0 = 0.55, accent = 0) {
+  // the map: cat, fish, hungry, and `it`, which moves toward cat
+  let cx = 0.5
+  let cy = 0.5
+  let side = 0.5
+  let frame = cut(rect(cx, cy, side + 0.006, side + 0.006, 0, 0.002), rect(cx, cy, side, side, 0, 0.002)) * 0.35
+  let pts = [[0.3, 0.3], [0.75, 0.35], [0.4, 0.7]]
+  let names = ["cat", "fish", "hungry"]
+  let P(u, v) = [cx - side / 2 + side * u, cy + side / 2 - side * v]
+  let fixed = merge([merge(circle(P(pts[k][0], pts[k][1]).x, P(pts[k][0], pts[k][1]).y, 0.014, 0.002), text(names[k], P(pts[k][0], pts[k][1]).x + 0.026, P(pts[k][0], pts[k][1]).y - 0.03, 0.026, 0, "mono", "left") * 0.8) for k in range(3)])
+  let p = ease(progress(move0, moved0), "in-out")
+  let iu = 0.72 + (0.38 - 0.72) * p
+  let iv = 0.78 + (0.36 - 0.78) * p
+  let itpoint = merge(circle(P(iu, iv).x, P(iu, iv).y, 0.018, 0.002), text("it", P(iu, iv).x + 0.028, P(iu, iv).y - 0.03, 0.028, 0, "mono", "left"))
+  let trail = line(P(0.72, 0.78).x, P(0.72, 0.78).y, P(iu, iv).x, P(iu, iv).y, 0.003, 0.002) * 0.5 * (p > 0.01)
+  let mapgone = 1 - smoothstep(layers0 - 0.04, layers0, t)
+  let map = merge(frame, fixed) * mapgone
+  let absorbed = text("it has absorbed its context", 0.5, cy + side / 2 + 0.08, 0.028, 0, "mono") * 0.65 * smoothstep(moved0 + 0.02, moved0 + 0.06, t) * mapgone
+  // the layers: three rows of the sentence, chords between them
+  let words = ["the", "cat", "was", "hungry", "so", "it", "ate", "the", "fish"]
+  let N = 9
+  let wx(k) = 0.1 + 0.8 * k / (N - 1)
+  let wy(r) = 1.0 - 0.3 * r
+  let row(r) = merge([text(words[k], wx(k), wy(r), 0.022, 0, "mono") * 0.7 for k in range(N)]) * smoothstep(layers0 + 0.12 * r, layers0 + 0.12 * r + 0.04, t)
+  let between(r) = merge([line(wx(a), wy(r) - 0.03, wx(b), wy(r + 1) + 0.03, 0.002, 0.002) * (0.15 + 0.5 * (a == 5) * (b == 1)) for a in range(N) for b in range(N)]) * smoothstep(layers0 + 0.12 * (r + 1), layers0 + 0.12 * (r + 1) + 0.06, t)
+  let layers = merge(merge([row(r) for r in range(3)]), merge([between(r) for r in range(2)]))
+  let layerlabel = merge([text("layer {r + 1}", 0.03, wy(r), 0.022, 0, "mono", "left") * 0.5 * smoothstep(layers0 + 0.12 * r, layers0 + 0.12 * r + 0.04, t) for r in range(3)])
+  let again = text("again, and again", 0.5, wy(2) - 0.12, 0.028, 0, "mono") * 0.65 * smoothstep(layers0 + 0.4, layers0 + 0.44, t)
+  output accent * merge(itpoint, trail) * mapgone + (1 - accent) * merge(map, absorbed, layers, layerlabel, again)
+}

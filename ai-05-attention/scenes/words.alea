@@ -1,0 +1,20 @@
+// Words — the sentence on a circle: nine words around a ring, `lit` the
+// one in question (in vermilion when `accent`). Shared by the scenes of
+// this episode: it returns the ring and the words; the chords are drawn by
+// the scenes. `cx`, `cy`, `R` place the ring. What it returns: 0 paper,
+// up to 1 ink.
+
+work Words(cx = 0.5, cy = 0.8, R = 0.3, show = 0, lit = -1, accent = 0) {
+  let names = ["the", "cat", "was", "hungry", "so", "it", "ate", "the", "fish"]
+  let N = 9
+  let ang(k) = -tau / 4 + tau * k / N
+  let px(k) = cx + R * cos(ang(k))
+  let py(k) = cy + R * sin(ang(k))
+  let ring = cut(circle(cx, cy, 2 * R, 0.002), circle(cx, cy, 2 * R - 0.004, 0.002)) * 0.2
+  let dot(k) = circle(px(k), py(k), 0.014, 0.002)
+  let name(k) = text(names[k], cx + (R + 0.07) * cos(ang(k)), cy + (R + 0.07) * sin(ang(k)), 0.03, 0, "mono")
+  let shown = smoothstep(show, show + 0.04, t)
+  let plain = merge([merge(dot(k), name(k)) * (k != lit) for k in range(N)])
+  let marked = merge([merge(circle(px(k), py(k), 0.022, 0.002), name(k)) * (k == lit) for k in range(N)])
+  output (accent * marked + (1 - accent) * merge(ring, plain)) * shown
+}
