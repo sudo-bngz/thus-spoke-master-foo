@@ -1,0 +1,14 @@
+// Half — a half-plane: the line w1 u + w2 v + b = 0 in the square's own
+// coordinates (0 to 1 across the square at cx, cy, side), the side where
+// it fires shaded by `shade`, shown from `show`. What it returns: the line
+// (1) and the shade.
+
+work Half(w1 = 1, w2 = -1, b = 0.3, cx = 0.5, cy = 0.9, side = 0.64, show = 0, shade = 0.12) {
+  let u = (x - cx + side / 2) / side
+  let v = (cy + side / 2 - y) / side
+  let s = (w1 * u + w2 * v + b) / sqrt(w1 ^ 2 + w2 ^ 2 + 0.0001)
+  let inside = (abs(x - cx) < side / 2) * (abs(y - cy) < side / 2)
+  let edge = (abs(s) < 0.006) * inside
+  let fill = (s > 0) * inside * shade
+  output merge(edge, fill) * smoothstep(show, show + 0.04, t)
+}

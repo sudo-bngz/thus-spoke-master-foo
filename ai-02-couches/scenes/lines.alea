@@ -1,0 +1,37 @@
+// Lines — two neurons, two lines: A fires above its line, B below its own;
+// the network grows above the square as they come; then, for each point,
+// the two answers (yes / no), the full points getting yes from both.
+// `accent: 1` gives only the answers that are "no". Times are the scene's
+// own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+use "plane.alea"
+use "half.alea"
+use "net.alea"
+
+work Lines(net0 = 0.02, a0 = 0.1, b0 = 0.3, each0 = 0.45, full0 = 0.6, hollow0 = 0.8, accent = 0) {
+  let cx = 0.5
+  let cy = 0.98
+  let side = 0.56
+  let corners = Corners(cx: cx, cy: cy, side: side, show: net0, axes: 0)
+  // A: fires above (to the upper left of) u - v + 0.3 = 0; B: below u - v - 0.3 = 0
+  let A = Half(w1: -1, w2: 1, b: 0.3, cx: cx, cy: cy, side: side, show: a0, shade: 0.14)
+  let B = Half(w1: 1, w2: -1, b: 0.3, cx: cx, cy: cy, side: side, show: b0, shade: 0.14)
+  let la = text("A", cx - side / 2 + side * 0.44, cy + side / 2 - 0.035, 0.034, 0, "mono") * smoothstep(a0, a0 + 0.04, t)
+  let lb = text("B", cx - side / 2 + side * 0.56, cy - side / 2 + 0.035, 0.034, 0, "mono") * smoothstep(b0, b0 + 0.04, t)
+  let net = Net(cx: 0.5, cy: 0.42, inputs0: net0, a0: a0, b0: b0, c0: 5, accent: 0)
+  let question = text("which side of my line?", 0.5, 0.66, 0.028, 0, "mono") * 0.6 * smoothstep(each0, each0 + 0.04, t)
+  // the answers, by each point: A then B
+  let qx = [0.22, 0.78, 0.22, 0.78]
+  let qy = [0.22, 0.78, 0.78, 0.22]
+  let X(u) = cx - side / 2 + side * u
+  let Y(u) = cy + side / 2 - side * u
+  let ansA(q) = (-qx[q] + qy[q] + 0.3 > 0)
+  let ansB(q) = (qx[q] - qy[q] + 0.3 > 0)
+  let when(q) = full0 * (q < 2) + hollow0 * (q >= 2)
+  let yes(q, k, v) = text("yes", X(qx[q]) + 0.095, Y(qy[q]) - 0.022 + 0.044 * k, 0.03, 0, "mono", "left") * v
+  let no(q, k, v) = text("no", X(qx[q]) + 0.095, Y(qy[q]) - 0.022 + 0.044 * k, 0.03, 0, "mono", "left") * (1 - v)
+  let tags(q) = merge(text("A", X(qx[q]) + 0.055, Y(qy[q]) - 0.022, 0.03, 0, "mono", "left") * 0.5, text("B", X(qx[q]) + 0.055, Y(qy[q]) + 0.022, 0.03, 0, "mono", "left") * 0.5) * smoothstep(when(q), when(q) + 0.03, t)
+  let yeses(q) = merge(yes(q, 0, ansA(q)), yes(q, 1, ansB(q))) * smoothstep(when(q) + 0.03, when(q) + 0.06, t)
+  let nos(q) = merge(no(q, 0, ansA(q)), no(q, 1, ansB(q))) * smoothstep(when(q) + 0.03, when(q) + 0.06, t)
+  output accent * merge([nos(q) for q in range(4)]) + (1 - accent) * merge(corners, A, B, la, lb, net, question, merge([merge(tags(q), yeses(q)) for q in range(4)]))
+}

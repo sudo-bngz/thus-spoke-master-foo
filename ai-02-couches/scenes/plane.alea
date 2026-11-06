@@ -1,0 +1,17 @@
+// Plane — the four corners, the opposite ones together, in a square with
+// its axes (Corners, here); and a half-plane (Half, in half.alea). Shared
+// by the scenes of this episode. `cx`, `cy`, `side` place the square. What
+// it returns: 0 paper, up to 1 ink.
+
+work Corners(qx = [0.22, 0.78, 0.22, 0.78], qy = [0.22, 0.78, 0.78, 0.22], qlab = [1, 1, -1, -1], cx = 0.5, cy = 0.9, side = 0.64, show = 0, axes = 1) {
+  let X(u) = cx - side / 2 + side * u
+  let Y(u) = cy + side / 2 - side * u
+  let r = 0.045 * side
+  let dot(q) = circle(X(qx[q]), Y(qy[q]), r, 0.002) * (qlab[q] > 0)
+  let ring(q) = cut(circle(X(qx[q]), Y(qy[q]), r, 0.002), circle(X(qx[q]), Y(qy[q]), r * 0.72, 0.002)) * (qlab[q] < 0)
+  let pts = merge([merge(dot(q), ring(q)) * smoothstep(show + 0.02 * q, show + 0.02 * q + 0.03, t) for q in range(4)])
+  let frame = cut(rect(cx, cy, side + 0.006, side + 0.006, 0, 0.002), rect(cx, cy, side, side, 0, 0.002)) * 0.35
+  let labels = merge(text("input 1  →", cx, cy + side / 2 + 0.05, 0.024, 0, "mono"), text("input 2  →", cx - side / 2 - 0.05, cy, 0.024, -90, "mono")) * 0.6 * axes
+  output merge(frame, labels, pts) * smoothstep(show - 0.03, show, t)
+}
+

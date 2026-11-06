@@ -1,0 +1,36 @@
+// Shapes — more neurons in the layer: lines appear one by one around a
+// blob of points, and the region they enclose fills: any shape. Then more
+// layers: the network deepens, column after column. `accent: 1` gives only
+// the enclosed region. Times are the scene's own (0 to 1). What it
+// returns: 0 paper, up to 1 ink.
+
+work Shapes(lines0 = 0.05, lines1 = 0.4, fill0 = 0.45, deep0 = 0.65, accent = 0) {
+  let cx = 0.5
+  let cy = 0.62
+  let side = 0.6
+  let K = 8
+  let frame = cut(rect(cx, cy, side + 0.006, side + 0.006, 0, 0.002), rect(cx, cy, side, side, 0, 0.002)) * 0.35
+  let inside = (abs(x - cx) < side / 2) * (abs(y - cy) < side / 2)
+  // the blob: a wobbly radius around the centre, and the lines tangent to it
+  let rad(a) = 0.2 + 0.05 * sin(3 * a + 1) + 0.03 * cos(5 * a)
+  let ang(k) = tau * k / K
+  let px(k) = cx + rad(ang(k)) * cos(ang(k))
+  let py(k) = cy + rad(ang(k)) * sin(ang(k))
+  let when(k) = lines0 + (lines1 - lines0) * k / K
+  // the half-plane inside the k-th tangent line: (p - p_k) · n_k < 0
+  let sk(k) = (x - px(k)) * cos(ang(k)) + (y - py(k)) * sin(ang(k))
+  let edge(k) = (abs(sk(k)) < 0.003) * inside * smoothstep(when(k), when(k) + 0.03, t)
+  let region = (sum([(sk(k) < 0) for k in range(K)]) == K) * inside
+  let fill = region * 0.22 * smoothstep(fill0, fill0 + 0.06, t)
+  let dots = merge([circle(cx + 0.11 * cos(k * 2.4) * (0.4 + 0.6 * fract(k * 0.37)), cy + 0.11 * sin(k * 2.4) * (0.4 + 0.6 * fract(k * 0.53)), 0.018, 0.002) for k in range(9)]) * smoothstep(lines0 - 0.03, lines0, t)
+  let count = text("8 neurons, 8 lines", 0.5, cy + side / 2 + 0.07, 0.03, 0, "mono") * 0.7 * smoothstep(lines1, lines1 + 0.04, t)
+  // depth: columns of neurons, 2, 4, 4, 3, 1, appearing column by column
+  let gone = 1 - smoothstep(deep0 - 0.03, deep0, t)
+  let cols = [2, 4, 4, 3, 1]
+  let nx(c) = 0.14 + 0.18 * c
+  let ny(c, k) = 0.72 + (k - (cols[c] - 1) / 2) * 0.09
+  let node(c, k) = cut(circle(nx(c), ny(c, k), 0.03, 0.002), circle(nx(c), ny(c, k), 0.025, 0.002)) * smoothstep(deep0 + 0.08 * c, deep0 + 0.08 * c + 0.04, t)
+  let wires(c) = merge([line(nx(c) + 0.03, ny(c, k), nx(c + 1) - 0.03, ny(c + 1, j), 0.003, 0.002) for k in range(cols[c]) for j in range(cols[c + 1])]) * 0.3 * smoothstep(deep0 + 0.08 * (c + 1), deep0 + 0.08 * (c + 1) + 0.04, t)
+  let deep = merge(merge([node(c, k) for c in range(5) for k in range(cols[c])]), merge([wires(c) for c in range(4)]), text("layers", 0.5, 1.02, 0.03, 0, "mono") * 0.6 * smoothstep(deep0 + 0.4, deep0 + 0.44, t))
+  output accent * fill * gone + (1 - accent) * merge(merge(frame, dots, merge([edge(k) for k in range(K)]), count) * gone, deep)
+}

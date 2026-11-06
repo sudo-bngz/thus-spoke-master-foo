@@ -11,7 +11,7 @@
 work Learn(px = [0.3], py = [0.3], lab = [1], w1 = 0, w2 = 0, b = 0, S = 72, l0 = 0.1, l1 = 0.8, pace = 1.8, done = "never wrong again", accent = 0) {
   let N = count(px)
   let X(u) = 0.1 + 0.8 * u
-  let Y(u) = 0.3 + 0.8 * u
+  let Y(u) = 1.1 - 0.8 * u
   let K = floor(S * clamp((t - l0) / (l1 - l0), 0, 1) ^ pace)
   let W1 = at(w1, time: K / S)
   let W2 = at(w2, time: K / S)
@@ -23,7 +23,7 @@ work Learn(px = [0.3], py = [0.3], lab = [1], w1 = 0, w2 = 0, b = 0, S = 72, l0 
   let pts = merge([merge(dot(q) * (lab[q] > 0), ring(q)) for q in range(N)])
   let frame = cut(rect(0.5, 0.7, 0.84, 0.84, 0, 0.002), rect(0.5, 0.7, 0.834, 0.834, 0, 0.002)) * 0.35
   let u = (x - 0.1) / 0.8
-  let v = (y - 0.3) / 0.8
+  let v = (1.1 - y) / 0.8
   let s = (W1 * u + W2 * v + B) / sqrt(W1 ^ 2 + W2 ^ 2 + 0.0001)
   let inside = (x > 0.08) * (x < 0.92) * (y > 0.28) * (y < 1.12)
   let edge = (abs(s) < 0.005) * inside

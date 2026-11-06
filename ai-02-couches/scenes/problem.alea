@@ -1,0 +1,30 @@
+// Problem — the recap: one neuron is one line (a line across the corners,
+// turning slowly), and whichever way it turns, two points are on the
+// wrong side (ringed in vermilion). Times are the scene's own (0 to 1).
+// `accent: 1` gives only the rings. What it returns: 0 paper, up to 1 ink.
+
+use "plane.alea"
+use "half.alea"
+
+work Problem(show = 0.05, line0 = 0.2, turn0 = 0.45, wrong0 = 0.55, accent = 0) {
+  let cx = 0.5
+  let cy = 0.82
+  let side = 0.7
+  let angle = 0.6 + 2.2 * ease(progress(turn0, 0.95), "in-out")
+  let w1 = cos(angle)
+  let w2 = sin(angle)
+  let b = -0.5 * (w1 + w2) + 0.08
+  let corners = Corners(cx: cx, cy: cy, side: side, show: show)
+  let half = Half(w1: w1, w2: w2, b: b, cx: cx, cy: cy, side: side, show: line0)
+  let one = text("1 neuron  =  1 line", 0.5, 0.33, 0.034, 0, "mono") * 0.7 * smoothstep(line0, line0 + 0.04, t)
+  // the wrong points, for this line
+  let qx = [0.22, 0.78, 0.22, 0.78]
+  let qy = [0.22, 0.78, 0.78, 0.22]
+  let qlab = [1, 1, -1, -1]
+  let X(u) = cx - side / 2 + side * u
+  let Y(u) = cy + side / 2 - side * u
+  let wrong(q) = (qlab[q] * (w1 * qx[q] + w2 * qy[q] + b) <= 0)
+  let rings = merge([cut(circle(X(qx[q]), Y(qy[q]), 0.06, 0.002), circle(X(qx[q]), Y(qy[q]), 0.05, 0.002)) * wrong(q) for q in range(4)]) * smoothstep(wrong0, wrong0 + 0.04, t)
+  let count = text("2 wrong", 0.5, cy + side / 2 + 0.11, 0.03, 0, "mono") * 0.7 * smoothstep(wrong0, wrong0 + 0.04, t)
+  output accent * rings + (1 - accent) * merge(corners, half, one, count)
+}

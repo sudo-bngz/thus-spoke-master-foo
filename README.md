@@ -34,6 +34,7 @@ say it all in one; these take their time.
 | # | Episode | The idea | Length |
 |---|---|---|---|
 | AI 01 | [Neurone](ai-01-neurone/) | The perceptron. Inputs on weighted wires, a sum, a threshold: it fires or not. With two inputs it is a line; the rule (show it a point; if wrong, move the weights toward the answer) swings the line until it is never wrong again. Then the limit: the opposite corners together, which no line separates. The edition draws the points, and the weights are grown by the rule itself, inside alea. | 2 min 59 |
+| AI 02 | [Couches](ai-02-couches/) | Layers. The opposite corners beat one neuron; two neurons draw two lines and each answers one question; a third neuron takes their answers as its inputs and fires only between the lines: a band, two lines joined. More neurons, any shape; more layers, shapes of shapes: deep. | 2 min 31 |
 
 ## Render
 
@@ -69,6 +70,10 @@ alea token.alea --seed 0xa164 -o out/
 cd ../ai-01-neurone
 python3 gen.py
 alea neurone.alea --seed 0xa1a1 -o out/
+
+cd ../ai-02-couches
+python3 gen.py
+alea couches.alea --seed 0xa1a2 -o out/
 ```
 
 Master Foo's Japanese needs misaki, Kokoro's pronunciation library:
@@ -108,6 +113,10 @@ ai-01-neurone/
   gen.py                the script; the points and the perceptron rule, grown with `grow`
   neurone.alea          the Reel
   scenes/               koan, cell, line, learn (also the XOR corners)
+ai-02-couches/
+  gen.py                the script
+  couches.alea          the Reel
+  scenes/               koan, plane, half, net, problem, lines, band, shapes
 lib/episode.py          what the generators share: the voice measured, the captions typed, the layout
 ```
 
@@ -135,6 +144,10 @@ alea token.alea --seed 0xa164 -o out/
 cd ../ai-01-neurone
 python3 gen.py
 alea neurone.alea --seed 0xa1a1 -o out/
+
+cd ../ai-02-couches
+python3 gen.py
+alea couches.alea --seed 0xa1a2 -o out/
 ```
 
 Run `gen.py` and `alea` with the same variables: `gen.py` measures each

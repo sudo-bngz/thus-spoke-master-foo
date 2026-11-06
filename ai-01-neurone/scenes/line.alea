@@ -8,7 +8,7 @@
 work Line(px = [0.3], py = [0.3], lab = [1], w1 = -0.4, w2 = 0.1, b = 0.1, axes0 = 0.02, points0 = 0.05, line0 = 0.3, fire0 = 0.45, wrong0 = 0.7, accent = 0) {
   let N = count(px)
   let X(u) = 0.1 + 0.8 * u
-  let Y(u) = 0.3 + 0.8 * u
+  let Y(u) = 1.1 - 0.8 * u
   let dot(q) = circle(X(px[q]), Y(py[q]), 0.036, 0.002) * (0.3 + 0.7 * (lab[q] > 0))
   let ring(q) = cut(circle(X(px[q]), Y(py[q]), 0.036, 0.002), circle(X(px[q]), Y(py[q]), 0.026, 0.002)) * (lab[q] < 0)
   let pts = merge([merge(dot(q) * (lab[q] > 0), ring(q)) * smoothstep(points0 + 0.02 * q, points0 + 0.02 * q + 0.02, t) for q in range(N)])
@@ -16,7 +16,7 @@ work Line(px = [0.3], py = [0.3], lab = [1], w1 = -0.4, w2 = 0.1, b = 0.1, axes0
   let axes = merge(text("input 1  →", 0.5, 1.17, 0.026, 0, "mono"), text("input 2  →", 0.04, 0.7, 0.026, -90, "mono")) * 0.6 * smoothstep(axes0, axes0 + 0.05, t)
   // the line, in the points' coordinates
   let u = (x - 0.1) / 0.8
-  let v = (y - 0.3) / 0.8
+  let v = (1.1 - y) / 0.8
   let s = (w1 * u + w2 * v + b) / sqrt(w1 ^ 2 + w2 ^ 2 + 0.0001)
   let inside = (x > 0.08) * (x < 0.92) * (y > 0.28) * (y < 1.12)
   let edge = (abs(s) < 0.005) * inside * smoothstep(line0, line0 + 0.04, t)

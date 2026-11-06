@@ -1,0 +1,29 @@
+// Band — the third neuron: it takes the answers of A and B as its inputs
+// (the network completes, C lit when both are yes), and its decision is
+// the band between the two lines: full points inside, hollow outside.
+// `accent: 1` gives only the band and the lit C. Times are the scene's own
+// (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+use "plane.alea"
+use "half.alea"
+use "net.alea"
+
+work Band(c0 = 0.05, both0 = 0.3, band0 = 0.5, layer0 = 0.8, accent = 0) {
+  let cx = 0.5
+  let cy = 0.98
+  let side = 0.56
+  let corners = Corners(cx: cx, cy: cy, side: side, show: -1, axes: 0)
+  let A = Half(w1: -1, w2: 1, b: 0.3, cx: cx, cy: cy, side: side, show: -1, shade: 0)
+  let B = Half(w1: 1, w2: -1, b: 0.3, cx: cx, cy: cy, side: side, show: -1, shade: 0)
+  let u = (x - cx + side / 2) / side
+  let v = (cy + side / 2 - y) / side
+  let inside = (abs(x - cx) < side / 2) * (abs(y - cy) < side / 2)
+  let both = (-u + v + 0.3 > 0) * (u - v + 0.3 > 0) * inside
+  let band = both * 0.22 * smoothstep(band0, band0 + 0.06, t)
+  let lit = smoothstep(both0, both0 + 0.04, t)
+  let net = Net(cx: 0.5, cy: 0.42, inputs0: -1, a0: -1, b0: -1, c0: c0, litA: lit, litB: lit, litC: lit, accent: 0)
+  let netlit = Net(cx: 0.5, cy: 0.42, inputs0: -1, a0: -1, b0: -1, c0: c0, litA: lit, litB: lit, litC: lit, accent: 1)
+  let rule = text("C fires if A and B both say yes", 0.5, 0.66, 0.028, 0, "mono") * 0.6 * smoothstep(both0, both0 + 0.04, t)
+  let name = text("a band: 2 lines, joined", 0.5, cy + side / 2 + 0.08, 0.03, 0, "mono") * 0.7 * smoothstep(band0 + 0.06, band0 + 0.1, t)
+  output accent * merge(band, netlit) + (1 - accent) * merge(corners, A, B, net, rule, name)
+}

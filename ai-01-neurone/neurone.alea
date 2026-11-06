@@ -15,7 +15,7 @@ use "scenes/line.alea"
 use "scenes/learn.alea"
 
 work Neurone {
-  let total = 180.3
+  let total = 179.7
   let T = t * total
   let EN = "../voices/narrator.sh"
   let JA = "../voices/master.sh"
@@ -92,7 +92,7 @@ work Neurone {
       scene(ink(Line(px: px, py: py, lab: lab, w1: w10, w2: w20, b: b0, axes0: ((n10.words[9]) - 69.10) / 31.0, points0: ((n11.words[0]) - 69.10) / 31.0, line0: ((n12.words[6]) - 69.10) / 31.0, fire0: ((n12.words[10]) - 69.10) / 31.0, wrong0: ((n14.words[12]) - 69.10) / 31.0, accent: 0), Line(px: px, py: py, lab: lab, w1: w10, w2: w20, b: b0, axes0: ((n10.words[9]) - 69.10) / 31.0, points0: ((n11.words[0]) - 69.10) / 31.0, line0: ((n12.words[6]) - 69.10) / 31.0, fire0: ((n12.words[10]) - 69.10) / 31.0, wrong0: ((n14.words[12]) - 69.10) / 31.0, accent: 1)), 31.0),  wipe(0.7, angle: 90, softness: 0.1),
       scene(ink(Learn(px: px, py: py, lab: lab, w1: w1, w2: w2, b: b, S: S, l0: ((n16.words[0]) - 100.10) / 35.7, l1: ((n20.words[11]) - 100.10) / 35.7, pace: 2.5, done: "never wrong again", accent: 0), Learn(px: px, py: py, lab: lab, w1: w1, w2: w2, b: b, S: S, l0: ((n16.words[0]) - 100.10) / 35.7, l1: ((n20.words[11]) - 100.10) / 35.7, pace: 2.5, done: "never wrong again", accent: 1)), 35.7),  morph(0.8, amount: 0.15),
       scene(ink(Learn(px: qx, py: qy, lab: qlab, w1: v1, w2: v2, b: c, S: S, l0: ((n24.words[2]) - 135.80) / 24.8, l1: ((n25.end) - 135.80) / 24.8, pace: 1.8, done: "no line", accent: 0), Learn(px: qx, py: qy, lab: qlab, w1: v1, w2: v2, b: c, S: S, l0: ((n24.words[2]) - 135.80) / 24.8, l1: ((n25.end) - 135.80) / 24.8, pace: 1.8, done: "no line", accent: 1)), 24.8),  wipe(0.8, angle: 180, softness: 0.12),
-      scene(ink(Koan(draw0: ((m4.start) - 160.60) / 19.7, draw1: ((m6.end) - 160.60) / 19.7, word: ((m6.start + 0.5) - 160.60) / 19.7, title: ((m6.end + 0.6) - 160.60) / 19.7, kana: ["ニ", "ュ", "ー", "ロ", "ン"], episode: "AI 01  ·  neuron", accent: 0), Koan(draw0: ((m4.start) - 160.60) / 19.7, draw1: ((m6.end) - 160.60) / 19.7, word: ((m6.start + 0.5) - 160.60) / 19.7, title: ((m6.end + 0.6) - 160.60) / 19.7, kana: ["ニ", "ュ", "ー", "ロ", "ン"], episode: "AI 01  ·  neuron", accent: 1)), 19.7),  morph(1.2, amount: 0.2),
+      scene(ink(Koan(draw0: ((m4.start) - 160.60) / 19.1, draw1: ((m6.end) - 160.60) / 19.1, word: ((m6.start + 0.5) - 160.60) / 19.1, title: ((m6.end + 0.6) - 160.60) / 19.1, kana: ["ニ", "ュ", "ー", "ロ", "ン"], episode: "AI 01  ·  neuron", accent: 0), Koan(draw0: ((m4.start) - 160.60) / 19.1, draw1: ((m6.end) - 160.60) / 19.1, word: ((m6.start + 0.5) - 160.60) / 19.1, title: ((m6.end + 0.6) - 160.60) / 19.1, kana: ["ニ", "ュ", "ー", "ロ", "ン"], episode: "AI 01  ·  neuron", accent: 1)), 19.1),  morph(1.2, amount: 0.2),
   ], loop: 1)
 
   // ── over it: the series, the step, the captions (the master's, translated, in vermilion) ──
@@ -179,6 +179,6 @@ work Neurone {
     notes(reel.cues, instrument: brush, scale: "chromatic", key: 100, gain: 0.3),
   ]
 
-  render image(look, width: 1080, height: 1920, at: 0.6542)
+  render image(look, width: 1080, height: 1920, at: 0.6564)
   render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.12, echo: 0)
 }
