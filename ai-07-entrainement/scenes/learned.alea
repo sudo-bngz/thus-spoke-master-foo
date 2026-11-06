@@ -1,0 +1,20 @@
+// Learned — what the next-word game taught the machine: three prompts,
+// their completions typed in vermilion as they are named; then the
+// weights hold it all. `prompts`, `answers`, `at` when each comes.
+// `accent: 1` gives only the answers. Times are the scene's own (0 to 1).
+// What it returns: 0 paper, up to 1 ink.
+
+work Learned(prompts = ["The capital of France is", "2 + 2 =", "Dear Sir,"], answers = ["Paris", "4", "I hope this"], at = [0.2, 0.35, 0.5], all0 = 0.7, accent = 0) {
+  let N = 3
+  let ry(k) = 0.42 + 0.18 * k
+  let on(k) = smoothstep(at[k], at[k] + 0.03, t)
+  let lens = [5, 1, 11]
+  let adv = 0.01965
+  let typed(k) = clamp((t - at[k] - 0.05) / 0.08, 0, 1) * lens[k]
+  let prompt(k) = text(prompts[k], 0.47, ry(k), 0.038, 0, "mono", "right") * 0.85 * on(k)
+  let answer(k) = text(answers[k], 0.5, ry(k), 0.038, 0, "mono", "left") * (x < 0.5 + typed(k) * adv) * (t > at[k] + 0.05)
+  let head = text("to guess the next word well, it had to learn", 0.5, 0.26, 0.026, 0, "mono") * 0.6 * smoothstep(0.03, 0.08, t)
+  let subjects = text("grammar  ·  facts  ·  styles  ·  arithmetic", 0.5, 0.32, 0.026, 0, "mono") * 0.6 * smoothstep(0.1, 0.15, t)
+  let all = text("the weights hold it all: the true and the false alike", 0.5, 1.1, 0.028, 0, "mono") * 0.65 * smoothstep(all0, all0 + 0.04, t)
+  output accent * merge([answer(k) for k in range(N)]) + (1 - accent) * merge(merge([prompt(k) for k in range(N)]), head, subjects, all)
+}

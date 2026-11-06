@@ -39,6 +39,7 @@ say it all in one; these take their time.
 | AI 04 | [Jeton](ai-04-jeton/) | Tokens, and the map of meaning. A token is a piece of text (a sentence of 4, a long word of 3, a vocabulary of 50 000); each has a number, which says nothing about meaning; so each gets a place on a learned map where words used in the same ways sit close (an embedding); and directions mean something: king − man + woman ≈ queen. The ids and places are illustrative. | 2 min 30 |
 | AI 05 | [Attention](ai-05-attention/) | The transformer's idea. The cat was hungry, so it ate the fish: what is "it"? A word alone means little; each word looks at every other and gives it a score (the attention, adding up to 1); the scores come from a question and a label made from each word's point on the map; then each word becomes a blend of the others and absorbs its context, layer after layer. The scores are illustrative. | 2 min 34 |
 | AI 06 | [Suivant](ai-06-suivant/) | The next token. Once upon a: after all the layers, the last word's point becomes a score for every token the machine knows (50 000); squeezed, the scores are probabilities; the machine picks 1, adds it to the text, and starts over, 1 token at a time; which 1 it picks is a weighted die, shaped by the temperature and rolled with a seed; and the whole machine is a loop: text, tokens, map, layers, probabilities, die, and back into the text. The probabilities are illustrative; the die's temperatures are computed by gen.py. | 2 min 38 |
+| AI 07 | [Entraînement](ai-07-entrainement/) | Where the weights come from. At first they are random; training is a game: a sentence from the internet, the next word hidden, the machine guesses; the error is how far the guess is from the truth; it flows backward and every weight moves a tiny step; done on everything ever written, on thousands of machines for months, the error goes down; and to guess the next word well the machine had to learn grammar, facts, styles, arithmetic. The numbers are illustrative. | 2 min 23 |
 
 ## Render
 
@@ -95,6 +96,10 @@ alea attention.alea --seed 0xa1a5 -o out/
 cd ../ai-06-suivant
 python3 gen.py
 alea suivant.alea --seed 0xa1a6 -o out/
+
+cd ../ai-07-entrainement
+python3 gen.py
+alea entrainement.alea --seed 0xa1a7 -o out/
 ```
 
 Master Foo's Japanese needs misaki, Kokoro's pronunciation library:
@@ -154,6 +159,10 @@ ai-06-suivant/
   gen.py                the script
   suivant.alea          the Reel
   scenes/               koan, job, next, dice, loop
+ai-07-entrainement/
+  gen.py                the script
+  entrainement.alea     the Reel
+  scenes/               koan, guess, nudge, scale, learned
 lib/episode.py          what the generators share: the voice measured, the captions typed, the layout
 ```
 
@@ -201,6 +210,10 @@ alea attention.alea --seed 0xa1a5 -o out/
 cd ../ai-06-suivant
 python3 gen.py
 alea suivant.alea --seed 0xa1a6 -o out/
+
+cd ../ai-07-entrainement
+python3 gen.py
+alea entrainement.alea --seed 0xa1a7 -o out/
 ```
 
 Run `gen.py` and `alea` with the same variables: `gen.py` measures each

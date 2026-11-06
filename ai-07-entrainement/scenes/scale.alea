@@ -1,0 +1,30 @@
+// Scale — training at scale: a grid of small squares, the machines; the
+// counter of words seen; and the error going down, a curve drawn over
+// time, steep then flat, with a little noise. `accent: 1` gives only the
+// pen of the curve. Times are the scene's own (0 to 1). What it returns:
+// 0 paper, up to 1 ink.
+
+work Scale(machines0 = 0.05, curve0 = 0.3, curve1 = 0.95, rule0 = 0.6, accent = 0) {
+  // the machines
+  let mshown = smoothstep(machines0, machines0 + 0.08, t)
+  let mach = merge([rect(0.12 + 0.76 * (a % 16) / 15, 0.22 + 0.06 * floor(a / 16), 0.03, 0.03, 0, 0.001) * (t > machines0 + 0.08 * a / 48) for a in range(48)]) * 0.55
+  let mlabel = text("thousands of machines, for months", 0.5, 0.44, 0.026, 0, "mono") * 0.6 * smoothstep(machines0 + 0.06, machines0 + 0.1, t)
+  // the curve: error against words seen
+  let x0 = 0.12
+  let x1 = 0.88
+  let y0 = 0.62
+  let y1 = 1.1
+  let axes = merge(line(x0, y1, x1, y1, 0.003, 0.002), line(x0, y0, x0, y1, 0.003, 0.002)) * 0.4 * smoothstep(curve0 - 0.04, curve0, t)
+  let xl = text("words seen", x1, y1 + 0.05, 0.024, 0, "mono", "right") * 0.5 * smoothstep(curve0 - 0.04, curve0, t)
+  let yl = text("error", x0, y0 - 0.04, 0.024, 0, "mono", "left") * 0.5 * smoothstep(curve0 - 0.04, curve0, t)
+  let prog = clamp((t - curve0) / (curve1 - curve0), 0, 1)
+  let err(u) = 1 / (1 + 14 * u) ^ 0.6 + 0.03 * sin(u * 90) * (1 - u) * 0.5
+  let steps = 160
+  let px(s) = x0 + (x1 - x0) * s / steps
+  let py(s) = y1 - (y1 - y0) * 0.92 * err(s / steps)
+  let curve = merge([line(px(s), py(s), px(s + 1), py(s + 1), 0.005, 0.002) * (prog > (s + 1) / steps) for s in range(steps)]) * 0.85
+  let pen = glow(x: px(floor(prog * steps)), y: py(floor(prog * steps)), size: 0.05) * (prog > 0) * (prog < 1)
+  let words = merge([text("{d} 000 000 000 000 words seen", 0.5, 1.22, 0.028, 0, "mono") * (floor(prog * 10) == d) for d in range(1, 11)]) * 0.6
+  let rule = text("no rules written. only: guess the next word", 0.5, 1.32, 0.026, 0, "mono") * 0.6 * smoothstep(rule0, rule0 + 0.04, t)
+  output accent * pen + (1 - accent) * merge(mach * mshown, mlabel, axes, xl, yl, curve, words, rule)
+}

@@ -1,0 +1,32 @@
+// Nudge — the error flows backward through the layers (three boxes full
+// of tiny dots, the weights), the arrow going right to left; then every
+// weight moves a tiny step, all at once (the dots shift, lit in
+// vermilion for a moment); then the same sentence again: time, 4 %.
+// `accent: 1` gives only the backward arrow and the moving weights. Times
+// are the scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Nudge(layers0 = 0.05, back0 = 0.2, step0 = 0.45, again0 = 0.7, accent = 0) {
+  let ly = 0.5
+  let lx(k) = 0.22 + 0.28 * k
+  let shown = smoothstep(layers0, layers0 + 0.05, t)
+  let box(k) = cut(rect(lx(k), ly, 0.22, 0.3, 0, 0.002), rect(lx(k), ly, 0.214, 0.294, 0, 0.002)) * 0.5 * shown
+  let moved = smoothstep(step0, step0 + 0.06, t)
+  let dot(k, a, b) = circle(lx(k) - 0.09 + 0.18 * a / 7 + 0.012 * (fract(sin(a * 12.9898 + b * 78.233 + k * 37.1) * 43758.5) - 0.5) * moved, ly - 0.12 + 0.24 * b / 9 + 0.012 * (fract(sin(a * 93.9898 + b * 67.345 + k * 11.7) * 24634.6) - 0.5) * moved, 0.006, 0.001)
+  let dots = merge([merge([merge([dot(k, a, b) for b in range(10)]) for a in range(8)]) for k in range(3)]) * 0.7 * shown
+  let names = text("the layers, and their weights", 0.5, ly + 0.22, 0.026, 0, "mono") * 0.5 * shown
+  // the error flowing backward: an arrow from the right, through the boxes
+  let flow = clamp((t - back0) / 0.12, 0, 1)
+  let ax = 0.92 - 0.84 * flow
+  let arrow = merge(line(0.92, ly - 0.2, ax, ly - 0.2, 0.005, 0.002), circle(ax, ly - 0.2, 0.014, 0.002)) * (t > back0) * (1 - 0.5 * smoothstep(step0, step0 + 0.1, t))
+  let errlabel = text("error 97", 0.92, ly - 0.26, 0.028, 0, "mono", "right") * 0.8 * smoothstep(back0 - 0.03, back0, t)
+  let backward = text("backward", 0.5, ly - 0.26, 0.024, 0, "mono") * 0.5 * (flow > 0.3) * (flow < 1)
+  // the step: the dots lit for a moment
+  let lit = merge([merge([merge([dot(k, a, b) for b in range(10)]) for a in range(8)]) for k in range(3)]) * smoothstep(step0, step0 + 0.03, t) * (1 - smoothstep(step0 + 0.1, step0 + 0.16, t))
+  let stepnote = text("every weight, a tiny step", 0.5, ly + 0.28, 0.026, 0, "mono") * 0.6 * smoothstep(step0, step0 + 0.04, t)
+  // again: time, 4 %
+  let ag = smoothstep(again0, again0 + 0.04, t)
+  let again = merge(text("Once upon a ?", 0.5, 0.98, 0.034, 0, "mono") * 0.8, text("time", 0.36, 1.08, 0.032, 0, "mono", "right") * 0.8,
+                    rect(0.38 + 0.16 * ag / 2, 1.08, 0.16 * ag, 0.04, 0, 0.002), text("4 %", 0.4 + 0.16 * ag, 1.08, 0.026, 0, "mono", "left") * 0.7 * (t > again0 + 0.05),
+                    text("was 3", 0.5, 1.16, 0.024, 0, "mono") * 0.5 * (t > again0 + 0.08)) * ag
+  output accent * merge(arrow, lit) + (1 - accent) * merge(merge([box(k) for k in range(3)]), dots, names, errlabel, backward, stepnote, again)
+}

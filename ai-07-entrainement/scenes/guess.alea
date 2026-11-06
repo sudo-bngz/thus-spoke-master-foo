@@ -1,0 +1,38 @@
+// Guess — the training game: at first the weights are random and every
+// token is as likely as any other (a flat row of bars); then a sentence
+// from the internet, its next word hidden; the machine's guess (bars),
+// the truth (time, in vermilion); and the error, a number. `accent: 1`
+// gives only the truth and the error. Times are the scene's own (0 to 1).
+// What it returns: 0 paper, up to 1 ink.
+
+work Guess(flat0 = 0.05, sentence0 = 0.25, hide0 = 0.3, guess0 = 0.5, truth0 = 0.6, error0 = 0.7, accent = 0) {
+  let cand = ["time", "midnight", "the", "dragon"]
+  let prob = [3, 2, 4, 1]
+  // at first: a flat row of many tiny bars, all the same height
+  let flatshown = smoothstep(flat0, flat0 + 0.05, t) * (1 - smoothstep(sentence0 - 0.04, sentence0, t))
+  let flat = merge(merge([rect(0.1 + 0.8 * r / 39, 0.55, 0.012, 0.06, 0, 0.001) for r in range(40)]) * 0.5,
+                   text("random weights: every token as likely as any other", 0.5, 0.68, 0.026, 0, "mono") * 0.6) * flatshown
+  // the sentence, the hidden word
+  let sy = 0.3
+  let shown = smoothstep(sentence0, sentence0 + 0.04, t)
+  let sentence = merge(text("Once upon a", 0.42, sy, 0.04, 0, "mono", "right") * 0.9, text("time", 0.45, sy, 0.04, 0, "mono", "left") * (1 - smoothstep(hide0, hide0 + 0.03, t))) * shown
+  let hidden = cut(rect(0.5, sy, 0.1, 0.055, 0, 0.002), rect(0.5, sy, 0.094, 0.049, 0, 0.002)) * 0.6 * smoothstep(hide0, hide0 + 0.03, t)
+  let qmark = text("?", 0.5, sy, 0.04, 0, "mono") * 0.6 * smoothstep(hide0 + 0.03, hide0 + 0.06, t)
+  let fromweb = text("a sentence from the internet", 0.5, sy + 0.08, 0.024, 0, "mono") * 0.5 * shown
+  // the guess
+  let row(k) = 0.52 + 0.08 * k
+  let grown(k) = clamp((t - guess0 - 0.015 * k) / 0.06, 0, 1)
+  let w(k) = 0.5 * prob[k] / 100 * 8 * grown(k)
+  let label(k) = text(cand[k], 0.36, row(k), 0.032, 0, "mono", "right") * 0.8 * smoothstep(guess0, guess0 + 0.03, t)
+  let bar(k) = rect(0.38 + w(k) / 2, row(k), w(k), 0.04, 0, 0.002) * (t > guess0 + 0.015 * k)
+  let pct(k) = text("{prob[k]} %", 0.4 + w(k), row(k), 0.026, 0, "mono", "left") * 0.7 * (t > guess0 + 0.015 * k + 0.06)
+  let guesslabel = text("the guess", 0.36, row(0) - 0.07, 0.024, 0, "mono", "right") * 0.5 * smoothstep(guess0, guess0 + 0.03, t)
+  // the truth: time, 100, a thin vermilion bar beside the guess
+  let truthshown = smoothstep(truth0, truth0 + 0.04, t)
+  let truth = merge(rect(0.38 + 0.5 / 2, row(0) - 0.03, 0.5, 0.008, 0, 0.002), text("the truth: time, 100 %", 0.88, row(0) - 0.05, 0.024, 0, "mono", "right") * 0.8) * truthshown
+  // the error
+  let errshown = smoothstep(error0, error0 + 0.04, t)
+  let err = merge(text("error", 0.5, 0.98, 0.028, 0, "mono") * 0.6, text("97", 0.5, 1.07, 0.09, 0, "mono")) * errshown
+  let errnote = text("how far 3 is from 100", 0.5, 1.16, 0.024, 0, "mono") * 0.5 * smoothstep(error0 + 0.05, error0 + 0.09, t)
+  output accent * merge(truth, err) + (1 - accent) * merge(flat, sentence, hidden, qmark, fromweb, merge([merge(label(k), bar(k), pct(k)) for k in range(4)]), guesslabel, errnote)
+}
