@@ -133,6 +133,13 @@ def main():
       then clamp(gx + x * 0 - 0.2 * slopex(gx, gy), 0.03, 0.97)
     gy = y0
       then clamp(gy + x * 0 - 0.2 * slopey(gx, gy), 0.03, 0.97)
+    // the trails: a dot stamped where each walker stands, kept
+    tb = 0
+      then max(tb, exp(-((x - bx) ^ 2 + (y - by) ^ 2) / 0.00005))
+    ts = 0
+      then max(ts, exp(-((x - sx) ^ 2 + (y - sy) ^ 2) / 0.00003))
+    tg = 0
+      then max(tg, exp(-((x - gx) ^ 2 + (y - gy) ^ 2) / 0.00005))
   }
 """)
     w("  // ── the scenes: ink on paper, a vermilion accent, under the captions ──")
@@ -147,7 +154,7 @@ def main():
                           f'kana: ["エ", "ラ", "ー"], episode: "AI 03  ·  error", accent: {a})',
         "error": lambda a: f'Error(first0: {lt("n3.words[0]", "error")}, gap0: {lt("n3.words[17]", "error")}, rest0: {lt("n4.words[0]", "error")}, total0: {lt("n4.words[12]", "error")}, accent: {a})',
         "landscape": lambda a: f'Landscape(E: E, bx: x0, by: y0, cu: cu, cv: cv, curve0: {lt("n5.words[1]", "landscape")}, map0: {lt("n6.words[0]", "landscape")}, valley0: {lt("n6.words[6]", "landscape")}, here0: {lt("n8.words[9]", "landscape")}, accent: {a})',
-        "descent": lambda a: f'Descent(E: E, bx: bx, by: by, sx: sx, sy: sy, gx: gx, gy: gy, S: S, arrow0: {lt("n9.words[5]", "descent")}, l0: {lt("n10.words[3]", "descent")}, l1: {lt("n11.end + 0.8", "descent")}, size0: {lt("n12.words[6]", "descent")}, accent: {a})',
+        "descent": lambda a: f'Descent(E: E, bx: bx, by: by, sx: sx, sy: sy, gx: gx, gy: gy, tb: tb, ts: ts, tg: tg, S: S, arrow0: {lt("n9.words[5]", "descent")}, l0: {lt("n10.words[3]", "descent")}, l1: {lt("n11.end + 0.8", "descent")}, size0: {lt("n12.words[6]", "descent")}, accent: {a})',
         "backward": lambda a: f'Backward(fwd0: {lt("n13.start - 0.9", "backward")}, gap0: {lt("n14.words[4]", "backward")}, back0: {lt("n14.words[8]", "backward")}, move0: {lt("n15.words[8]", "backward")}, accent: {a})',
         "end": lambda a: f'Koan(draw0: {lt("m4.start", "end")}, draw1: {lt("m6.end", "end")}, word: {lt("m6.start + 0.5", "end")}, title: {lt("m6.end + 0.6", "end")}, '
                          f'kana: ["エ", "ラ", "ー"], episode: "AI 03  ·  error", accent: {a})',

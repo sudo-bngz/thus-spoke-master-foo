@@ -15,7 +15,7 @@ use "scenes/descent.alea"
 use "scenes/backward.alea"
 
 work Erreur {
-  let total = 159.4
+  let total = 159.3
   let T = t * total
   let EN = "../voices/narrator.sh"
   let JA = "../voices/master.sh"
@@ -36,11 +36,11 @@ work Erreur {
   let n10 = say("So it takes one small step downhill. Then feels the slope again. Then steps again.", at: n9.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
   let n11 = say("Step by step, it walks down into the valley. This is gradient descent.", at: n10.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
   let n12 = say("The size of the step matters. Too small, and it takes forever. Too big, and it jumps over the valley, and bounces.", at: n11.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
-  let n13 = say("One thing left. With many weights, in many layers, which weights are to blame for the error?", at: 113.30, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n13 = say("One thing left. With many weights, in many layers, which weights are to blame for the error?", at: 113.20, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
   let n14 = say("The error is measured at the end. So it is sent backward, layer by layer, along the same wires the answer came through.", at: n13.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
   let n15 = say("Each wire receives its share of the blame, and moves its weight by that much.", at: n14.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
   let n16 = say("Forward to answer. Backward to blame. This is backpropagation, and every network learns this way.", at: n15.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
-  let m4 = say("弟子は、谷を下る水のように、重りを動かした。", at: 141.70, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let m4 = say("弟子は、谷を下る水のように、重りを動かした。", at: 141.60, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
   let m5 = say("師は言った。一歩ずつ。急げば、谷を跳び越える。", at: m4.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
   let m6 = say("その時、弟子は悟った。", at: m5.end + 1.6, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
 
@@ -70,6 +70,13 @@ work Erreur {
       then clamp(gx + x * 0 - 0.2 * slopex(gx, gy), 0.03, 0.97)
     gy = y0
       then clamp(gy + x * 0 - 0.2 * slopey(gx, gy), 0.03, 0.97)
+    // the trails: a dot stamped where each walker stands, kept
+    tb = 0
+      then max(tb, exp(-((x - bx) ^ 2 + (y - by) ^ 2) / 0.00005))
+    ts = 0
+      then max(ts, exp(-((x - sx) ^ 2 + (y - sy) ^ 2) / 0.00003))
+    tg = 0
+      then max(tg, exp(-((x - gx) ^ 2 + (y - gy) ^ 2) / 0.00005))
   }
 
   // ── the scenes: ink on paper, a vermilion accent, under the captions ──
@@ -80,9 +87,9 @@ work Erreur {
       scene(ink(Koan(draw0: ((m1.start) - 0.00) / 25.1, draw1: ((m1.end) - 0.00) / 25.1, word: ((m3.end + 0.8) - 0.00) / 25.1, title: ((m3.end + 1.0) - 0.00) / 25.1, kana: ["エ", "ラ", "ー"], episode: "AI 03  ·  error", accent: 0), Koan(draw0: ((m1.start) - 0.00) / 25.1, draw1: ((m1.end) - 0.00) / 25.1, word: ((m3.end + 0.8) - 0.00) / 25.1, title: ((m3.end + 1.0) - 0.00) / 25.1, kana: ["エ", "ラ", "ー"], episode: "AI 03  ·  error", accent: 1)), 25.1),  wipe(0.8, angle: 0, softness: 0.12),
       scene(ink(Error(first0: ((n3.words[0]) - 25.10) / 30.6, gap0: ((n3.words[17]) - 25.10) / 30.6, rest0: ((n4.words[0]) - 25.10) / 30.6, total0: ((n4.words[12]) - 25.10) / 30.6, accent: 0), Error(first0: ((n3.words[0]) - 25.10) / 30.6, gap0: ((n3.words[17]) - 25.10) / 30.6, rest0: ((n4.words[0]) - 25.10) / 30.6, total0: ((n4.words[12]) - 25.10) / 30.6, accent: 1)), 30.6),  pixels(0.6, size: 0.05),
       scene(ink(Landscape(E: E, bx: x0, by: y0, cu: cu, cv: cv, curve0: ((n5.words[1]) - 55.70) / 27.2, map0: ((n6.words[0]) - 55.70) / 27.2, valley0: ((n6.words[6]) - 55.70) / 27.2, here0: ((n8.words[9]) - 55.70) / 27.2, accent: 0), Landscape(E: E, bx: x0, by: y0, cu: cu, cv: cv, curve0: ((n5.words[1]) - 55.70) / 27.2, map0: ((n6.words[0]) - 55.70) / 27.2, valley0: ((n6.words[6]) - 55.70) / 27.2, here0: ((n8.words[9]) - 55.70) / 27.2, accent: 1)), 27.2),  wipe(0.7, angle: 90, softness: 0.1),
-      scene(ink(Descent(E: E, bx: bx, by: by, sx: sx, sy: sy, gx: gx, gy: gy, S: S, arrow0: ((n9.words[5]) - 82.90) / 28.9, l0: ((n10.words[3]) - 82.90) / 28.9, l1: ((n11.end + 0.8) - 82.90) / 28.9, size0: ((n12.words[6]) - 82.90) / 28.9, accent: 0), Descent(E: E, bx: bx, by: by, sx: sx, sy: sy, gx: gx, gy: gy, S: S, arrow0: ((n9.words[5]) - 82.90) / 28.9, l0: ((n10.words[3]) - 82.90) / 28.9, l1: ((n11.end + 0.8) - 82.90) / 28.9, size0: ((n12.words[6]) - 82.90) / 28.9, accent: 1)), 28.9),  morph(0.8, amount: 0.15),
-      scene(ink(Backward(fwd0: ((n13.start - 0.9) - 111.80) / 28.4, gap0: ((n14.words[4]) - 111.80) / 28.4, back0: ((n14.words[8]) - 111.80) / 28.4, move0: ((n15.words[8]) - 111.80) / 28.4, accent: 0), Backward(fwd0: ((n13.start - 0.9) - 111.80) / 28.4, gap0: ((n14.words[4]) - 111.80) / 28.4, back0: ((n14.words[8]) - 111.80) / 28.4, move0: ((n15.words[8]) - 111.80) / 28.4, accent: 1)), 28.4),  wipe(0.8, angle: 180, softness: 0.12),
-      scene(ink(Koan(draw0: ((m4.start) - 140.20) / 19.2, draw1: ((m6.end) - 140.20) / 19.2, word: ((m6.start + 0.5) - 140.20) / 19.2, title: ((m6.end + 0.6) - 140.20) / 19.2, kana: ["エ", "ラ", "ー"], episode: "AI 03  ·  error", accent: 0), Koan(draw0: ((m4.start) - 140.20) / 19.2, draw1: ((m6.end) - 140.20) / 19.2, word: ((m6.start + 0.5) - 140.20) / 19.2, title: ((m6.end + 0.6) - 140.20) / 19.2, kana: ["エ", "ラ", "ー"], episode: "AI 03  ·  error", accent: 1)), 19.2),  morph(1.2, amount: 0.2),
+      scene(ink(Descent(E: E, bx: bx, by: by, sx: sx, sy: sy, gx: gx, gy: gy, tb: tb, ts: ts, tg: tg, S: S, arrow0: ((n9.words[5]) - 82.90) / 28.8, l0: ((n10.words[3]) - 82.90) / 28.8, l1: ((n11.end + 0.8) - 82.90) / 28.8, size0: ((n12.words[6]) - 82.90) / 28.8, accent: 0), Descent(E: E, bx: bx, by: by, sx: sx, sy: sy, gx: gx, gy: gy, tb: tb, ts: ts, tg: tg, S: S, arrow0: ((n9.words[5]) - 82.90) / 28.8, l0: ((n10.words[3]) - 82.90) / 28.8, l1: ((n11.end + 0.8) - 82.90) / 28.8, size0: ((n12.words[6]) - 82.90) / 28.8, accent: 1)), 28.8),  morph(0.8, amount: 0.15),
+      scene(ink(Backward(fwd0: ((n13.start - 0.9) - 111.70) / 28.4, gap0: ((n14.words[4]) - 111.70) / 28.4, back0: ((n14.words[8]) - 111.70) / 28.4, move0: ((n15.words[8]) - 111.70) / 28.4, accent: 0), Backward(fwd0: ((n13.start - 0.9) - 111.70) / 28.4, gap0: ((n14.words[4]) - 111.70) / 28.4, back0: ((n14.words[8]) - 111.70) / 28.4, move0: ((n15.words[8]) - 111.70) / 28.4, accent: 1)), 28.4),  wipe(0.8, angle: 180, softness: 0.12),
+      scene(ink(Koan(draw0: ((m4.start) - 140.10) / 19.2, draw1: ((m6.end) - 140.10) / 19.2, word: ((m6.start + 0.5) - 140.10) / 19.2, title: ((m6.end + 0.6) - 140.10) / 19.2, kana: ["エ", "ラ", "ー"], episode: "AI 03  ·  error", accent: 0), Koan(draw0: ((m4.start) - 140.10) / 19.2, draw1: ((m6.end) - 140.10) / 19.2, word: ((m6.start + 0.5) - 140.10) / 19.2, title: ((m6.end + 0.6) - 140.10) / 19.2, kana: ["エ", "ラ", "ー"], episode: "AI 03  ·  error", accent: 1)), 19.2),  morph(1.2, amount: 0.2),
   ], loop: 1)
 
   // ── over it: the series, the step, the captions (the master's, translated, in vermilion) ──
@@ -171,6 +178,6 @@ work Erreur {
     notes(reel.cues, instrument: brush, scale: "chromatic", key: 100, gain: 0.3),
   ]
 
-  render image(look, width: 1080, height: 1920, at: 0.6107)
+  render image(look, width: 1080, height: 1920, at: 0.6108)
   render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.12, echo: 0)
 }
