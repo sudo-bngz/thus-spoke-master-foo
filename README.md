@@ -33,7 +33,7 @@ say it all in one; these take their time.
 
 | # | Episode | The idea | Length |
 |---|---|---|---|
-| AI 01 | [Neurone](ai-01-neurone/) | The perceptron. Inputs on weighted wires, a sum, a threshold: it fires or not. With two inputs it is a line; the rule (show it a point; if wrong, move the weights toward the answer) swings the line until it is never wrong again. Then the limit: the opposite corners together, which no line separates. The edition draws the points, and the weights are grown by the rule itself, inside alea. | 1 min 46 |
+| AI 01 | [Neurone](ai-01-neurone/) | The perceptron. Inputs on weighted wires, a sum, a threshold: it fires or not. With two inputs it is a line; the rule (show it a point; if wrong, move the weights toward the answer) swings the line until it is never wrong again. Then the limit: the opposite corners together, which no line separates. The edition draws the points, and the weights are grown by the rule itself, inside alea. | 2 min 59 |
 
 ## Render
 

@@ -2,16 +2,17 @@
 // each step (in vermilion); when it is on the wrong side, the weights move
 // and the line swings. `w1`, `w2`, `b` are the grown weights (a field: at
 // time k / S, their values after k steps), `S` the number of steps; the
-// steps run from `l0` to `l1`, slowly then faster. `done` writes the last
+// steps run from `l0` to `l1`, slowly then faster (`pace`: the higher, the
+// slower the first steps). `done` writes the last
 // word when the steps are over. `accent: 1` gives only the lit point and
 // the line while it moves. Times are the scene's own (0 to 1). What it
 // returns: 0 paper, up to 1 ink.
 
-work Learn(px = [0.3], py = [0.3], lab = [1], w1 = 0, w2 = 0, b = 0, S = 72, l0 = 0.1, l1 = 0.8, done = "never wrong again", accent = 0) {
+work Learn(px = [0.3], py = [0.3], lab = [1], w1 = 0, w2 = 0, b = 0, S = 72, l0 = 0.1, l1 = 0.8, pace = 1.8, done = "never wrong again", accent = 0) {
   let N = count(px)
   let X(u) = 0.1 + 0.8 * u
   let Y(u) = 0.3 + 0.8 * u
-  let K = floor(S * clamp((t - l0) / (l1 - l0), 0, 1) ^ 1.8)
+  let K = floor(S * clamp((t - l0) / (l1 - l0), 0, 1) ^ pace)
   let W1 = at(w1, time: K / S)
   let W2 = at(w2, time: K / S)
   let B = at(b, time: K / S)

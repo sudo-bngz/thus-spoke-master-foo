@@ -10,42 +10,58 @@ import os, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "lib"))
+import episode
 from episode import GAP, caption, layout, measure
+episode.LEAD, episode.HOLD = 1.5, 1.8     # a lesson: more picture alone before the voice, a longer hold
 
 SEED = "0xa1a1"
 EN_ENGINE = "../voices/narrator.sh"
 JA_ENGINE = "../voices/master.sh"
-NARRATOR = (os.environ.get("NARRATOR_VOICE", "af_heart"), 0.95)
+NARRATOR = (os.environ.get("NARRATOR_VOICE", "af_heart"), 1.0)
 MASTER = (os.environ.get("MASTER_VOICE", "jm_kumo"), 0.82)   # an ElevenLabs voice id, with ELEVENLABS_API_KEY
 
 SCENES = [
     ("koan", "", [
         ("m1", "M", "弟子は尋ねた。機械は、どうやって学ぶのですか。", 0, "The novice asked: how does a machine learn?"),
-        ("m2", "M", "師は、皿が二つある秤を渡した。", 1.2, "Master Foo handed him a scale with 2 pans."),
-        ("m3", "M", "師は言った。重りを置け。間違えたら、動かせ。", 1.2, "Master Foo said: put the weights on. When it is wrong, move them."),
-    ], 1.0),
+        ("m2", "M", "師は、皿が二つある秤を渡した。", 1.4, "Master Foo handed him a scale with 2 pans."),
+        ("m3", "M", "師は言った。重りを置け。間違えたら、動かせ。", 1.4, "Master Foo said: put the weights on. When it is wrong, move them."),
+    ], 0.6),
     ("cell", "1 / 4   the cell", [
-        ("n1", "N", "A neuron is a small machine. Inputs come in, each through a wire with a weight.", 0, ""),
-        ("n2", "N", "It adds them up: a heavy weight counts more. If the sum passes a threshold, it fires: one. If not: zero.", 1.2, "It adds them up: a heavy weight counts more. If the sum passes a threshold, it fires: 1. If not: 0."),
+        ("n1", "N", "A neuron is a small machine that makes one decision: yes, or no.", 0, "A neuron is a small machine that makes 1 decision: yes, or no."),
+        ("n2", "N", "It has inputs. Here, three of them. Each input is a number: how strong that signal is.", 1.4, "It has inputs. Here, 3 of them. Each input is a number: how strong that signal is."),
+        ("n3", "N", "Each input arrives through a wire. And each wire has a weight: how much that input counts.", 1.4, ""),
+        ("n4", "N", "A heavy weight: this input matters a lot. A light one: it barely matters.", 1.6, ""),
+        ("n5", "N", "The neuron multiplies each input by its weight, and adds everything up.", 1.4, ""),
+        ("n6", "N", "Then it compares the sum to a threshold.", 1.6, ""),
+        ("n7", "N", "Above the threshold, it fires: one. Yes.", 1.6, "Above the threshold, it fires: 1. Yes."),
+        ("n8", "N", "Other inputs. The sum stays below. Nothing: zero. No.", 1.6, "Other inputs. The sum stays below. Nothing: 0. No."),
+        ("n9", "N", "That is all a neuron does. Weigh, add, decide.", 1.4, ""),
     ], 1.0),
     ("line", "2 / 4   the line", [
-        ("n3", "N", "With two inputs, the neuron draws a line. On one side it fires, on the other it does not.", 0, "With 2 inputs, the neuron draws a line. On 1 side it fires, on the other it does not."),
-        ("n4", "N", "At first the weights are random, and the line is wrong.", 1.2, ""),
-    ], 0.8),
+        ("n10", "N", "Now give it two inputs only, and draw them as a point: input one left to right, input two bottom to top.", 0, "Now give it 2 inputs only, and draw them as a point: input 1 left to right, input 2 bottom to top."),
+        ("n11", "N", "Here are points of two kinds: hollow, and full. We want the neuron to fire on the full ones only.", 1.4, "Here are points of 2 kinds: hollow, and full. We want the neuron to fire on the full ones only."),
+        ("n12", "N", "With two inputs, the neuron's decision is a straight line. On one side it fires. On the other, it stays quiet.", 1.4, "With 2 inputs, the neuron's decision is a straight line. On 1 side it fires. On the other, it stays quiet."),
+        ("n14", "N", "At first, the weights are random. So the line is random, and some points are on the wrong side.", 1.4, ""),
+    ], 1.0),
     ("learn", "3 / 4   the rule", [
-        ("n5", "N", "Learning is a rule: show it a point. If it is wrong, move the weights a little toward the right answer.", 0, ""),
-        ("n6", "N", "Point by point, the line swings. After a few passes, it is never wrong again.", 1.2, ""),
-        ("n7", "N", "That is a perceptron, from nineteen fifty-eight. One cell. It can learn any line.", 1.4, "That is a perceptron, from 1958. 1 cell. It can learn any line."),
+        ("n15", "N", "How does it learn? With a rule simple enough to say in one sentence.", 0, "How does it learn? With a rule simple enough to say in 1 sentence."),
+        ("n16", "N", "Show it one point. If the neuron is right, do nothing.", 1.4, "Show it 1 point. If the neuron is right, do nothing."),
+        ("n17", "N", "If it is wrong, move every weight a little, toward the right answer. The line shifts a bit.", 1.4, ""),
+        ("n18", "N", "Then the next point. And the next. One by one, around and around.", 1.4, "Then the next point. And the next. 1 by 1, around and around."),
+        ("n20", "N", "Until one pass goes by without a single mistake. Then it stops. It has learned.", 1.4, "Until 1 pass goes by without a single mistake. Then it stops. It has learned."),
+        ("n21", "N", "This is the perceptron, from nineteen fifty-eight. One cell, one rule, any line.", 1.4, "This is the perceptron, from 1958. 1 cell, 1 rule, any line."),
     ], 1.0),
     ("xor", "4 / 4   the limit", [
-        ("n8", "N", "But some problems are not a line: here, the opposite corners go together.", 0, ""),
-        ("n9", "N", "One neuron can swing forever and never find it. For that, you need several, in layers. Next time.", 1.2, "1 neuron can swing forever and never find it. For that, you need several, in layers. Next time."),
+        ("n23", "N", "But some problems are not a line. Here, the full points sit in opposite corners.", 0, ""),
+        ("n24", "N", "You can't. Whichever way the line turns, two points are always on the wrong side.", 1.4, "You can't. Whichever way the line turns, 2 points are always on the wrong side."),
+        ("n25", "N", "The neuron swings forever, and never settles. One cell is not enough.", 1.4, "The neuron swings forever, and never settles. 1 cell is not enough."),
+        ("n26", "N", "For this, you need several neurons, in layers. That is the next episode.", 1.4, ""),
     ], 1.0),
     ("end", "", [
         ("m4", "M", "千回の間違いのあと、秤は正しく傾いた。", 0, "After 1 000 mistakes, the scale tipped right."),
-        ("m5", "M", "師は言った。一つの秤では、引けない線もある。", 1.2, "Master Foo said: there are lines 1 scale cannot draw."),
-        ("m6", "M", "その時、弟子は悟った。", 1.4, "And the novice was enlightened."),
-    ], 2.5),
+        ("m5", "M", "師は言った。一つの秤では、引けない線もある。", 1.4, "Master Foo said: there are lines 1 scale cannot draw."),
+        ("m6", "M", "その時、弟子は悟った。", 1.6, "And the novice was enlightened."),
+    ], 1.0),
 ]
 TRANSITIONS = ["wipe(0.8, angle: 0, softness: 0.12)", "pixels(0.6, size: 0.05)", "wipe(0.7, angle: 90, softness: 0.1)",
                "morph(0.8, amount: 0.15)", "wipe(0.8, angle: 180, softness: 0.12)", "morph(1.2, amount: 0.2)"]
@@ -139,10 +155,10 @@ def main():
     args = {
         "koan": lambda a: f'Koan(draw0: {lt("m1.start", "koan")}, draw1: {lt("m1.end", "koan")}, word: {lt("m3.end + 0.8", "koan")}, title: {lt("m3.end + 1.0", "koan")}, '
                           f'kana: ["ニ", "ュ", "ー", "ロ", "ン"], episode: "AI 01  ·  neuron", accent: {a})',
-        "cell": lambda a: f'Cell(inputs0: {lt("n1.words[5]", "cell")}, wires0: {lt("n1.words[10]", "cell")}, sum0: {lt("n2.words[1]", "cell")}, thresh0: {lt("n2.words[14]", "cell")}, fire0: {lt("n2.words[16]", "cell")}, again0: {lt("n2.words[18]", "cell")}, accent: {a})',
-        "line": lambda a: f'Line(px: px, py: py, lab: lab, w1: w10, w2: w20, b: b0, points0: {lt("n3.start - 0.8", "line")}, line0: {lt("n3.words[6]", "line")}, fire0: {lt("n3.words[13]", "line")}, wrong0: {lt("n4.words[9]", "line")}, accent: {a})',
-        "learn": lambda a: f'Learn(px: px, py: py, lab: lab, w1: w1, w2: w2, b: b, S: S, l0: {lt("n5.words[4]", "learn")}, l1: {lt("n6.end + 0.5", "learn")}, done: "never wrong again", accent: {a})',
-        "xor": lambda a: f'Learn(px: qx, py: qy, lab: qlab, w1: v1, w2: v2, b: c, S: S, l0: {lt("n9.words[0]", "xor")}, l1: {lt("n9.end + 1.0", "xor")}, done: "no line", accent: {a})',
+        "cell": lambda a: f'Cell(inputs0: {lt("n2.words[2]", "cell")}, wires0: {lt("n3.words[4]", "cell")}, heavy0: {lt("n4.words[0]", "cell")}, light0: {lt("n4.words[8]", "cell")}, sum0: {lt("n5.words[8]", "cell")}, thresh0: {lt("n6.words[6]", "cell")}, fire0: {lt("n7.words[3]", "cell")}, again0: {lt("n8.words[0]", "cell")}, zero0: {lt("n8.words[7]", "cell")}, accent: {a})',
+        "line": lambda a: f'Line(px: px, py: py, lab: lab, w1: w10, w2: w20, b: b0, axes0: {lt("n10.words[9]", "line")}, points0: {lt("n11.words[0]", "line")}, line0: {lt("n12.words[6]", "line")}, fire0: {lt("n12.words[10]", "line")}, wrong0: {lt("n14.words[12]", "line")}, accent: {a})',
+        "learn": lambda a: f'Learn(px: px, py: py, lab: lab, w1: w1, w2: w2, b: b, S: S, l0: {lt("n16.words[0]", "learn")}, l1: {lt("n20.words[11]", "learn")}, pace: 2.5, done: "never wrong again", accent: {a})',
+        "xor": lambda a: f'Learn(px: qx, py: qy, lab: qlab, w1: v1, w2: v2, b: c, S: S, l0: {lt("n24.words[2]", "xor")}, l1: {lt("n25.end", "xor")}, pace: 1.8, done: "no line", accent: {a})',
         "end": lambda a: f'Koan(draw0: {lt("m4.start", "end")}, draw1: {lt("m6.end", "end")}, word: {lt("m6.start + 0.5", "end")}, title: {lt("m6.end + 0.6", "end")}, '
                          f'kana: ["ニ", "ュ", "ー", "ロ", "ン"], episode: "AI 01  ·  neuron", accent: {a})',
     }
@@ -181,18 +197,18 @@ def main():
   // the temple bell when the master speaks; the scale handed over
   pattern bells = repeat 2 event(t: [m1.start - 1.0, m4.start - 1.0][i] / total, x: 0.5, y: 0.95, size: 0.12, intensity: 0.9)
   pattern scale = repeat 1 event(t: m2.start / total + 0.6 * m2.duration / total, x: 0.5, y: 0.5, size: 0.06, intensity: 0.8)
-  // the cell: the inputs, the wires, the sum filling, the fire, the second try
-  pattern inputs = repeat 3 event(t: (n1.words[5] + 0.04 * {L["cell"]} * i) / total, x: 0.2, y: 0.4 + 0.15 * i, intensity: 0.5)
-  pattern fires = repeat 1 event(t: n2.words[16] / total, x: 0.86, y: 0.5, size: 0.08, intensity: 0.9)
-  pattern silent = repeat 1 event(t: (n2.words[18] + 0.15 * {L["cell"]}) / total, x: 0.86, y: 0.5, size: 0.04, intensity: 0.4)
+  // the cell: the inputs, the sum filling, the fire, the second try
+  pattern inputs = repeat 3 event(t: (n2.words[2] + 0.04 * {L["cell"]} * i) / total, x: 0.2, y: 0.4 + 0.15 * i, intensity: 0.5)
+  pattern fires = repeat 1 event(t: n7.words[3] / total, x: 0.86, y: 0.5, size: 0.08, intensity: 0.9)
+  pattern silent = repeat 1 event(t: n8.words[7] / total, x: 0.86, y: 0.5, size: 0.04, intensity: 0.4)
   // the line drawn, the wrong points ringed
-  pattern drawn = repeat 1 event(t: n3.words[6] / total, x: 0.5, y: 0.5, size: 0.08, intensity: 0.7)
-  pattern wrongs = repeat 4 event(t: (n4.words[9] + 0.12 * i) / total, x: 0.3 + 0.1 * i, y: 0.4, intensity: 0.6)
-  // the steps: a tick at each, slowly then faster; a knock when the line moves is in the scene's own moments (unknown here), so every step ticks and the pass changes ring
-  pattern steps = repeat 96 event(t: (n5.words[4] + (n6.end + 0.5 - n5.words[4]) * ((i + 1) / 96) ^ (1 / 1.8)) / total, x: 0.3 + 0.4 * (i % 2), y: 0.6 - 0.3 * (i % 12) / 12, intensity: 0.35 + 0.3 * ((i % 12) == 0))
-  pattern settled = repeat 3 event(t: (n6.end + 0.5) / total, x: 0.5, y: [0.5, 0.4, 0.3][i], size: 0.1, intensity: 0.7)
-  pattern xsteps = repeat 96 event(t: (n9.words[0] + (n9.end + 1.0 - n9.words[0]) * ((i + 1) / 96) ^ (1 / 1.8)) / total, x: 0.3 + 0.4 * (i % 2), y: 0.6 - 0.3 * (i % 4) / 4, intensity: 0.35 + 0.3 * ((i % 4) == 0))
-  pattern never = repeat 1 event(t: (n9.end + 1.0) / total, x: 0.5, y: 0.7, size: 0.1, intensity: 0.8)
+  pattern drawn = repeat 1 event(t: n12.words[6] / total, x: 0.5, y: 0.5, size: 0.08, intensity: 0.7)
+  pattern wrongs = repeat 4 event(t: (n14.words[12] + 0.12 * i) / total, x: 0.3 + 0.1 * i, y: 0.4, intensity: 0.6)
+  // the steps: a tick at each, slowly then faster; the pass changes ring
+  pattern steps = repeat 144 event(t: (n16.words[0] + (n20.words[11] - n16.words[0]) * ((i + 1) / 144) ^ (1 / 2.5)) / total, x: 0.3 + 0.4 * (i % 2), y: 0.6 - 0.3 * (i % 12) / 12, intensity: 0.35 + 0.3 * ((i % 12) == 0))
+  pattern settled = repeat 3 event(t: n20.words[11] / total, x: 0.5, y: [0.5, 0.4, 0.3][i], size: 0.1, intensity: 0.7)
+  pattern xsteps = repeat 144 event(t: (n24.words[2] + (n25.end - n24.words[2]) * ((i + 1) / 144) ^ (1 / 1.8)) / total, x: 0.3 + 0.4 * (i % 2), y: 0.6 - 0.3 * (i % 4) / 4, intensity: 0.35 + 0.3 * ((i % 4) == 0))
+  pattern never = repeat 1 event(t: n25.end / total, x: 0.5, y: 0.7, size: 0.1, intensity: 0.8)
 """)
     w("  let music = [")
     w("    " + ", ".join(order) + ",")
