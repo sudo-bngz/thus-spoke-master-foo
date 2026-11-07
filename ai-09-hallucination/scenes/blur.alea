@@ -1,0 +1,31 @@
+// Blur — the weights hold the internet, blurred: a sharp peak for a fact
+// seen a million times (Paris), a flat spread for one seen twice; and
+// the gap filled anyway, with words that sound right. `accent: 1` gives
+// only the filled words. Times are the scene's own (0 to 1). What it
+// returns: 0 paper, up to 1 ink.
+
+work Blur(sharp0 = 0.05, flat0 = 0.35, fill0 = 0.65, accent = 0) {
+  let x0 = 0.12
+  let x1 = 0.88
+  // one distribution drawn as a column of bars, as a field: height h(u) along u in 0..1
+  let dist(cy, h, shown) = merge([rect(x0 + (x1 - x0) * (b + 0.5) / 40, cy - 0.18 * h((b + 0.5) / 40) * shown / 2, (x1 - x0) / 40 * 0.7, 0.18 * h((b + 0.5) / 40) * shown, 0, 0.001) for b in range(40)]) * 0.65
+  let base(cy, shown) = line(x0, cy, x1, cy, 0.003, 0.002) * 0.4 * shown
+  let peak(u) = exp(-((u - 0.5) / 0.03) ^ 2)
+  let spread(u) = 0.18 + 0.1 * sin(u * 37) * sin(u * 11) + 0.06 * sin(u * 5)
+  let s1 = smoothstep(sharp0, sharp0 + 0.08, t)
+  let s2 = smoothstep(flat0, flat0 + 0.08, t)
+  let cy1 = 0.42
+  let cy2 = 0.8
+  let sharp = merge(dist(cy1, peak, s1), base(cy1, s1), text("Paris", 0.5, cy1 - 0.22, 0.034, 0, "mono") * 0.9 * smoothstep(sharp0 + 0.06, sharp0 + 0.1, t),
+                    text("seen 1 000 000 times: a sharp peak", 0.5, cy1 + 0.06, 0.026, 0, "mono") * 0.6 * smoothstep(sharp0 + 0.1, sharp0 + 0.14, t))
+  let flat = merge(dist(cy2, spread, s2), base(cy2, s2), text("a paper from 1987", 0.5, cy2 - 0.1, 0.034, 0, "mono") * 0.9 * smoothstep(flat0 + 0.06, flat0 + 0.1, t),
+                   text("seen 2 times: almost nothing", 0.5, cy2 + 0.06, 0.026, 0, "mono") * 0.6 * smoothstep(flat0 + 0.1, flat0 + 0.14, t))
+  // the gap filled
+  let fs = smoothstep(fill0, fill0 + 0.04, t)
+  let adv = 0.01965 * 0.034 / 0.038
+  let typed = clamp((t - fill0 - 0.03) / 0.14, 0, 1) * 42
+  let line1 = text("Dr. R. Lindqvist, Journal of Optics, 1987.", 0.5, 1.0, 0.034, 0, "mono") * (x < 0.5 - 21 * adv + typed * adv) * fs
+  let note = text("a name that sounds like a name, a date that sounds like a date", 0.5, 1.08, 0.024, 0, "mono") * 0.55 * smoothstep(fill0 + 0.18, fill0 + 0.22, t)
+  let goes = text("the sentence must go on", 0.5, 0.94, 0.026, 0, "mono") * 0.6 * fs
+  output accent * line1 + (1 - accent) * merge(sharp, flat, note, goes)
+}

@@ -41,6 +41,7 @@ say it all in one; these take their time.
 | AI 06 | [Suivant](ai-06-suivant/) | The next token. Once upon a: after all the layers, the last word's point becomes a score for every token the machine knows (50 000); squeezed, the scores are probabilities; the machine picks 1, adds it to the text, and starts over, 1 token at a time; which 1 it picks is a weighted die, shaped by the temperature and rolled with a seed; and the whole machine is a loop: text, tokens, map, layers, probabilities, die, and back into the text. The probabilities are illustrative; the die's temperatures are computed by gen.py. | 2 min 38 |
 | AI 07 | [Entraînement](ai-07-entrainement/) | Where the weights come from. At first they are random; training is a game: a sentence from the internet, the next word hidden, the machine guesses; the error is how far the guess is from the truth; it flows backward and every weight moves a tiny step; done on everything ever written, on thousands of machines for months, the error goes down; and to guess the next word well the machine had to learn grammar, facts, styles, arithmetic. The numbers are illustrative. | 2 min 23 |
 | AI 08 | [Mémoire](ai-08-memoire/) | The window. The weights never change once training is done; a conversation lives in the text, fed back in whole at every message; the text has a limit, the window (12 tokens here, 100 000 or more in real ones); why: every token looks at every other, so twice the text is 4 times the work; at the edge the oldest tokens fall out, never seen; and the machine's 2 memories, the weights and the window, with the trick: a note at the top of the window. | 2 min 27 |
+| AI 09 | [Hallucination](ai-09-hallucination/) | Sure, and wrong. The machine was never asked to be right, only to continue: a sentence shaped like a fact, with no fact behind it; why: the weights hold the internet blurred, a sharp peak for what was seen 1 000 000 times, a flat spread for what was seen 2 times, and the gap filled anyway; the same voice for a fact and an invention, the number under the words never shown; and what to do: give it the text, ask twice, check what matters. Closes the AI series. The percentages and the paper are illustrative. | 2 min 31 |
 
 ## Render
 
@@ -105,6 +106,10 @@ alea entrainement.alea --seed 0xa1a7 -o out/
 cd ../ai-08-memoire
 python3 gen.py
 alea memoire.alea --seed 0xa1a8 -o out/
+
+cd ../ai-09-hallucination
+python3 gen.py
+alea hallucination.alea --seed 0xa1a9 -o out/
 ```
 
 Master Foo's Japanese needs misaki, Kokoro's pronunciation library:
@@ -172,6 +177,10 @@ ai-08-memoire/
   gen.py                the script
   memoire.alea          the Reel
   scenes/               koan, window, cost, edge, two
+ai-09-hallucination/
+  gen.py                the script
+  hallucination.alea    the Reel
+  scenes/               koan, shape, blur, sure, check
 lib/episode.py          what the generators share: the voice measured, the captions typed, the layout
 ```
 
@@ -227,6 +236,10 @@ alea entrainement.alea --seed 0xa1a7 -o out/
 cd ../ai-08-memoire
 python3 gen.py
 alea memoire.alea --seed 0xa1a8 -o out/
+
+cd ../ai-09-hallucination
+python3 gen.py
+alea hallucination.alea --seed 0xa1a9 -o out/
 ```
 
 Run `gen.py` and `alea` with the same variables: `gen.py` measures each

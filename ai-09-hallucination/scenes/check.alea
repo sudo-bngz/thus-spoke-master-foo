@@ -1,0 +1,29 @@
+// Check — what to do: three things, each with a small picture: a page put
+// in the window; two dice; a check mark on a name and a date. Then the
+// series closed: the 9 episodes in a row. `at` when each thing comes,
+// `end0` the row. `accent: 1` gives only the marks. Times are the scene's
+// own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Check(at = [0.1, 0.35, 0.55], end0 = 0.8, accent = 0) {
+  let things = ["give it the text", "ask twice", "check what matters"]
+  let subs = ["the document in the window: it reads, instead of guessing", "2 rolls of the die: if the answers disagree, the spread was flat", "a name, a date, a number, a law: true or not is your job"]
+  let ry(k) = 0.38 + 0.22 * k
+  let on(k) = smoothstep(at[k], at[k] + 0.04, t)
+  let num(k) = text("{k + 1}", 0.12, ry(k), 0.05, 0, "mono") * on(k)
+  let title(k) = text(things[k], 0.2, ry(k) - 0.02, 0.036, 0, "mono", "left") * 0.9 * on(k)
+  let sub(k) = text(subs[k], 0.2, ry(k) + 0.04, 0.022, 0, "mono", "left") * 0.55 * smoothstep(at[k] + 0.06, at[k] + 0.1, t)
+  // the pictures, at the right
+  let px = 0.84
+  let page = merge(cut(rect(px, ry(0), 0.07, 0.09, 0, 0.002), rect(px, ry(0), 0.064, 0.084, 0, 0.002)) * 0.6, merge([line(px - 0.02, ry(0) - 0.025 + 0.015 * a, px + 0.02, ry(0) - 0.025 + 0.015 * a, 0.003, 0.002) for a in range(4)]) * 0.4) * on(0)
+  let die(cx, cy) = merge(cut(rect(cx, cy, 0.05, 0.05, 0, 0.002), rect(cx, cy, 0.044, 0.044, 0, 0.002)) * 0.6, circle(cx - 0.012, cy - 0.012, 0.005, 0.001), circle(cx + 0.012, cy + 0.012, 0.005, 0.001))
+  let dice = merge(die(px - 0.035, ry(1)), die(px + 0.035, ry(1) + 0.01)) * on(1)
+  let tick = merge(line(px - 0.03, ry(2), px - 0.008, ry(2) + 0.025, 0.006, 0.002), line(px - 0.008, ry(2) + 0.025, px + 0.035, ry(2) - 0.03, 0.006, 0.002)) * on(2)
+  // the series, closed
+  let eps = ["neuron", "layers", "error", "token", "attention", "next", "training", "memory", "hallucination"]
+  let es = smoothstep(end0, end0 + 0.06, t)
+  let ey = 1.12
+  let chain = merge([merge(circle(0.1 + 0.8 * k / 8, ey, 0.012, 0.002) * 0.7, text(eps[k], 0.1 + 0.8 * k / 8, ey + 0.04 + 0.03 * (k % 2), 0.016, 0, "mono") * 0.6) * smoothstep(end0 + 0.05 * k, end0 + 0.05 * k + 0.03, t) for k in range(9)])
+  let wire = line(0.1, ey, 0.1 + 0.8 * clamp((t - end0) / 0.45, 0, 1), ey, 0.003, 0.002) * 0.4 * es
+  let closed = text("the series on AI, from the neuron to the next token", 0.5, ey - 0.07, 0.024, 0, "mono") * 0.6 * es
+  output accent * merge(tick, merge([num(k) for k in range(3)])) + (1 - accent) * merge(merge([merge(title(k), sub(k)) for k in range(3)]), page, dice, chain, wire, closed)
+}
