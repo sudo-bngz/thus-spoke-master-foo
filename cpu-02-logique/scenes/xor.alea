@@ -1,0 +1,55 @@
+// Xor — exclusive or built from 4 gates: A and B on the left; an OR on
+// top, an AND then a NOT below; an AND on their answers; a lamp. The 4
+// cases flow through at `cases`: wires carrying 1 are lit, the answer is
+// computed from the gates. A small table fills in on the right. `accent:
+// 1` gives only the lit wires and the lamp. Times are the scene's own
+// (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Xor(draw0 = 0.05, cases = [0.4, 0.5, 0.6, 0.7], hold = 0.08, neuron0 = 0.85, accent = 0) {
+  let ds = smoothstep(draw0, draw0 + 0.08, t)
+  let cy = 0.62
+  // which case is live
+  let live = sum([(t >= cases[k]) * (t < cases[k] + hold) for k in range(4)])
+  let which = sum([k * (t >= cases[k]) * (t < cases[k] + hold) for k in range(4)])
+  let a = floor(which / 2) * live
+  let b = (which % 2) * live
+  let o = clamp(a + b, 0, 1)
+  let nd = (1 - a * b) * live
+  let out = o * nd
+  // positions
+  let ax = 0.12
+  let ay = cy - 0.1
+  let by = cy + 0.1
+  let g1 = [0.42, cy - 0.14]
+  let g2 = [0.42, cy + 0.14]
+  let g3 = [0.7, cy]
+  let box(cx, cyy, name, w) = merge(cut(rect(cx, cyy, w, 0.1, 0, 0.002), rect(cx, cyy, w - 0.006, 0.094, 0, 0.002)) * 0.6, text(name, cx, cyy, 0.026, 0, "mono") * 0.9)
+  let gates = merge(box(g1[0], g1[1], "OR", 0.14), box(g2[0], g2[1], "AND", 0.14), box(0.56, g2[1], "NOT", 0.08), box(g3[0], g3[1], "AND", 0.14)) * ds
+  let insq(cx, cyy, v) = merge(cut(rect(cx, cyy, 0.05, 0.05, 0, 0.002), rect(cx, cyy, 0.044, 0.044, 0, 0.002)) * 0.6, rect(cx, cyy, 0.036, 0.036, 0, 0.002) * 0.8 * v)
+  let ins = merge(insq(ax, ay, a), insq(ax, by, b), text("A", ax, ay - 0.05, 0.026, 0, "mono") * 0.6, text("B", ax, by + 0.05, 0.026, 0, "mono") * 0.6) * ds
+  // the wires: A and B to both gates; OR and NOT to the last AND; the output
+  let w = merge(line(ax + 0.025, ay, 0.26, ay, 0.004, 0.002), line(0.26, ay, 0.26, g1[1] - 0.02, 0.004, 0.002), line(0.26, g1[1] - 0.02, 0.35, g1[1] - 0.02, 0.004, 0.002),
+                line(0.26, ay, 0.26, g2[1] - 0.02, 0.004, 0.002), line(0.26, g2[1] - 0.02, 0.35, g2[1] - 0.02, 0.004, 0.002),
+                line(ax + 0.025, by, 0.3, by, 0.004, 0.002), line(0.3, by, 0.3, g1[1] + 0.02, 0.004, 0.002), line(0.3, g1[1] + 0.02, 0.35, g1[1] + 0.02, 0.004, 0.002),
+                line(0.3, by, 0.3, g2[1] + 0.02, 0.004, 0.002), line(0.3, g2[1] + 0.02, 0.35, g2[1] + 0.02, 0.004, 0.002),
+                line(0.49, g1[1], 0.6, g1[1], 0.004, 0.002), line(0.6, g1[1], 0.6, g3[1] - 0.02, 0.004, 0.002), line(0.6, g3[1] - 0.02, 0.63, g3[1] - 0.02, 0.004, 0.002),
+                line(0.49, g2[1], 0.52, g2[1], 0.004, 0.002), line(0.6, g2[1], 0.6, g3[1] + 0.02, 0.004, 0.002), line(0.6, g3[1] + 0.02, 0.63, g3[1] + 0.02, 0.004, 0.002),
+                line(0.77, g3[1], 0.86, g3[1], 0.004, 0.002)) * 0.45 * ds
+  // the lit wires, by value
+  let la = merge(line(ax + 0.025, ay, 0.26, ay, 0.007, 0.002), line(0.26, ay, 0.26, g1[1] - 0.02, 0.007, 0.002), line(0.26, g1[1] - 0.02, 0.35, g1[1] - 0.02, 0.007, 0.002), line(0.26, ay, 0.26, g2[1] - 0.02, 0.007, 0.002), line(0.26, g2[1] - 0.02, 0.35, g2[1] - 0.02, 0.007, 0.002)) * a
+  let lb = merge(line(ax + 0.025, by, 0.3, by, 0.007, 0.002), line(0.3, by, 0.3, g1[1] + 0.02, 0.007, 0.002), line(0.3, g1[1] + 0.02, 0.35, g1[1] + 0.02, 0.007, 0.002), line(0.3, by, 0.3, g2[1] + 0.02, 0.007, 0.002), line(0.3, g2[1] + 0.02, 0.35, g2[1] + 0.02, 0.007, 0.002)) * b
+  let lo = merge(line(0.49, g1[1], 0.6, g1[1], 0.007, 0.002), line(0.6, g1[1], 0.6, g3[1] - 0.02, 0.007, 0.002), line(0.6, g3[1] - 0.02, 0.63, g3[1] - 0.02, 0.007, 0.002)) * o
+  let land = line(0.49, g2[1], 0.52, g2[1], 0.007, 0.002) * a * b
+  let ln = merge(line(0.6, g2[1], 0.6, g3[1] + 0.02, 0.007, 0.002), line(0.6, g3[1] + 0.02, 0.63, g3[1] + 0.02, 0.007, 0.002)) * nd
+  let lout = line(0.77, g3[1], 0.86, g3[1], 0.007, 0.002) * out
+  let lamp = cut(circle(0.9, g3[1], 0.035, 0.002), circle(0.9, g3[1], 0.03, 0.002)) * 0.7 * ds
+  let lit = glow(x: 0.9, y: g3[1], size: 0.09) * out
+  // the small table, filling in
+  let ty = cy + 0.3
+  let d(v, x0, y0) = merge(text("0", x0, y0, 0.026, 0, "mono") * (1 - v), text("1", x0, y0, 0.026, 0, "mono") * v)
+  let trow(k) = merge(d(floor(k / 2), 0.38, ty + 0.045 * k), d(k % 2, 0.46, ty + 0.045 * k), d((floor(k / 2) + k % 2) == 1, 0.6, ty + 0.045 * k)) * 0.8 * (t >= cases[k] + hold * 0.5)
+  let thead = merge(text("A", 0.38, ty - 0.05, 0.026, 0, "mono"), text("B", 0.46, ty - 0.05, 0.026, 0, "mono"), text("XOR", 0.6, ty - 0.05, 0.026, 0, "mono")) * 0.6 * (t >= cases[0])
+  let exactly = text("exclusive or: on if exactly 1 input is on", 0.5, cy - 0.3, 0.026, 0, "mono") * 0.6 * smoothstep(draw0 + 0.1, draw0 + 0.14, t)
+  let neuron = text("the line no neuron could draw: 4 gates", 0.5, ty + 0.24, 0.028, 0, "mono") * 0.75 * smoothstep(neuron0, neuron0 + 0.04, t)
+  output accent * merge(la, lb, lo, land, ln, lout, lit) + (1 - accent) * merge(gates, ins, w, lamp, thead, merge([trow(k) for k in range(4)]), exactly, neuron)
+}

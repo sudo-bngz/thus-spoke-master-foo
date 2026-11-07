@@ -1,0 +1,28 @@
+// Any — the big idea: any truth table can be built from gates. Three
+// small abstract tables on the left (random answers), an arrow, a block
+// of gates (a mesh) on the right; then the block grows to fill the
+// picture: billions. `accent: 1` gives only the arrow. Times are the
+// scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Any(tables0 = 0.05, arrow0 = 0.3, gates0 = 0.4, billions0 = 0.7, accent = 0) {
+  let cy = 0.62
+  let ts = smoothstep(tables0, tables0 + 0.06, t)
+  let bit(k) = (floor(sin(k * 9.7) * 100) % 2 == 0)
+  let cell(tx, ty, k) = merge(text("0", tx, ty, 0.018, 0, "mono") * (1 - bit(k)), text("1", tx, ty, 0.018, 0, "mono") * bit(k))
+  let tbl(q) = merge(merge([merge([cell(0.12 + 0.04 * c, cy - 0.22 + 0.24 * q + 0.03 * r, q * 100 + c * 10 + r) for c in range(3)]) for r in range(5)]) * 0.7, line(0.1, cy - 0.235 + 0.24 * q, 0.22, cy - 0.235 + 0.24 * q, 0.002, 0.002) * 0.4) * smoothstep(tables0 + 0.05 * q, tables0 + 0.05 * q + 0.04, t)
+  let tables = merge([tbl(q) for q in range(3)])
+  let tlabels = text("any table", 0.16, cy - 0.3, 0.024, 0, "mono") * 0.6 * ts
+  let ars = smoothstep(arrow0, arrow0 + 0.05, t)
+  let arrow = merge(line(0.28, cy, 0.4, cy, 0.006, 0.002), circle(0.4, cy, 0.014, 0.002)) * ars
+  // the block of gates: a mesh, growing
+  let gs = smoothstep(gates0, gates0 + 0.08, t)
+  let growing = smoothstep(billions0, billions0 + 0.2, t)
+  let side = 0.36 + 0.5 * growing
+  let bx = 0.68 - 0.18 * growing
+  let cells = 6 + 30 * growing
+  let mesh = rect(bx, cy, side, side * 0.8, 0, 0.001) * (fract((x - bx + side / 2) / side * cells) > 0.15) * (fract((x - bx + side / 2) / side * cells) < 0.85) * (fract((y - cy + side * 0.4) / (side * 0.8) * cells * 0.8) > 0.15) * (fract((y - cy + side * 0.4) / (side * 0.8) * cells * 0.8) < 0.85) * 0.5 * gs
+  let glabel = text("gates", bx, cy - side * 0.4 - 0.05, 0.024, 0, "mono") * 0.6 * gs * (1 - growing)
+  let onlyq = text("and the only question each 1 answers: both on?", 0.5, cy + 0.5, 0.026, 0, "mono") * 0.65 * smoothstep(billions0 + 0.22, billions0 + 0.26, t)
+  let billions = text("billions of gates", 0.5, cy + 0.44, 0.03, 0, "mono") * 0.8 * smoothstep(billions0 + 0.1, billions0 + 0.14, t)
+  output accent * arrow * (1 - growing) + (1 - accent) * merge(tables * (1 - growing), tlabels * (1 - growing), arrow * (1 - growing), mesh, glabel, billions, onlyq)
+}

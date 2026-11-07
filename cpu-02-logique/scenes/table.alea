@@ -1,0 +1,24 @@
+// Table — the truth table of AND: 2 inputs, 4 cases, the answer for each,
+// rows appearing at `rows`; then "4 lines, completely described". The
+// answers are computed. `accent: 1` gives only the answer column. Times
+// are the scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Table(head0 = 0.05, rows = [0.3, 0.38, 0.46, 0.54], whole0 = 0.75, accent = 0) {
+  let cx = [0.3, 0.45, 0.68]
+  let ty = 0.42
+  let rh = 0.09
+  let hs = smoothstep(head0, head0 + 0.04, t)
+  let head = merge(text("A", cx[0], ty, 0.034, 0, "mono"), text("B", cx[1], ty, 0.034, 0, "mono"), text("A AND B", cx[2], ty, 0.034, 0, "mono"), line(0.2, ty + 0.05, 0.84, ty + 0.05, 0.003, 0.002) * 0.5, line(0.56, ty - 0.03, 0.56, ty + 0.05 + 4 * rh, 0.003, 0.002) * 0.4 * (t > rows[0])) * 0.85 * hs
+  let a(r) = floor(r / 2)
+  let b(r) = r % 2
+  let ans(r) = a(r) * b(r)
+  let d(v, x0, y0) = merge(text("0", x0, y0, 0.034, 0, "mono") * (1 - v), text("1", x0, y0, 0.034, 0, "mono") * v)
+  let ry(r) = ty + 0.05 + rh * (r + 0.5)
+  let on(r) = smoothstep(rows[r], rows[r] + 0.03, t)
+  let row(r) = merge(d(a(r), cx[0], ry(r)), d(b(r), cx[1], ry(r))) * 0.85 * on(r)
+  let out(r) = d(ans(r), cx[2], ry(r)) * smoothstep(rows[r] + 0.03, rows[r] + 0.06, t)
+  let four = text("2 inputs, each 0 or 1: 4 cases, no more", 0.5, ty - 0.12, 0.026, 0, "mono") * 0.6 * smoothstep(head0 + 0.06, head0 + 0.1, t)
+  let whole = text("4 lines: the gate, completely described", 0.5, ty + 0.05 + 4 * rh + 0.08, 0.028, 0, "mono") * 0.75 * smoothstep(whole0, whole0 + 0.04, t)
+  let truth = text("nothing hidden. a table is the whole truth", 0.5, ty + 0.05 + 4 * rh + 0.14, 0.024, 0, "mono") * 0.55 * smoothstep(whole0 + 0.12, whole0 + 0.16, t)
+  output accent * merge([out(r) for r in range(4)]) + (1 - accent) * merge(head, merge([merge(row(r), out(r)) for r in range(4)]), four, whole, truth)
+}
