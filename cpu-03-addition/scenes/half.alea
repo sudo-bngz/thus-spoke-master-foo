@@ -1,0 +1,48 @@
+// Half — 1 + 1 = 10; the table of 2 bits added, sum and carry computed;
+// the 2 gates that do it, XOR for the sum, AND for the carry, cycling
+// through the 4 cases. `accent: 1` gives only the carry column and the
+// lamps. Times are the scene's own (0 to 1). What it returns: 0 paper,
+// up to 1 ink.
+
+work Half(big0 = 0.05, table0 = 0.3, rows = [0.38, 0.42, 0.46, 0.5], gates0 = 0.7, cycle = 0.2, accent = 0) {
+  let bs = smoothstep(big0, big0 + 0.05, t)
+  let big = merge(text("1 + 1 = 10", 0.5, 0.3, 0.07, 0, "mono"), text("0, and carry 1", 0.5, 0.39, 0.028, 0, "mono") * 0.6 * smoothstep(big0 + 0.08, big0 + 0.12, t)) * bs
+  // the table
+  let cx = [0.22, 0.32, 0.52, 0.68]
+  let ty = 0.52
+  let rh = 0.06
+  let hs = smoothstep(table0, table0 + 0.04, t)
+  let head = merge(text("A", cx[0], ty, 0.03, 0, "mono"), text("B", cx[1], ty, 0.03, 0, "mono"), text("sum", cx[2], ty, 0.03, 0, "mono"), text("carry", cx[3], ty, 0.03, 0, "mono"), line(0.14, ty + 0.04, 0.78, ty + 0.04, 0.003, 0.002) * 0.5) * 0.85 * hs
+  let d(v, x0, y0, sz) = merge(text("0", x0, y0, sz, 0, "mono") * (1 - v), text("1", x0, y0, sz, 0, "mono") * v)
+  let a(r) = floor(r / 2)
+  let b(r) = r % 2
+  let sm(r) = (a(r) + b(r)) == 1
+  let cr(r) = a(r) * b(r)
+  let ry(r) = ty + 0.04 + rh * (r + 0.5)
+  let on(r) = smoothstep(rows[r], rows[r] + 0.03, t)
+  let row(r) = merge(d(a(r), cx[0], ry(r), 0.03), d(b(r), cx[1], ry(r), 0.03), d(sm(r), cx[2], ry(r), 0.03)) * 0.85 * on(r)
+  let carry(r) = d(cr(r), cx[3], ry(r), 0.03) * on(r)
+  let xorlabel = text("sum: exactly 1 on. XOR", 0.5, ty + 0.04 + 4 * rh + 0.04, 0.026, 0, "mono") * 0.6 * smoothstep(rows[3] + 0.06, rows[3] + 0.1, t)
+  let andlabel = text("carry: both on. AND", 0.5, ty + 0.04 + 4 * rh + 0.08, 0.026, 0, "mono") * 0.6 * smoothstep(gates0 - 0.06, gates0 - 0.02, t)
+  // the two gates, cycling
+  let gs = smoothstep(gates0, gates0 + 0.05, t)
+  let gy = 1.1
+  let u = clamp((t - gates0 - 0.05) / cycle, 0, 0.999)
+  let step = floor(u * 4) * (t > gates0 + 0.05)
+  let ga = floor(step / 2)
+  let gb = step % 2
+  let insq(xx, yy, v) = merge(cut(rect(xx, yy, 0.04, 0.04, 0, 0.002), rect(xx, yy, 0.034, 0.034, 0, 0.002)) * 0.6, rect(xx, yy, 0.028, 0.028, 0, 0.002) * 0.8 * v)
+  let box(xx, name) = merge(cut(rect(xx, gy, 0.14, 0.09, 0, 0.002), rect(xx, gy, 0.134, 0.084, 0, 0.002)) * 0.6, text(name, xx, gy, 0.028, 0, "mono") * 0.9)
+  let gates = merge(insq(0.14, gy - 0.03, ga), insq(0.14, gy + 0.03, gb),
+                    line(0.16, gy - 0.03, 0.26, gy - 0.03, 0.004, 0.002) * 0.5, line(0.16, gy + 0.03, 0.26, gy + 0.03, 0.004, 0.002) * 0.5,
+                    line(0.26, gy - 0.03, 0.26, gy - 0.12, 0.004, 0.002) * 0.5, line(0.26, gy - 0.12, 0.33, gy - 0.12, 0.004, 0.002) * 0.5,
+                    line(0.26, gy + 0.03, 0.26, gy + 0.12, 0.004, 0.002) * 0.5, line(0.26, gy + 0.12, 0.33, gy + 0.12, 0.004, 0.002) * 0.5,
+                    merge(cut(rect(0.4, gy - 0.12, 0.14, 0.08, 0, 0.002), rect(0.4, gy - 0.12, 0.134, 0.074, 0, 0.002)) * 0.6, text("XOR", 0.4, gy - 0.12, 0.028, 0, "mono") * 0.9),
+                    merge(cut(rect(0.4, gy + 0.12, 0.14, 0.08, 0, 0.002), rect(0.4, gy + 0.12, 0.134, 0.074, 0, 0.002)) * 0.6, text("AND", 0.4, gy + 0.12, 0.028, 0, "mono") * 0.9),
+                    line(0.47, gy - 0.12, 0.56, gy - 0.12, 0.004, 0.002) * 0.5, line(0.47, gy + 0.12, 0.56, gy + 0.12, 0.004, 0.002) * 0.5,
+                    cut(circle(0.6, gy - 0.12, 0.03, 0.002), circle(0.6, gy - 0.12, 0.025, 0.002)) * 0.7, cut(circle(0.6, gy + 0.12, 0.03, 0.002), circle(0.6, gy + 0.12, 0.025, 0.002)) * 0.7,
+                    text("sum", 0.7, gy - 0.12, 0.026, 0, "mono", "left") * 0.6, text("carry", 0.7, gy + 0.12, 0.026, 0, "mono", "left") * 0.6) * gs
+  let lits = merge(glow(x: 0.6, y: gy - 0.12, size: 0.08) * ((ga + gb) == 1), glow(x: 0.6, y: gy + 0.12, size: 0.08) * ga * gb) * (t > gates0 + 0.05)
+  let halfadder = text("a half adder: 2 gates", 0.5, gy + 0.22, 0.028, 0, "mono") * 0.75 * smoothstep(gates0 + 0.22, gates0 + 0.26, t)
+  output accent * merge(merge([carry(r) for r in range(4)]), lits) + (1 - accent) * merge(big, head, merge([row(r) for r in range(4)]), xorlabel, andlabel, gates, halfadder)
+}

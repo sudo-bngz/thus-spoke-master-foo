@@ -1,0 +1,40 @@
+// Full — a real column has 3 things to add: the 2 bits and the carry
+// in. A full adder as a box with 3 inputs and 2 outputs, running through
+// the 8 cases, sum and carry computed; then what is inside: 2 half
+// adders and an OR. `accent: 1` gives only the lamps. Times are the
+// scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Full(box0 = 0.05, cases0 = 0.3, cycle = 0.3, inside0 = 0.7, accent = 0) {
+  let cy = 0.55
+  let bs = smoothstep(box0, box0 + 0.05, t)
+  let u = clamp((t - cases0) / cycle, 0, 0.999)
+  let step = floor(u * 8) * (t > cases0)
+  let a = floor(step / 4)
+  let b = floor(step / 2) % 2
+  let c = step % 2
+  let sm = (a + b + c) % 2
+  let cr = (a + b + c) >= 2
+  let insq(xx, yy, v) = merge(cut(rect(xx, yy, 0.045, 0.045, 0, 0.002), rect(xx, yy, 0.039, 0.039, 0, 0.002)) * 0.6, rect(xx, yy, 0.031, 0.031, 0, 0.002) * 0.8 * v)
+  let box = merge(cut(rect(0.5, cy, 0.3, 0.26, 0, 0.002), rect(0.5, cy, 0.294, 0.254, 0, 0.002)) * 0.6, text("full adder", 0.5, cy, 0.03, 0, "mono") * 0.9) * bs
+  let ins = merge(insq(0.2, cy - 0.08, a), insq(0.2, cy, b), insq(0.2, cy + 0.08, c),
+                  text("A", 0.12, cy - 0.08, 0.026, 0, "mono") * 0.6, text("B", 0.12, cy, 0.026, 0, "mono") * 0.6, text("carry in", 0.2, cy + 0.14, 0.022, 0, "mono") * 0.6,
+                  line(0.225, cy - 0.08, 0.35, cy - 0.08, 0.004, 0.002) * 0.5, line(0.225, cy, 0.35, cy, 0.004, 0.002) * 0.5, line(0.225, cy + 0.08, 0.35, cy + 0.08, 0.004, 0.002) * 0.5) * bs
+  let outs = merge(line(0.65, cy - 0.05, 0.74, cy - 0.05, 0.004, 0.002) * 0.5, line(0.65, cy + 0.05, 0.74, cy + 0.05, 0.004, 0.002) * 0.5,
+                   cut(circle(0.78, cy - 0.05, 0.03, 0.002), circle(0.78, cy - 0.05, 0.025, 0.002)) * 0.7, cut(circle(0.78, cy + 0.05, 0.03, 0.002), circle(0.78, cy + 0.05, 0.025, 0.002)) * 0.7,
+                   text("sum", 0.86, cy - 0.05, 0.024, 0, "mono", "left") * 0.6, text("carry out", 0.86, cy + 0.05, 0.024, 0, "mono", "left") * 0.6) * bs
+  let lits = merge(glow(x: 0.78, y: cy - 0.05, size: 0.08) * sm, glow(x: 0.78, y: cy + 0.05, size: 0.08) * cr) * (t > cases0)
+  let three = text("3 inputs: 8 cases", 0.5, cy - 0.24, 0.028, 0, "mono") * 0.7 * smoothstep(cases0 - 0.04, cases0, t)
+  let rule = merge(text("sum: an odd number on", 0.5, cy + 0.24, 0.026, 0, "mono"), text("carry: at least 2 on", 0.5, cy + 0.29, 0.026, 0, "mono")) * 0.6 * smoothstep(cases0 + 0.1, cases0 + 0.14, t)
+  // inside: 2 half adders and an OR
+  let inn = smoothstep(inside0, inside0 + 0.05, t)
+  let iy = cy + 0.5
+  let small(xx, yy, name, w) = merge(cut(rect(xx, yy, w, 0.07, 0, 0.002), rect(xx, yy, w - 0.006, 0.064, 0, 0.002)) * 0.6, text(name, xx, yy, 0.022, 0, "mono") * 0.9)
+  let inside = merge(small(0.3, iy, "half", 0.12), small(0.52, iy, "half", 0.12), small(0.74, iy + 0.07, "OR", 0.09),
+                     line(0.36, iy, 0.46, iy, 0.004, 0.002) * 0.5, line(0.36, iy + 0.03, 0.36, iy + 0.07, 0.004, 0.002) * 0.5, line(0.36, iy + 0.07, 0.695, iy + 0.07, 0.004, 0.002) * 0.5,
+                     line(0.58, iy + 0.02, 0.62, iy + 0.02, 0.004, 0.002) * 0.5, line(0.62, iy + 0.02, 0.62, iy + 0.055, 0.004, 0.002) * 0.5, line(0.62, iy + 0.055, 0.695, iy + 0.055, 0.004, 0.002) * 0.5,
+                     line(0.58, iy - 0.02, 0.66, iy - 0.02, 0.004, 0.002) * 0.5, text("sum", 0.68, iy - 0.02, 0.02, 0, "mono", "left") * 0.6, text("carry", 0.8, iy + 0.07, 0.02, 0, "mono", "left") * 0.6,
+                     line(0.18, iy - 0.02, 0.24, iy - 0.02, 0.004, 0.002) * 0.5, line(0.18, iy + 0.02, 0.24, iy + 0.02, 0.004, 0.002) * 0.5, line(0.4, iy - 0.06, 0.46, iy - 0.02, 0.004, 0.002) * 0.5,
+                     text("A B", 0.14, iy, 0.02, 0, "mono") * 0.6, text("carry in", 0.36, iy - 0.09, 0.02, 0, "mono") * 0.6) * inn
+  let five = text("1 column of an addition: 5 gates", 0.5, iy + 0.17, 0.028, 0, "mono") * 0.75 * smoothstep(inside0 + 0.1, inside0 + 0.14, t)
+  output accent * lits + (1 - accent) * merge(box, ins, outs, three, rule, inside, five)
+}

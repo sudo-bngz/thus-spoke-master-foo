@@ -1,0 +1,136 @@
+// Addition — Thus Spoke Master Foo, CPU 03: the first thing worth
+// building. 1 + 1 = 10; the half adder, XOR for the sum and AND for the
+// carry, its table computed; the full adder with the carry in, 8 cases
+// computed, 2 half adders and an OR inside; 4 of them chained, the
+// carries rippling right to left, 5 + 7 added column by column; and
+// subtraction with the same adder, 2's complement. Master Foo speaks
+// Japanese, translated in the captions.
+
+use "scenes/koan.alea"
+use "scenes/half.alea"
+use "scenes/full.alea"
+use "scenes/ripple.alea"
+use "scenes/minus.alea"
+
+work Addition {
+  let total = 160.1
+  let T = t * total
+  let EN = "../voices/narrator.sh"
+  let JA = "../voices/master.sh"
+
+  // ── the voices: the master, in Japanese; the one who explains, in English ──
+  let m1 = say("弟子は尋ねた。機械は、数を数えられるのですか。", at: 1.50, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let m2 = say("師は言った。1と1を足してみよ。", at: m1.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let m3 = say("弟子は答えた。2です。師は言った。機械には、2という数字はない。", at: m2.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let n1 = say("In binary, one plus one is not two. There is no digit two. One plus one is one zero: zero, and carry one. Just like nine plus one is ten.", at: 22.50, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n2 = say("So adding two bits gives two answers: the sum, and the carry. Zero and zero. Zero and one. One and zero. One and one. The sum is on when exactly one input is on: exclusive or.", at: n1.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n3 = say("The carry is on when both are on: AND. Two gates from last time, and we have a half adder.", at: n2.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n4 = say("Half, because a real column has three things to add: the two bits, and the carry coming in from the right.", at: 53.50, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n5 = say("Three inputs: eight cases. The sum is on when an odd number of them are on. The carry, when at least two are on.", at: n4.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n6 = say("Two half adders and an OR gate do it. That is a full adder: one column of an addition, in five gates.", at: n5.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n7 = say("Now chain four of them. Each column passes its carry to the next, right to left, like you learned at school.", at: 77.60, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n8 = say("Five plus seven. Zero one zero one, plus zero one one one. Watch the carry ripple.", at: n7.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n9 = say("Right column: one plus one, zero, carry one. Next: zero plus one plus the carry, zero, carry one. Next: one plus one plus one: one, carry one. Last: zero plus zero plus one: one.", at: n8.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n10 = say("One one zero zero: twelve. That is a ripple adder. Twenty gates, and it adds. The first piece of our machine.", at: n9.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n11 = say("And subtracting? No new circuit. Seven minus five. Take five: zero one zero one. Flip every bit: one zero one zero. Add one: one zero one one.", at: 115.10, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n12 = say("Now add that to seven. Zero one one one plus one zero one one: one zero zero one zero. The fifth bit falls off the end. Zero zero one zero: two.", at: n11.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let n13 = say("Two's complement: the same adder subtracts. Next time: how a wire remembers.", at: n12.end + 1.4, engine: EN, voice: "af_heart", speed: 1.0, gain: 2.3)
+  let m4 = say("師は言った。1と1で、10。それだけを知る機械が、", at: 145.00, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let m5 = say("すべての数を足す。", at: m4.end + 1.4, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+  let m6 = say("その時、弟子は悟った。", at: m5.end + 1.6, engine: JA, voice: "jm_kumo", speed: 0.82, gain: 2.3)
+
+  // ── the scenes: ink on paper, a vermilion accent, under the captions ──
+  let PAPER = ["#efe9dc", "#d3c9b4", "#3b352c", "#17140f"]
+  let fit(piece) = zoom(piece, by: 0.82, x: 0.5, y: 0.66)
+  let ink(piece, accent) = overlay(paint(fit(piece), palette: PAPER, range: [0, 1]), paint(fit(accent), palette: ["#000000", "#c23b22"], range: [0, 1], alpha: fit(accent)))
+  let reel = timeline([
+      scene(ink(Koan(draw0: ((m1.start) - 0.00) / 21.0, draw1: ((m1.end) - 0.00) / 21.0, word: ((m3.end + 0.8) - 0.00) / 21.0, title: ((m3.end + 1.0) - 0.00) / 21.0, kana: ["タ", "シ", "ザ", "ン"], episode: "CPU 03  ·  addition", accent: 0), Koan(draw0: ((m1.start) - 0.00) / 21.0, draw1: ((m1.end) - 0.00) / 21.0, word: ((m3.end + 0.8) - 0.00) / 21.0, title: ((m3.end + 1.0) - 0.00) / 21.0, kana: ["タ", "シ", "ザ", "ン"], episode: "CPU 03  ·  addition", accent: 1)), 21.0),  wipe(0.8, angle: 0, softness: 0.12),
+      scene(ink(Half(big0: ((n1.words[9]) - 21.00) / 31.0, table0: ((n2.words[2]) - 21.00) / 31.0, rows: [((n2.words[12]) - 21.00) / 31.0, ((n2.words[15]) - 21.00) / 31.0, ((n2.words[18]) - 21.00) / 31.0, ((n2.words[21]) - 21.00) / 31.0], gates0: ((n3.words[8]) - 21.00) / 31.0, cycle: 0.1935, accent: 0), Half(big0: ((n1.words[9]) - 21.00) / 31.0, table0: ((n2.words[2]) - 21.00) / 31.0, rows: [((n2.words[12]) - 21.00) / 31.0, ((n2.words[15]) - 21.00) / 31.0, ((n2.words[18]) - 21.00) / 31.0, ((n2.words[21]) - 21.00) / 31.0], gates0: ((n3.words[8]) - 21.00) / 31.0, cycle: 0.1935, accent: 1)), 31.0),  pixels(0.6, size: 0.05),
+      scene(ink(Full(box0: ((n4.words[5]) - 52.00) / 24.1, cases0: ((n5.words[0]) - 52.00) / 24.1, cycle: 0.3734, inside0: ((n6.words[0]) - 52.00) / 24.1, accent: 0), Full(box0: ((n4.words[5]) - 52.00) / 24.1, cases0: ((n5.words[0]) - 52.00) / 24.1, cycle: 0.3734, inside0: ((n6.words[0]) - 52.00) / 24.1, accent: 1)), 24.1),  wipe(0.7, angle: 90, softness: 0.1),
+      scene(ink(Ripple(draw0: ((n7.words[2]) - 76.10) / 37.5, nums0: ((n8.words[0]) - 76.10) / 37.5, steps: [((n9.words[0]) - 76.10) / 37.5, ((n9.words[7]) - 76.10) / 37.5, ((n9.words[16]) - 76.10) / 37.5, ((n9.words[25]) - 76.10) / 37.5], value0: ((n10.words[0]) - 76.10) / 37.5, accent: 0), Ripple(draw0: ((n7.words[2]) - 76.10) / 37.5, nums0: ((n8.words[0]) - 76.10) / 37.5, steps: [((n9.words[0]) - 76.10) / 37.5, ((n9.words[7]) - 76.10) / 37.5, ((n9.words[16]) - 76.10) / 37.5, ((n9.words[25]) - 76.10) / 37.5], value0: ((n10.words[0]) - 76.10) / 37.5, accent: 1)), 37.5),  morph(0.8, amount: 0.15),
+      scene(ink(Minus(q0: ((n11.words[0]) - 113.60) / 29.9, five0: ((n11.words[8]) - 113.60) / 29.9, flip0: ((n11.words[14]) - 113.60) / 29.9, plus0: ((n11.words[22]) - 113.60) / 29.9, add0: ((n12.words[0]) - 113.60) / 29.9, drop0: ((n12.words[16]) - 113.60) / 29.9, result0: ((n12.words[25]) - 113.60) / 29.9, accent: 0), Minus(q0: ((n11.words[0]) - 113.60) / 29.9, five0: ((n11.words[8]) - 113.60) / 29.9, flip0: ((n11.words[14]) - 113.60) / 29.9, plus0: ((n11.words[22]) - 113.60) / 29.9, add0: ((n12.words[0]) - 113.60) / 29.9, drop0: ((n12.words[16]) - 113.60) / 29.9, result0: ((n12.words[25]) - 113.60) / 29.9, accent: 1)), 29.9),  wipe(0.8, angle: 180, softness: 0.12),
+      scene(ink(Koan(draw0: ((m4.start) - 143.50) / 16.6, draw1: ((m6.end) - 143.50) / 16.6, word: ((m6.start + 0.5) - 143.50) / 16.6, title: ((m6.end + 0.6) - 143.50) / 16.6, kana: ["タ", "シ", "ザ", "ン"], episode: "CPU 03  ·  addition", accent: 0), Koan(draw0: ((m4.start) - 143.50) / 16.6, draw1: ((m6.end) - 143.50) / 16.6, word: ((m6.start + 0.5) - 143.50) / 16.6, title: ((m6.end + 0.6) - 143.50) / 16.6, kana: ["タ", "シ", "ザ", "ン"], episode: "CPU 03  ·  addition", accent: 1)), 16.6),  morph(1.2, amount: 0.2),
+  ], loop: 1)
+
+  // ── over it: the series, the step, the captions (the master's, translated, in vermilion) ──
+  let adv = 0.021722
+  let header = merge(text("1 / 4   one plus one", x: 0.06, y: -0.15, size: 0.03, font: "mono", align: "left") * (reel.index > 1 - 0.5) * (reel.index < 1 + 0.5), text("2 / 4   the carry", x: 0.06, y: -0.15, size: 0.03, font: "mono", align: "left") * (reel.index > 2 - 0.5) * (reel.index < 2 + 0.5), text("3 / 4   four columns", x: 0.06, y: -0.15, size: 0.03, font: "mono", align: "left") * (reel.index > 3 - 0.5) * (reel.index < 3 + 0.5), text("4 / 4   subtraction", x: 0.06, y: -0.15, size: 0.03, font: "mono", align: "left") * (reel.index > 4 - 0.5) * (reel.index < 4 + 0.5)) * 0.7
+  let series = text("thus spoke master foo  ·  CPU 03", x: 0.94, y: -0.3, size: 0.024, font: "mono", align: "right") * 0.45
+  let c_m1 = merge(text("The novice asked: can the machine", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - m1.start) / (m1.duration * 0.92), 0, 1) * 40) - 0, 0, 33) * adv), text("count?", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - m1.start) / (m1.duration * 0.92), 0, 1) * 40) - 34, 0, 6) * adv)) * (T >= m1.start) * (T < min(m1.end + 1.5, m2.start))
+  let c_m2 = text("Master Foo said: add 1 and 1.", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - m2.start) / (m2.duration * 0.92), 0, 1) * 29) - 0, 0, 29) * adv) * (T >= m2.start) * (T < min(m2.end + 1.5, m3.start))
+  let c_m3 = merge(text("The novice answered: 2. Master", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - m3.start) / (m3.duration * 0.92), 0, 1) * 68) - 0, 0, 30) * adv), text("Foo said: the machine has no", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - m3.start) / (m3.duration * 0.92), 0, 1) * 68) - 31, 0, 28) * adv), text("digit 2.", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - m3.start) / (m3.duration * 0.92), 0, 1) * 68) - 60, 0, 8) * adv)) * (T >= m3.start) * (T < min(m3.end + 1.5, n1.start))
+  let c_n1 = merge(text("In binary, 1 + 1 is not 2. There", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n1.start) / (n1.duration * 0.92), 0, 1) * 99) - 0, 0, 32) * adv), text("is no digit 2. 1 + 1 is 10: 0,", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n1.start) / (n1.duration * 0.92), 0, 1) * 99) - 33, 0, 30) * adv), text("and carry 1. Just like 9 + 1 is", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n1.start) / (n1.duration * 0.92), 0, 1) * 99) - 64, 0, 31) * adv), text("10.", x: 0.06, y: 0.096, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n1.start) / (n1.duration * 0.92), 0, 1) * 99) - 96, 0, 3) * adv)) * (T >= n1.start) * (T < min(n1.end + 1.5, n2.start))
+  let c_n2 = merge(text("So adding 2 bits gives 2 answers:", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n2.start) / (n2.duration * 0.92), 0, 1) * 149) - 0, 0, 33) * adv), text("the sum, and the carry. 0 and 0.", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n2.start) / (n2.duration * 0.92), 0, 1) * 149) - 34, 0, 32) * adv), text("0 and 1. 1 and 0. 1 and 1. The", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n2.start) / (n2.duration * 0.92), 0, 1) * 149) - 67, 0, 30) * adv), text("sum is on when exactly 1 input is", x: 0.06, y: 0.096, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n2.start) / (n2.duration * 0.92), 0, 1) * 149) - 98, 0, 33) * adv), text("on: exclusive or.", x: 0.06, y: 0.148, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n2.start) / (n2.duration * 0.92), 0, 1) * 149) - 132, 0, 17) * adv)) * (T >= n2.start) * (T < min(n2.end + 1.5, n3.start))
+  let c_n3 = merge(text("The carry is on when both are on:", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n3.start) / (n3.duration * 0.92), 0, 1) * 88) - 0, 0, 33) * adv), text("AND. 2 gates from last time, and", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n3.start) / (n3.duration * 0.92), 0, 1) * 88) - 34, 0, 32) * adv), text("we have a half adder.", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n3.start) / (n3.duration * 0.92), 0, 1) * 88) - 67, 0, 21) * adv)) * (T >= n3.start) * (T < min(n3.end + 1.5, n4.start))
+  let c_n4 = merge(text("Half, because a real column has 3", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n4.start) / (n4.duration * 0.92), 0, 1) * 100) - 0, 0, 33) * adv), text("things to add: the 2 bits, and", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n4.start) / (n4.duration * 0.92), 0, 1) * 100) - 34, 0, 30) * adv), text("the carry coming in from the", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n4.start) / (n4.duration * 0.92), 0, 1) * 100) - 65, 0, 28) * adv), text("right.", x: 0.06, y: 0.096, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n4.start) / (n4.duration * 0.92), 0, 1) * 100) - 94, 0, 6) * adv)) * (T >= n4.start) * (T < min(n4.end + 1.5, n5.start))
+  let c_n5 = merge(text("3 inputs: 8 cases. The sum is on", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n5.start) / (n5.duration * 0.92), 0, 1) * 102) - 0, 0, 32) * adv), text("when an odd number of them are", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n5.start) / (n5.duration * 0.92), 0, 1) * 102) - 33, 0, 30) * adv), text("on. The carry, when at least 2", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n5.start) / (n5.duration * 0.92), 0, 1) * 102) - 64, 0, 30) * adv), text("are on.", x: 0.06, y: 0.096, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n5.start) / (n5.duration * 0.92), 0, 1) * 102) - 95, 0, 7) * adv)) * (T >= n5.start) * (T < min(n5.end + 1.5, n6.start))
+  let c_n6 = merge(text("2 half adders and an OR gate do", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n6.start) / (n6.duration * 0.92), 0, 1) * 94) - 0, 0, 31) * adv), text("it. That is a full adder: 1", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n6.start) / (n6.duration * 0.92), 0, 1) * 94) - 32, 0, 27) * adv), text("column of an addition, in 5", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n6.start) / (n6.duration * 0.92), 0, 1) * 94) - 60, 0, 27) * adv), text("gates.", x: 0.06, y: 0.096, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n6.start) / (n6.duration * 0.92), 0, 1) * 94) - 88, 0, 6) * adv)) * (T >= n6.start) * (T < min(n6.end + 1.5, n7.start))
+  let c_n7 = merge(text("Now chain 4 of them. Each column", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n7.start) / (n7.duration * 0.92), 0, 1) * 105) - 0, 0, 32) * adv), text("passes its carry to the next,", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n7.start) / (n7.duration * 0.92), 0, 1) * 105) - 33, 0, 29) * adv), text("right to left, like you learned", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n7.start) / (n7.duration * 0.92), 0, 1) * 105) - 63, 0, 31) * adv), text("at school.", x: 0.06, y: 0.096, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n7.start) / (n7.duration * 0.92), 0, 1) * 105) - 95, 0, 10) * adv)) * (T >= n7.start) * (T < min(n7.end + 1.5, n8.start))
+  let c_n8 = merge(text("5 + 7. 0101 + 0111. Watch the", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n8.start) / (n8.duration * 0.92), 0, 1) * 43) - 0, 0, 29) * adv), text("carry ripple.", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n8.start) / (n8.duration * 0.92), 0, 1) * 43) - 30, 0, 13) * adv)) * (T >= n8.start) * (T < min(n8.end + 1.5, n9.start))
+  let c_n9 = merge(text("Right column: 1 + 1, 0, carry 1.", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n9.start) / (n9.duration * 0.92), 0, 1) * 118) - 0, 0, 32) * adv), text("Next: 0 + 1 + the carry, 0, carry", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n9.start) / (n9.duration * 0.92), 0, 1) * 118) - 33, 0, 33) * adv), text("1. Next: 1 + 1 + 1: 1, carry 1.", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n9.start) / (n9.duration * 0.92), 0, 1) * 118) - 67, 0, 31) * adv), text("Last: 0 + 0 + 1: 1.", x: 0.06, y: 0.096, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n9.start) / (n9.duration * 0.92), 0, 1) * 118) - 99, 0, 19) * adv)) * (T >= n9.start) * (T < min(n9.end + 1.5, n10.start))
+  let c_n10 = merge(text("1100: 12. That is a ripple adder.", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n10.start) / (n10.duration * 0.92), 0, 1) * 88) - 0, 0, 33) * adv), text("20 gates, and it adds. The first", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n10.start) / (n10.duration * 0.92), 0, 1) * 88) - 34, 0, 32) * adv), text("piece of our machine.", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n10.start) / (n10.duration * 0.92), 0, 1) * 88) - 67, 0, 21) * adv)) * (T >= n10.start) * (T < min(n10.end + 1.5, n11.start))
+  let c_n11 = merge(text("And subtracting? No new circuit.", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n11.start) / (n11.duration * 0.92), 0, 1) * 88) - 0, 0, 32) * adv), text("7 - 5. Take 5: 0101. Flip every", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n11.start) / (n11.duration * 0.92), 0, 1) * 88) - 33, 0, 31) * adv), text("bit: 1010. Add 1: 1011.", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n11.start) / (n11.duration * 0.92), 0, 1) * 88) - 65, 0, 23) * adv)) * (T >= n11.start) * (T < min(n11.end + 1.5, n12.start))
+  let c_n12 = merge(text("Now add that to 7. 0111 + 1011:", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n12.start) / (n12.duration * 0.92), 0, 1) * 78) - 0, 0, 31) * adv), text("10010. The 5th bit falls off the", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n12.start) / (n12.duration * 0.92), 0, 1) * 78) - 32, 0, 32) * adv), text("end. 0010: 2.", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n12.start) / (n12.duration * 0.92), 0, 1) * 78) - 65, 0, 13) * adv)) * (T >= n12.start) * (T < min(n12.end + 1.5, n13.start))
+  let c_n13 = merge(text("2's complement: the same adder", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n13.start) / (n13.duration * 0.92), 0, 1) * 74) - 0, 0, 30) * adv), text("subtracts. Next time: how a wire", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n13.start) / (n13.duration * 0.92), 0, 1) * 74) - 31, 0, 32) * adv), text("remembers.", x: 0.06, y: 0.044, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - n13.start) / (n13.duration * 0.92), 0, 1) * 74) - 64, 0, 10) * adv)) * (T >= n13.start) * (T < min(n13.end + 1.5, m4.start))
+  let c_m4 = merge(text("Master Foo said: 1 and 1 make 10.", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - m4.start) / (m4.duration * 0.92), 0, 1) * 64) - 0, 0, 33) * adv), text("A machine that knows only that", x: 0.06, y: -0.008, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - m4.start) / (m4.duration * 0.92), 0, 1) * 64) - 34, 0, 30) * adv)) * (T >= m4.start) * (T < min(m4.end + 1.5, m5.start))
+  let c_m5 = text("adds every number there is.", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - m5.start) / (m5.duration * 0.92), 0, 1) * 27) - 0, 0, 27) * adv) * (T >= m5.start) * (T < min(m5.end + 1.5, m6.start))
+  let c_m6 = text("And the novice was enlightened.", x: 0.06, y: -0.060, size: 0.042, font: "mono", align: "left") * (x < 0.06 + clamp((clamp((T - m6.start) / (m6.duration * 0.92), 0, 1) * 31) - 0, 0, 31) * adv) * (T >= m6.start) * (T < m6.end + 3)
+  let said = merge(c_n1, c_n2, c_n3, c_n4, c_n5, c_n6, c_n7, c_n8, c_n9, c_n10, c_n11, c_n12, c_n13)
+  let spoken = merge(c_m1, c_m2, c_m3, c_m4, c_m5, c_m6)
+  let dark = paint(merge(header, series, said), palette: ["#000000", "#1a1712"], range: [0, 1], alpha: merge(header, series, said))
+  let red  = paint(spoken, palette: ["#000000", "#b8361f"], range: [0, 1], alpha: spoken)
+  let look = film(vignette(overlay(reel, dark, red), amount: 0.06), amount: 0.035)
+
+  // ── the sound ──
+  let pad = synth {
+    let env = adsr(attack: 3, decay: 1, sustain: 0.9, release: 4)
+    lowpass(saw(note.freq) + saw(note.freq * 1.003) + sine(note.freq * 0.5), cutoff: 260 + 300 * note.level, resonance: 0.2) * env
+  }
+  let brush = synth { bandpass(noise(), cutoff: 1400, resonance: 0.3) * adsr(attack: 0.12, decay: 0.3, sustain: 0.3, release: 0.5) * note.velocity }
+  let tick = synth { highpass(noise(), cutoff: 4000, resonance: 0.2) * perc(release: 0.015) * note.velocity + sine(note.freq) * perc(release: 0.05) * 0.4 }
+  let knock = synth { lowpass(noise(), cutoff: 700, resonance: 0.5) * perc(attack: 0.002, release: 0.12) * note.velocity + sine(note.freq) * perc(release: 0.1) * 0.5 }
+  let chord = synth {
+    let env = adsr(attack: 0.3, decay: 0.6, sustain: 0.8, release: 2.5)
+    chorus(lowpass(saw(note.freq) + saw(note.freq * 1.004) + sine(note.freq * 0.5), cutoff: 1200, resonance: 0.15) * env, depth: 0.6)
+  }
+  // the temple bell when the master speaks; the question
+  pattern bells = repeat 2 event(t: [m1.start - 1.0, m4.start - 1.0][i] / total, x: 0.5, y: 0.95, size: 0.12, intensity: 0.9)
+  pattern asked = repeat 1 event(t: (m2.start + 0.85 * m2.duration) / total, x: 0.5, y: 0.5, size: 0.06, intensity: 0.8)
+  // 1 + 1; the rows; the 2 gates cycling
+  pattern oneone = repeat 1 event(t: n1.words[9] / total, x: 0.5, y: 0.3, size: 0.1, intensity: 0.7)
+  pattern hrows = repeat 4 event(t: [n2.words[12], n2.words[15], n2.words[18], n2.words[21]][i] / total, x: 0.4, y: 0.63 + 0.07 * i, size: 0.04, intensity: 0.5)
+  pattern hcases = repeat 4 event(t: (n3.words[8] + 0.05 * 31.0 + 1.5 * i) / total, x: 0.14, y: 1.12, size: 0.03, intensity: 0.4)
+  // the 8 cases of the full adder
+  pattern fcases = repeat 8 event(t: (n5.words[0] + 9.0 * (i / 8)) / total, x: 0.2, y: 0.55, size: 0.03, intensity: 0.35)
+  pattern inside = repeat 3 event(t: (n6.words[0] + 0.03 * 24.1 * i) / total, x: 0.3 + 0.22 * i, y: 1.05, size: 0.05, intensity: 0.5)
+  // the 4 columns, right to left; the value
+  pattern columns = repeat 4 event(t: [n9.words[0], n9.words[7], n9.words[16], n9.words[25]][i] / total, x: 0.8 - 0.2 * i, y: 0.66, size: 0.08, intensity: 0.6 + 0.1 * i)
+  pattern carries = repeat 3 event(t: ([n9.words[0], n9.words[7], n9.words[16]][i] + 0.05 * 37.5) / total, x: 0.7 - 0.2 * i, y: 0.66, size: 0.03, intensity: 0.5)
+  pattern twelve = repeat 1 event(t: n10.words[0] / total, x: 0.5, y: 0.98, size: 0.1, intensity: 0.8)
+  // the rows of the subtraction; the dropped bit; the result
+  pattern mrows = repeat 5 event(t: [n11.words[8], n11.words[14], n11.words[22], n12.words[0], n12.words[0] + 0.06 * 29.9][i] / total, x: 0.6, y: 0.48 + 0.08 * i, size: 0.04, intensity: 0.45)
+  pattern dropped = repeat 1 event(t: n12.words[16] / total, x: 0.45, y: 1.04, size: 0.04, intensity: 0.6)
+  pattern two = repeat 1 event(t: n12.words[25] / total, x: 0.5, y: 1.22, size: 0.1, intensity: 0.8)
+
+  let music = [
+    m1, m2, m3, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, m4, m5, m6,
+    drone(0.45 + 0.15 * lfo(3) + x * 0, voices: 2, instrument: pad, scale: "hirajoshi", key: 55, gain: 0.9),
+    notes(bells, instrument: "bell", scale: "hirajoshi", key: 110, gain: 0.7),
+    notes(asked, instrument: "kalimba", scale: "hirajoshi", key: 392, gain: 0.6),
+    notes(oneone, instrument: "glass", scale: "hirajoshi", key: 523, gain: 0.5),
+    notes(hrows, instrument: "wood", scale: "hirajoshi", key: 330, gain: 0.45),
+    notes(hcases, instrument: tick, scale: "hirajoshi", key: 880, gain: 0.3),
+    notes(fcases, instrument: tick, scale: "hirajoshi", key: 880, gain: 0.3),
+    notes(inside, instrument: "kalimba", scale: "hirajoshi", key: 392, gain: 0.45),
+    notes(columns, instrument: "kalimba", scale: "hirajoshi", key: 262, gain: 0.5),
+    notes(carries, instrument: "glass", scale: "hirajoshi", key: 784, gain: 0.4),
+    notes(twelve, instrument: chord, scale: "major", key: 110, gain: 0.45),
+    notes(mrows, instrument: "wood", scale: "hirajoshi", key: 330, gain: 0.4),
+    notes(dropped, instrument: knock, scale: "hirajoshi", key: 165, gain: 0.6),
+    notes(two, instrument: chord, scale: "major", key: 110, gain: 0.45),
+    notes(reel.cues, instrument: brush, scale: "chromatic", key: 100, gain: 0.3),
+  ]
+
+  render image(look, width: 1080, height: 1920, at: 0.6744)
+  render video(look, fps: 30, width: 1080, height: 1920, sound: music, room: 0.12, echo: 0)
+}

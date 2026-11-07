@@ -55,9 +55,9 @@ episodes (an adder in 03, a register in 04, a clock in 05, a decoder in
 |---|---|---|---|
 | CPU 01 | [Bit](cpu-01-bit/) | What a computer is made of. A switch, open or closed, 0 or 1, nothing in between: a bit. Why 2 and not 10: a dial with 10 positions and a trembling needle, against a switch that is never ambiguous. Counting with 4 switches, each worth twice the one before, the 16 numbers computed from the bits. The byte, the 64-bit word, and the row of bits everything else is built from. | 2 min 27 |
 | CPU 02 | [Logique](cpu-02-logique/) | What you can ask a switch. Boole's 3 questions, AND, OR, NOT, each a gate with inputs and a lamp, the answers computed; the truth table, 4 cases and nothing hidden; exclusive or built from 4 gates, the 4 cases flowing through the wires, the answer computed from the gates; and the big idea: any table can be built from gates. | 2 min 35 |
+| CPU 03 | [Addition](cpu-03-addition/) | The first thing worth building. 1 + 1 = 10; the half adder, XOR for the sum and AND for the carry, its table computed; the full adder with the carry in, 8 cases computed, 2 half adders and an OR inside; 4 of them chained, the carries rippling right to left, 5 + 7 added column by column inside alea; and subtraction with the same adder, 2's complement. | 2 min 40 |
 
-Planned: 03 Addition (half adder, full adder, a 4-bit ripple adder that adds for
-real), 04 Bistable (2 NOR gates in a loop hold a bit; a byte of latches;
+Planned: 04 Bistable (2 NOR gates in a loop hold a bit; a byte of latches;
 an address), 05 Horloge (the clock, steps, a counter), 06 Turing (tape,
 head, table; a machine that adds 1; the halting problem in a sentence),
 07 Von Neumann (the program in the memory; fetch, decode, execute; the
@@ -140,6 +140,10 @@ alea bit.alea --seed 0xa1b1 -o out/
 cd ../cpu-02-logique
 python3 gen.py
 alea logique.alea --seed 0xa1b2 -o out/
+
+cd ../cpu-03-addition
+python3 gen.py
+alea addition.alea --seed 0xa1b3 -o out/
 ```
 
 Master Foo's Japanese needs misaki, Kokoro's pronunciation library:
@@ -219,6 +223,10 @@ cpu-02-logique/
   gen.py                the script
   logique.alea          the Reel
   scenes/               koan, gates, table, xor, any
+cpu-03-addition/
+  gen.py                the script
+  addition.alea         the Reel
+  scenes/               koan, half, full, ripple, minus
 lib/episode.py          what the generators share: the voice measured, the captions typed, the layout
 ```
 
@@ -286,6 +294,10 @@ alea bit.alea --seed 0xa1b1 -o out/
 cd ../cpu-02-logique
 python3 gen.py
 alea logique.alea --seed 0xa1b2 -o out/
+
+cd ../cpu-03-addition
+python3 gen.py
+alea addition.alea --seed 0xa1b3 -o out/
 ```
 
 Run `gen.py` and `alea` with the same variables: `gen.py` measures each

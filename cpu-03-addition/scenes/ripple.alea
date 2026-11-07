@@ -1,0 +1,48 @@
+// Ripple — 4 full adders in a row, right to left: A above, B above, the
+// sum below, the carries between the boxes; the columns compute one
+// after the other at `steps` (rightmost first), the sum and carries
+// computed from the bits; then the value. `a` and `b` are the numbers,
+// 4 bits each, most significant first. `accent: 1` gives only the
+// carries and the column at work. Times are the scene's own (0 to 1).
+// What it returns: 0 paper, up to 1 ink.
+
+work Ripple(a = [0, 1, 0, 1], b = [0, 1, 1, 1], draw0 = 0.05, nums0 = 0.25, steps = [0.45, 0.52, 0.59, 0.66], value0 = 0.8, accent = 0) {
+  let cy = 0.66
+  let bx(k) = 0.2 + 0.2 * k
+  let ds = smoothstep(draw0, draw0 + 0.06, t)
+  // the carries, computed column by column (column 3 is the rightmost)
+  let bitA(k) = a[k]
+  let bitB(k) = b[k]
+  let c4 = 0
+  let s3 = (bitA(3) + bitB(3)) % 2
+  let c3 = (bitA(3) + bitB(3)) >= 2
+  let s2 = (bitA(2) + bitB(2) + c3) % 2
+  let c2 = (bitA(2) + bitB(2) + c3) >= 2
+  let s1 = (bitA(1) + bitB(1) + c2) % 2
+  let c1 = (bitA(1) + bitB(1) + c2) >= 2
+  let s0 = (bitA(0) + bitB(0) + c1) % 2
+  let c0 = (bitA(0) + bitB(0) + c1) >= 2
+  let sums = [s0, s1, s2, s3]
+  let carries = [c0, c1, c2, c3]
+  let done(k) = (t >= steps[3 - k])
+  let busy(k) = (t >= steps[3 - k]) * (t < steps[3 - k] + 0.05)
+  let box(k) = merge(cut(rect(bx(k), cy, 0.15, 0.12, 0, 0.002), rect(bx(k), cy, 0.144, 0.114, 0, 0.002)) * 0.6, text("+", bx(k), cy, 0.04, 0, "mono") * 0.7) * ds
+  let d(v, x0, y0, sz) = merge(text("0", x0, y0, sz, 0, "mono") * (1 - v), text("1", x0, y0, sz, 0, "mono") * v)
+  let ns = smoothstep(nums0, nums0 + 0.04, t)
+  let numA(k) = d(bitA(k), bx(k) - 0.03, cy - 0.17, 0.036) * 0.85 * ns
+  let numB(k) = d(bitB(k), bx(k) + 0.03, cy - 0.17, 0.036) * 0.85 * ns
+  let wires(k) = merge(line(bx(k) - 0.03, cy - 0.14, bx(k) - 0.03, cy - 0.06, 0.004, 0.002), line(bx(k) + 0.03, cy - 0.14, bx(k) + 0.03, cy - 0.06, 0.004, 0.002), line(bx(k), cy + 0.06, bx(k), cy + 0.13, 0.004, 0.002)) * 0.5 * ds
+  let sumd(k) = d(sums[k], bx(k), cy + 0.18, 0.04) * done(k)
+  // the carries: an arrow from box k to box k-1 (leftward), lit when done
+  let carrywire(k) = merge(line(bx(k) - 0.075, cy, bx(k) - 0.125, cy, 0.004, 0.002) * 0.5, circle(bx(k) - 0.125, cy, 0.008, 0.002) * 0.5) * ds * (k > 0)
+  let carrylit(k) = merge(line(bx(k) - 0.075, cy, bx(k) - 0.125, cy, 0.008, 0.002), circle(bx(k) - 0.125, cy, 0.012, 0.002)) * carries[k] * done(k) * (k > 0)
+  let carryd(k) = d(carries[k], bx(k) - 0.1, cy - 0.04, 0.024) * 0.7 * done(k) * (k > 0)
+  let lastcarry = merge(line(bx(0) - 0.075, cy, bx(0) - 0.12, cy, 0.004, 0.002) * 0.5 * ds, d(c0, bx(0) - 0.14, cy, 0.024) * 0.7 * done(0))
+  let busybox(k) = rect(bx(k), cy, 0.15, 0.12, 0, 0.002) * busy(k) * 0.5
+  let labels = merge(text("A", 0.06, cy - 0.17, 0.028, 0, "mono") * 0.6, text("+ B", 0.06, cy - 0.12, 0.024, 0, "mono") * 0.6, text("sum", 0.06, cy + 0.18, 0.028, 0, "mono") * 0.6) * ns
+  let sumcount = sum([2 ^ (3 - k) * sums[k] for k in range(4)])
+  let val = merge([text("= {v}", 0.5, cy + 0.32, 0.06, 0, "mono") * (sumcount == v) for v in range(16)]) * smoothstep(value0, value0 + 0.03, t)
+  let rightleft = text("right to left, like at school", 0.5, cy - 0.3, 0.026, 0, "mono") * 0.55 * smoothstep(draw0 + 0.08, draw0 + 0.12, t)
+  let twenty = text("a ripple adder: 20 gates, and it adds", 0.5, cy + 0.42, 0.028, 0, "mono") * 0.75 * smoothstep(value0 + 0.1, value0 + 0.14, t)
+  output accent * merge(merge([merge(carrylit(k), busybox(k)) for k in range(4)]), val) + (1 - accent) * merge(merge([merge(box(k), numA(k), numB(k), wires(k), sumd(k), carrywire(k), carryd(k)) for k in range(4)]), lastcarry, labels, rightleft, twenty)
+}
