@@ -1,0 +1,38 @@
+// Window — where a conversation lives: the weights, a box that never
+// changes; the text, a strip of token boxes growing as messages are
+// sent; the window, a frame over the last 12 tokens; outside it, the
+// tokens fade. `accent: 1` gives only the frame. Times are the scene's
+// own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Window(weights0 = 0.05, text0 = 0.25, frame0 = 0.55, outside0 = 0.75, accent = 0) {
+  // the weights
+  let wy = 0.3
+  let wshown = smoothstep(weights0, weights0 + 0.05, t)
+  let weights = merge(cut(rect(0.5, wy, 0.4, 0.12, 0, 0.002), rect(0.5, wy, 0.394, 0.114, 0, 0.002)) * 0.5,
+                      merge([circle(0.33 + 0.34 * a / 11, wy + 0.025 * (fract(sin(a * 12.9898) * 43758.5) - 0.5), 0.005, 0.001) for a in range(12)]) * 0.6,
+                      text("the weights: fixed since training", 0.5, wy + 0.1, 0.026, 0, "mono") * 0.6) * wshown
+  // the text: tokens appended in three messages, a strip
+  let ty = 0.72
+  let N = 20
+  let bw = 0.038
+  let bx(k) = 0.08 + (0.84 / (N - 1)) * k
+  let msgs = [7, 7, 6]
+  let when(k) = text0 + 0.07 * floor(k / 7) + 0.006 * (k % 7)
+  let inwin(k) = (k >= N - 12)
+  let fade(k) = 1 - 0.7 * (1 - inwin(k)) * smoothstep(outside0, outside0 + 0.05, t)
+  let tok(k) = rect(bx(k), ty, bw - 0.006, 0.05, 0, 0.002) * 0.7 * fade(k) * smoothstep(when(k), when(k) + 0.02, t)
+  let toks = merge([tok(k) for k in range(N)])
+  let labels = merge(text("you", bx(0), ty - 0.06, 0.022, 0, "mono", "left") * smoothstep(when(0), when(0) + 0.02, t),
+                     text("it", bx(7), ty - 0.06, 0.022, 0, "mono", "left") * smoothstep(when(7), when(7) + 0.02, t),
+                     text("you", bx(14), ty - 0.06, 0.022, 0, "mono", "left") * smoothstep(when(14), when(14) + 0.02, t)) * 0.6
+  let fedback = text("every message: the whole text, fed back in", 0.5, ty + 0.1, 0.026, 0, "mono") * 0.6 * smoothstep(text0 + 0.16, text0 + 0.2, t)
+  // the window: a frame over the last 12
+  let fx0 = bx(N - 12) - bw / 2 - 0.008
+  let fx1 = bx(N - 1) + bw / 2 + 0.008
+  let fshown = smoothstep(frame0, frame0 + 0.04, t)
+  let frame = cut(rect((fx0 + fx1) / 2, ty, fx1 - fx0, 0.08, 0, 0.002), rect((fx0 + fx1) / 2, ty, fx1 - fx0 - 0.008, 0.072, 0, 0.002)) * fshown
+  let flabel = text("the window: 12 tokens", (fx0 + fx1) / 2, ty + 0.17, 0.028, 0, "mono") * 0.8 * fshown
+  let real = text("real ones: 100 000 or more", (fx0 + fx1) / 2, ty + 0.22, 0.024, 0, "mono") * 0.5 * smoothstep(frame0 + 0.08, frame0 + 0.12, t)
+  let nothing = text("outside the window: nothing", 0.5, ty + 0.32, 0.028, 0, "mono") * 0.65 * smoothstep(outside0, outside0 + 0.04, t)
+  output accent * frame + (1 - accent) * merge(weights, toks, labels, fedback, flabel, real, nothing)
+}

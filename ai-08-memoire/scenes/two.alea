@@ -1,0 +1,26 @@
+// Two — the machine's two memories: the weights (slow, learned once) and
+// the window (fast, this conversation); then the trick: a note written
+// at the top of the window. `accent: 1` gives only the note. Times are
+// the scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Two(weights0 = 0.05, window0 = 0.25, note0 = 0.6, accent = 0) {
+  let wy = 0.36
+  let vy = 0.78
+  let box(cy, h) = cut(rect(0.5, cy, 0.76, h, 0, 0.002), rect(0.5, cy, 0.754, h - 0.006, 0, 0.002)) * 0.5
+  let ws = smoothstep(weights0, weights0 + 0.05, t)
+  let weights = merge(box(wy, 0.2), text("the weights", 0.5, wy - 0.05, 0.034, 0, "mono") * 0.9,
+                      text("slow  ·  learned once  ·  everything ever written", 0.5, wy + 0.02, 0.024, 0, "mono") * 0.6,
+                      text("never change", 0.5, wy + 0.06, 0.024, 0, "mono") * 0.6) * ws
+  let vs = smoothstep(window0, window0 + 0.05, t)
+  let window = merge(box(vy, 0.3), text("the window", 0.5, vy - 0.1, 0.034, 0, "mono") * 0.9,
+                     text("fast  ·  this conversation  ·  gone when it closes", 0.5, vy - 0.03, 0.024, 0, "mono") * 0.6,
+                     merge([rect(0.2 + 0.6 * k / 11, vy + 0.06, 0.04, 0.04, 0, 0.002) for k in range(12)]) * 0.6) * vs
+  // the note, written at the top of the window
+  let ns = smoothstep(note0, note0 + 0.05, t)
+  let adv = 0.01965 * 0.028 / 0.038
+  let typed = clamp((t - note0 - 0.03) / 0.12, 0, 1) * 36
+  let note = text("note: the user is a novice. be patient.", 0.14, vy + 0.115, 0.028, 0, "mono", "left") * (x < 0.14 + typed * adv) * ns
+  let noteat = text("a note, put back in at the top, every time", 0.5, vy + 0.2, 0.026, 0, "mono") * 0.6 * smoothstep(note0 + 0.15, note0 + 0.19, t)
+  let all = text("that is all a memory feature is: text", 0.5, vy + 0.26, 0.026, 0, "mono") * 0.6 * smoothstep(note0 + 0.25, note0 + 0.29, t)
+  output accent * note + (1 - accent) * merge(weights, window, noteat, all)
+}

@@ -1,0 +1,28 @@
+// Edge — the conversation grows past the window: the strip slides left
+// under a fixed frame, and the oldest tokens fall out of it, dropping and
+// fading. `slide0` to `slide1` the sliding, `never0` "it never saw them".
+// `accent: 1` gives only the falling tokens. Times are the scene's own
+// (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Edge(slide0 = 0.1, slide1 = 0.6, never0 = 0.7, accent = 0) {
+  let ty = 0.62
+  let bw = 0.05
+  let W = 12
+  let fx0 = 0.5 - W * bw / 2
+  let fx1 = 0.5 + W * bw / 2
+  let frame = cut(rect(0.5, ty, W * bw + 0.016, 0.09, 0, 0.002), rect(0.5, ty, W * bw + 0.008, 0.082, 0, 0.002)) * 0.9
+  let flabel = text("the window", 0.5, ty - 0.1, 0.028, 0, "mono") * 0.7
+  // the strip: 24 tokens; at the start the first 12 fill the window; 12 more arrive and push it along
+  let prog = smoothstep(slide0, slide1, t)
+  let shift = 12 * bw * prog
+  let tx(k) = fx0 + bw * (k + 0.5) - shift
+  let out(k) = clamp((fx0 - tx(k)) / bw, 0, 1)
+  let fallen(k) = smoothstep(0, 1, out(k))
+  let tok(k) = rect(tx(k), ty + 0.25 * fallen(k) ^ 2, bw - 0.008, 0.05, 20 * fallen(k), 0.002) * 0.7 * (1 - 0.8 * fallen(k)) * (tx(k) < fx1 + bw * 0.5)
+  let toks = merge([tok(k) for k in range(24)])
+  let fall = merge([rect(tx(k), ty + 0.25 * fallen(k) ^ 2, bw - 0.008, 0.05, 20 * fallen(k), 0.002) * fallen(k) * (1 - fallen(k)) * 4 for k in range(24)])
+  let oldest = text("the oldest fall out", fx0, ty + 0.36, 0.028, 0, "mono", "left") * 0.7 * smoothstep(slide0 + 0.08, slide0 + 0.12, t)
+  let never = text("not forgotten: never seen", 0.5, ty + 0.46, 0.03, 0, "mono") * 0.7 * smoothstep(never0, never0 + 0.04, t)
+  let strange = text("a long chat that goes strange halfway: the beginning fell out", 0.5, ty + 0.53, 0.024, 0, "mono") * 0.5 * smoothstep(never0 + 0.18, never0 + 0.22, t)
+  output accent * fall + (1 - accent) * merge(frame, flabel, toks, oldest, never, strange)
+}

@@ -1,0 +1,22 @@
+// Cost — why the window has a limit: every token looks at every other;
+// a square grid of looks, 4 tokens then 8 then 40, with the counts;
+// then the wall. `at` is when each grid comes; `accent: 1` gives only
+// the newest grid for a moment. Times are the scene's own (0 to 1).
+// What it returns: 0 paper, up to 1 ink.
+
+work Cost(at = [0.1, 0.35, 0.6], wall0 = 0.85, accent = 0) {
+  let sizes = [4, 8, 40]
+  let counts = ["4 tokens  ·  16 looks", "8 tokens  ·  64 looks", "40 tokens  ·  1 600 looks"]
+  let cy = 0.62
+  let side = 0.6
+  // a grid of cells as one field: a square, with a fine mesh of gaps cut out
+  let grid(g) = rect(0.5, cy, side, side, 0, 0.001) * (fract((x - 0.5 + side / 2) / side * sizes[g]) > 0.1) * (fract((x - 0.5 + side / 2) / side * sizes[g]) < 0.9) * (fract((y - cy + side / 2) / side * sizes[g]) > 0.1) * (fract((y - cy + side / 2) / side * sizes[g]) < 0.9)
+  let on(g) = smoothstep(at[g], at[g] + 0.05, t) * (1 - smoothstep(at[min(g + 1, 2)] - 0.03, at[min(g + 1, 2)], t) * (g < 2))
+  let lit(g) = smoothstep(at[g], at[g] + 0.05, t) * (1 - smoothstep(at[g] + 0.08, at[g] + 0.14, t))
+  let grids = merge([grid(g) * 0.55 * on(g) for g in range(3)])
+  let count(g) = text(counts[g], 0.5, cy + side / 2 + 0.07, 0.03, 0, "mono") * 0.8 * on(g)
+  let rows = text("every token, looking at every other", 0.5, cy - side / 2 - 0.07, 0.026, 0, "mono") * 0.6 * smoothstep(at[0], at[0] + 0.05, t)
+  let rule = text("twice the text, 4 times the work", 0.5, cy + side / 2 + 0.13, 0.026, 0, "mono") * 0.55 * smoothstep(at[1], at[1] + 0.05, t)
+  let wall = text("a window, not a wall", 0.5, cy + side / 2 + 0.2, 0.03, 0, "mono") * 0.7 * smoothstep(wall0, wall0 + 0.04, t)
+  output accent * merge([grid(g) * lit(g) for g in range(3)]) + (1 - accent) * merge(grids, merge([count(g) for g in range(3)]), rows, rule, wall)
+}
