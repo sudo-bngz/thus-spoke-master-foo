@@ -1,0 +1,24 @@
+// Byte — 8 bits, 256; then 64 bits in one row, the number of
+// possibilities written out; then the row of bits as the thing the whole
+// series is built from. `accent: 1` gives only the 64-bit row lit.
+// Times are the scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Byte(byte0 = 0.05, word0 = 0.4, built0 = 0.75, accent = 0) {
+  let by = 0.42
+  let bs = smoothstep(byte0, byte0 + 0.05, t)
+  let pattern8 = [0, 1, 0, 0, 0, 0, 0, 1]
+  let cell8(k) = merge(cut(rect(0.18 + 0.09 * k, by, 0.07, 0.07, 0, 0.002), rect(0.18 + 0.09 * k, by, 0.064, 0.064, 0, 0.002)) * 0.6, rect(0.18 + 0.09 * k, by, 0.056, 0.056, 0, 0.002) * 0.75 * pattern8[k])
+  let byte = merge([cell8(k) * smoothstep(byte0 + 0.01 * k, byte0 + 0.01 * k + 0.02, t) for k in range(8)])
+  let b256 = text("8 bits: 256 numbers. a byte", 0.5, by + 0.1, 0.03, 0, "mono") * 0.8 * smoothstep(byte0 + 0.1, byte0 + 0.14, t)
+  let bwhat = text("1 letter  ·  1 small number  ·  1 shade of grey", 0.5, by + 0.16, 0.024, 0, "mono") * 0.55 * smoothstep(byte0 + 0.18, byte0 + 0.22, t)
+  // the word: 64 bits, 2 rows of 32
+  let wy = 0.76
+  let bit64(k) = (floor(sin(k * 7.3) * 100) % 2 == 0)
+  let cell64(k) = merge(cut(rect(0.12 + 0.0245 * (k % 32), wy + 0.035 * floor(k / 32), 0.02, 0.028, 0, 0.001), rect(0.12 + 0.0245 * (k % 32), wy + 0.035 * floor(k / 32), 0.016, 0.024, 0, 0.001)) * 0.5, rect(0.12 + 0.0245 * (k % 32), wy + 0.035 * floor(k / 32), 0.013, 0.021, 0, 0.001) * 0.75 * bit64(k))
+  let word = merge([cell64(k) * smoothstep(word0 + 0.003 * k, word0 + 0.003 * k + 0.02, t) for k in range(64)])
+  let w64 = text("64 bits: a word today", 0.5, wy + 0.1, 0.03, 0, "mono") * 0.8 * smoothstep(word0 + 0.2, word0 + 0.24, t)
+  let big = text("18 000 000 000 000 000 000 possibilities", 0.5, wy + 0.16, 0.026, 0, "mono") * 0.65 * smoothstep(word0 + 0.26, word0 + 0.3, t)
+  let built = text("a switch  ·  a bit  ·  a row of bits", 0.5, 1.1, 0.03, 0, "mono") * 0.75 * smoothstep(built0, built0 + 0.04, t)
+  let rest = text("everything else is built from this", 0.5, 1.16, 0.024, 0, "mono") * 0.55 * smoothstep(built0 + 0.06, built0 + 0.1, t)
+  output accent * merge([rect(0.12 + 0.0245 * (k % 32), wy + 0.035 * floor(k / 32), 0.013, 0.021, 0, 0.001) * bit64(k) for k in range(64)]) * smoothstep(word0 + 0.2, word0 + 0.24, t) * (1 - smoothstep(word0 + 0.3, word0 + 0.36, t)) + (1 - accent) * merge(byte, b256, bwhat, word, w64, big, built, rest)
+}

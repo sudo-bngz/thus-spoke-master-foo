@@ -1,0 +1,30 @@
+// Two — why not 10: a dial with 10 positions and a trembling needle,
+// beside a switch with 2; the needle wobbles with noise and lands
+// between marks; the switch is never ambiguous. `dial0`, `noise0`,
+// `switch0`, `many0` the moments. `accent: 1` gives only the needle.
+// Times are the scene's own (0 to 1). What it returns: 0 paper, up to 1 ink.
+
+work Two(dial0 = 0.05, noise0 = 0.3, switch0 = 0.55, many0 = 0.8, accent = 0) {
+  let cx = 0.5
+  let cy = 0.55
+  let R = 0.22
+  let ds = smoothstep(dial0, dial0 + 0.06, t)
+  let arc = ring(cx, cy, 2 * R, 0.005, 0.002) * (y < cy + 0.02) * 0.5 * ds
+  let mark(k) = merge(line(cx + R * cos(tau / 2 + tau / 2 * k / 9), cy + R * sin(tau / 2 + tau / 2 * k / 9), cx + (R - 0.03) * cos(tau / 2 + tau / 2 * k / 9), cy + (R - 0.03) * sin(tau / 2 + tau / 2 * k / 9), 0.004, 0.002) * 0.6,
+                      text("{k}", cx + (R + 0.05) * cos(tau / 2 + tau / 2 * k / 9), cy + (R + 0.05) * sin(tau / 2 + tau / 2 * k / 9), 0.024, 0, "mono") * 0.7) * ds
+  let marks = merge([mark(k) for k in range(10)])
+  // the needle: aims at 6, trembles with noise after noise0
+  let wob = smoothstep(noise0, noise0 + 0.05, t) * (0.6 * sin(t * 230) + 0.4 * sin(t * 71) + 0.3 * sin(t * 410))
+  let target = 6.3 + 0.9 * wob
+  let na = tau / 2 + tau / 2 * target / 9
+  let needle = merge(line(cx, cy, cx + (R - 0.01) * cos(na), cy + (R - 0.01) * sin(na), 0.005, 0.002), circle(cx, cy, 0.012, 0.002)) * ds
+  let dlabel = text("10 positions: a little open, more open, almost closed", cx, cy + 0.1, 0.024, 0, "mono") * 0.55 * smoothstep(dial0 + 0.08, dial0 + 0.12, t)
+  let which = text("6? 7? hard to tell, when the signal is weak", cx, cy + 0.16, 0.026, 0, "mono") * 0.65 * smoothstep(noise0 + 0.08, noise0 + 0.12, t)
+  // the switch: never ambiguous
+  let ss = smoothstep(switch0, switch0 + 0.05, t)
+  let sy = cy + 0.38
+  let sw = merge(circle(0.36, sy, 0.01, 0.002), circle(0.64, sy, 0.01, 0.002), line(0.36, sy, 0.64, sy, 0.006, 0.002), text("0", 0.28, sy, 0.034, 0, "mono") * 0.7, text("1", 0.72, sy, 0.034, 0, "mono") * 0.7) * ss
+  let never = text("open or closed: never ambiguous", cx, sy + 0.08, 0.028, 0, "mono") * 0.75 * smoothstep(switch0 + 0.06, switch0 + 0.1, t)
+  let many = text("the dumbest switch there is, asked billions of times", cx, sy + 0.16, 0.024, 0, "mono") * 0.55 * smoothstep(many0, many0 + 0.04, t)
+  output accent * needle * smoothstep(noise0, noise0 + 0.05, t) + (1 - accent) * merge(arc, marks, needle, dlabel, which, sw, never, many)
+}

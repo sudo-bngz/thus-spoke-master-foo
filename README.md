@@ -43,6 +43,28 @@ say it all in one; these take their time.
 | AI 08 | [Mémoire](ai-08-memoire/) | The window. The weights never change once training is done; a conversation lives in the text, fed back in whole at every message; the text has a limit, the window (12 tokens here, 100 000 or more in real ones); why: every token looks at every other, so twice the text is 4 times the work; at the edge the oldest tokens fall out, never seen; and the machine's 2 memories, the weights and the window, with the trick: a note at the top of the window. | 2 min 27 |
 | AI 09 | [Hallucination](ai-09-hallucination/) | Sure, and wrong. The machine was never asked to be right, only to continue: a sentence shaped like a fact, with no fact behind it; why: the weights hold the internet blurred, a sharp peak for what was seen 1 000 000 times, a flat spread for what was seen 2 times, and the gap filled anyway; the same voice for a fact and an invention, the number under the words never shown; and what to do: give it the text, ask twice, check what matters. Closes the AI series. The percentages and the paper are illustrative. | 2 min 31 |
 
+### CPU, a sub-series
+
+From the bit to the program, the way a first course in computer
+architecture goes: logic first, then what computing means, then the
+machine. One toy 4-bit machine is built piece by piece across the
+episodes (an adder in 03, a register in 04, a clock in 05, a decoder in
+08) until it runs a program in 09, inside alea.
+
+| # | Episode | The idea | Length |
+|---|---|---|---|
+| CPU 01 | [Bit](cpu-01-bit/) | What a computer is made of. A switch, open or closed, 0 or 1, nothing in between: a bit. Why 2 and not 10: a dial with 10 positions and a trembling needle, against a switch that is never ambiguous. Counting with 4 switches, each worth twice the one before, the 16 numbers computed from the bits. The byte, the 64-bit word, and the row of bits everything else is built from. | 2 min 27 |
+
+Planned: 02 Logique (AND, OR, NOT, truth tables, XOR from gates), 03
+Addition (half adder, full adder, a 4-bit ripple adder that adds for
+real), 04 Bistable (2 NOR gates in a loop hold a bit; a byte of latches;
+an address), 05 Horloge (the clock, steps, a counter), 06 Turing (tape,
+head, table; a machine that adds 1; the halting problem in a sentence),
+07 Von Neumann (the program in the memory; fetch, decode, execute; the
+bus), 08 Instruction (opcode and operand, the decoder, registers), 09
+Assembleur (a 6-line program that sums 1 to 5, assembled by gen.py and
+run by alea), 10 Hiérarchie (registers, cache, RAM, disk, to scale).
+
 ## Render
 
 You need alea (a clone of `sudo-bngz/alea`, built with `cargo build
@@ -110,6 +132,10 @@ alea memoire.alea --seed 0xa1a8 -o out/
 cd ../ai-09-hallucination
 python3 gen.py
 alea hallucination.alea --seed 0xa1a9 -o out/
+
+cd ../cpu-01-bit
+python3 gen.py
+alea bit.alea --seed 0xa1b1 -o out/
 ```
 
 Master Foo's Japanese needs misaki, Kokoro's pronunciation library:
@@ -181,6 +207,10 @@ ai-09-hallucination/
   gen.py                the script
   hallucination.alea    the Reel
   scenes/               koan, shape, blur, sure, check
+cpu-01-bit/
+  gen.py                the script
+  bit.alea              the Reel
+  scenes/               koan, switch, two, count, byte
 lib/episode.py          what the generators share: the voice measured, the captions typed, the layout
 ```
 
@@ -240,6 +270,10 @@ alea memoire.alea --seed 0xa1a8 -o out/
 cd ../ai-09-hallucination
 python3 gen.py
 alea hallucination.alea --seed 0xa1a9 -o out/
+
+cd ../cpu-01-bit
+python3 gen.py
+alea bit.alea --seed 0xa1b1 -o out/
 ```
 
 Run `gen.py` and `alea` with the same variables: `gen.py` measures each

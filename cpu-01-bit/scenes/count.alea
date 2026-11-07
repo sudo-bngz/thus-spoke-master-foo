@@ -1,0 +1,27 @@
+// Count — 4 switches read as a number: 4 squares, filled for 1, their
+// worths 8 4 2 1 above; a few examples at their moments (`show`, the
+// values and `showat` when), then all 16 in a row from `run0` to
+// `run1`, the value computed from the bits. `accent: 1` gives only the
+// value. Times are the scene's own (0 to 1). What it returns: 0 paper,
+// up to 1 ink.
+
+work Count(line0 = 0.05, worth0 = 0.2, show = [0, 1, 2, 11], showat = [0.4, 0.45, 0.5, 0.55], run0 = 0.75, run1 = 0.95, accent = 0) {
+  let cy = 0.58
+  let bx(k) = 0.26 + 0.16 * k
+  let ls = smoothstep(line0, line0 + 0.05, t)
+  // the value: the examples, then the run
+  let ex = sum([show[k] * (t >= showat[k]) * (t < showat[min(k + 1, 3)] + 10 * (k == 3)) for k in range(4)]) * (t >= showat[0]) * (t < run0)
+  let run = floor(clamp((t - run0) / (run1 - run0), 0, 0.999) * 16) * (t >= run0)
+  let value = ex + run
+  let bit(k) = floor(value / 2 ^ (3 - k)) % 2
+  let square(k) = merge(cut(rect(bx(k), cy, 0.12, 0.12, 0, 0.002), rect(bx(k), cy, 0.112, 0.112, 0, 0.002)) * 0.6, rect(bx(k), cy, 0.1, 0.1, 0, 0.002) * 0.75 * bit(k) * (t >= showat[0])) * ls
+  let digit(k) = merge(text("0", bx(k), cy + 0.12, 0.04, 0, "mono") * (1 - bit(k)), text("1", bx(k), cy + 0.12, 0.04, 0, "mono") * bit(k)) * 0.85 * (t >= showat[0])
+  let worths = [8, 4, 2, 1]
+  let ws = smoothstep(worth0, worth0 + 0.04, t)
+  let worth(k) = text("{worths[k]}", bx(k), cy - 0.12, 0.034, 0, "mono") * 0.7 * smoothstep(worth0 + 0.04 * (3 - k), worth0 + 0.04 * (3 - k) + 0.03, t)
+  let twice = text("each bit is worth twice the one before", 0.5, cy - 0.22, 0.024, 0, "mono") * 0.55 * smoothstep(worth0 + 0.16, worth0 + 0.2, t)
+  let val = merge([text("= {v}", 0.5, cy + 0.26, 0.07, 0, "mono") * (value == v) for v in range(16)]) * (t >= showat[0])
+  let sumline = text("8 + 2 + 1", 0.5, cy + 0.36, 0.028, 0, "mono") * 0.6 * (t >= showat[3]) * (t < run0)
+  let sixteen = text("4 bits: 16 numbers, 0 to 15", 0.5, cy + 0.36, 0.028, 0, "mono") * 0.7 * (t >= run0)
+  output accent * val + (1 - accent) * merge(merge([merge(square(k), digit(k), worth(k)) for k in range(4)]), twice, sumline, sixteen)
+}
